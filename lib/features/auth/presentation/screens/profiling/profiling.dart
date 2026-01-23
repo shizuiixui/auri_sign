@@ -1,5 +1,6 @@
-import 'package:auri_sign/core/widgets/button.dart';
 import 'package:flutter/material.dart';
+import 'package:auri_sign/core/widgets/button.dart';
+import 'package:auri_sign/core/widgets/loading_indicator.dart';
 
 class ProfilingScreen extends StatefulWidget {
   const ProfilingScreen({super.key});
@@ -9,6 +10,7 @@ class ProfilingScreen extends StatefulWidget {
 }
 
 class _ProfilingScreenState extends State<ProfilingScreen> {
+  bool _isLoading = false;
   int _currentPage = 0;
   final PageController _controller = PageController();
   final Map<int, int> _selectedAnswers = {};
@@ -83,6 +85,25 @@ class _ProfilingScreenState extends State<ProfilingScreen> {
     },
   ];
 
+  Future<void> _handleNext() async {
+    if (_currentPage < _profilingData.length - 1) {
+      _controller.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeIn,
+      );
+    } else {
+      setState(() {
+        _isLoading = true;
+      });
+
+      await Future.delayed(const Duration(seconds: 2));
+
+      if (!mounted) return;
+
+      Navigator.pushReplacementNamed(context, '/signup');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -156,32 +177,24 @@ class _ProfilingScreenState extends State<ProfilingScreen> {
               child: SizedBox(
                 width: double.infinity,
                 height: 50,
-                child: Builder(
-                  builder: (context) {
-                    bool isSelected = _selectedAnswers.containsKey(
-                      _currentPage,
-                    );
-                    return Opacity(
-                      opacity: isSelected ? 1.0 : 0.5,
-                      child: AbsorbPointer(
-                        absorbing: !isSelected,
-                        child: Button(
-                          text: "Next",
-                          onPressed: () {
-                            if (_currentPage < _profilingData.length - 1) {
-                              _controller.nextPage(
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeIn,
-                              );
-                            } else {
-                              Navigator.pushNamed(context, '/signup');
-                            }
-                          },
+                child: _isLoading
+                    ? const LoadingIndicator()
+                    : Opacity(
+                        opacity: _selectedAnswers.containsKey(_currentPage)
+                            ? 1.0
+                            : 0.5,
+                        child: AbsorbPointer(
+                          absorbing: !_selectedAnswers.containsKey(
+                            _currentPage,
+                          ),
+                          child: Button(
+                            text: _currentPage == _profilingData.length - 1
+                                ? "Finish"
+                                : "Next",
+                            onPressed: _handleNext,
+                          ),
                         ),
                       ),
-                    );
-                  },
-                ),
               ),
             ),
           ],
@@ -207,7 +220,6 @@ class _ProfilingScreenState extends State<ProfilingScreen> {
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 30),
-
           ...options.asMap().entries.map((entry) {
             int optionIndex = entry.key;
             Map<String, dynamic> optionData = entry.value;
