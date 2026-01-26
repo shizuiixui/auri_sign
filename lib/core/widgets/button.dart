@@ -11,8 +11,8 @@ class Button extends StatelessWidget {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
-        width: 328,
-        height: 49,
+        width: double.infinity,
+        height: 50,
         decoration: ShapeDecoration(
           color: const Color(0xFFE9B63B),
           shape: RoundedRectangleBorder(

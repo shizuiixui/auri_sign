@@ -101,39 +101,33 @@ class WelcomePage extends StatelessWidget {
                 ),
 
                 // Buttons
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 30,
-                  ),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        child: Button(
-                          text: "Get Started",
-                          onPressed: () {
-                            Navigator.pushNamed(context, '/profiling');
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(context, '/login');
+                Column(
+                  children: [
+                    SizedBox(
+                      child: Button(
+                        text: "Get Started",
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/profiling');
                         },
-                        child: const Text(
-                          "I already have an account",
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16.50,
-                            fontFamily: 'Kantumruy Pro',
-                            fontWeight: FontWeight.w400,
-                            height: 2.91,
-                          ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, '/login');
+                      },
+                      child: const Text(
+                        "I already have an account",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16.50,
+                          fontFamily: 'Kantumruy Pro',
+                          fontWeight: FontWeight.w400,
+                          height: 2.91,
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ],
             ),

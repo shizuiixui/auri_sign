@@ -100,6 +100,8 @@ flutter:
       fonts:
         - asset: assets/fonts/Inter_24pt-Light.ttf
           weight: 400
+        - asset: assets/fonts/Inter_24pt-Bold.ttf
+          weight: 700
 
     - family: KantumruyPro
       fonts:

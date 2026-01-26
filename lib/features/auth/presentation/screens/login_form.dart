@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '/core/widgets/button.dart';
+import '/core/widgets/text_input_field.dart';
+import '/core/utils/validators.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -8,134 +11,157 @@ class LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<LoginForm> {
+  // Form Key
   final _loginFormKey = GlobalKey<FormState>();
+
+  // Controllers
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+
   bool obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: false,
+      backgroundColor: const Color(0XFFF8F8F8),
       body: SafeArea(
         top: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 50),
           child: Form(
             key: _loginFormKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(
-                  child: Column(
-                    children: [
-                      // Login TItle
-                      const Text(
-                        "Welcome back!",
-                        style: TextStyle(fontSize: 32),
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      // Login Subtitle
-                      const Text(
-                        "Log in to continue learning sign language and building meaningful connections.",
-                        style: TextStyle(fontSize: 12),
-                      ),
-
-                      // Email Input Field
-                      TextFormField(
-                        controller: emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        autocorrect: false,
-                        decoration: const InputDecoration(
-                          labelText: 'Enter your email',
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Please enter your email";
-                          }
-                          return null;
-                        },
-                      ),
-
-                      // Password Input Field
-                      TextFormField(
-                        controller: passwordController,
-                        obscureText: obscurePassword,
-                        decoration: InputDecoration(
-                          labelText: 'Enter your password',
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              obscurePassword
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                              color: Colors.grey,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                obscurePassword = !obscurePassword;
-                              });
-                            },
-                          ),
-                        ),
-                        autocorrect: false,
-
-                        // Validation
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Please enter your password";
-                          }
-                          return null;
-                        },
-                      ),
-
-                      /* Forgot Password
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ForgotPassword(),
-                                ),
-                              );
-                            },
-                            child: const Text(
-                              "Forgot Password?",
-                              style: TextStyle(
-                                color: Colors.blue,
-                              ),
-                            ),
-                        ),
-                      ),
-                      ),
-
-                      const SizedBox(height: 35),
-
-                      // Login Button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 56,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            if (_loginFormKey.currentState!.validate()) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const HomeScreen(),
-                                ),
-                              );
-                            }
-                          },
-                        )
-                      )
-                      */
-                    ],
+                // Login Title
+                const Text(
+                  "Welcome \nBack!",
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.bold,
                   ),
+                ),
+
+                const SizedBox(height: 15),
+
+                // Login Subtitle
+                const Text(
+                  "Log in to continue learning sign language and building meaningful connections.",
+                  style: TextStyle(fontSize: 16, fontFamily: 'PlusJakartaSans'),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Email Text Field
+                TextFormField(
+                  controller: emailController,
+                  validator: (value) => Validators.validateEmail(value),
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: textInputField(
+                    "name@example.com",
+                    prefixIcon: Icons.email_outlined,
+                  ),
+                ),
+
+                const SizedBox(height: 14),
+
+                // Password Field
+                TextFormField(
+                  controller: passwordController,
+                  validator: (value) => Validators.validatePassword(value),
+                  obscureText: obscurePassword,
+                  decoration:
+                      textInputField(
+                        "Create a password",
+                        prefixIcon: Icons.lock_outlined,
+                      ).copyWith(
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.grey,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              obscurePassword = !obscurePassword;
+                            });
+                          },
+                        ),
+                      ),
+                ),
+
+                const SizedBox(height: 14),
+
+                // Forgot Password
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, '/');
+                    },
+                    child: const Text(
+                      "Forgot Password?",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF000000),
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Login Button
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: Button(
+                    text: "Get Started",
+                    onPressed: () {
+                      if (_loginFormKey.currentState!.validate()) {
+                        Navigator.pushNamed(context, '/');
+                      }
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Don't have an account
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Don't have an account?",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+
+                    const SizedBox(width: 6),
+
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, '/signup');
+                      },
+                      child: const Text(
+                        "Sign Up",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFFE9B63B),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
