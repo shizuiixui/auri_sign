@@ -100,7 +100,7 @@ class _LoginFormState extends State<LoginForm> {
                   alignment: Alignment.centerLeft,
                   child: GestureDetector(
                     onTap: () {
-                      Navigator.pushNamed(context, '/');
+                      Navigator.pushNamed(context, '/forgot_password');
                     },
                     child: const Text(
                       "Forgot Password?",
