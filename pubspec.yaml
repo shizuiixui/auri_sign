@@ -88,6 +88,17 @@ flutter:
     - assets/images/profiling/clock/15mins_clock.png
     - assets/images/profiling/clock/20mins_clock.png
 
+    # Bottom Navigation Bar Icons
+    - assets/images/bottom_navbar/home.png
+    - assets/images/bottom_navbar/home_selected.png
+    - assets/images/bottom_navbar/profile.png
+    - assets/images/bottom_navbar/profile_selected.png
+    - assets/images/bottom_navbar/dictionary.png
+    - assets/images/bottom_navbar/dictionary_selected.png
+
+    # FAB
+    - assets/images/FAB/scanner.png
+
   # Fonts
   fonts:
     - family: Poppins

@@ -1,6 +1,7 @@
 import 'package:auri_sign/features/auth/presentation/screens/signup.dart';
 import 'package:auri_sign/features/auth/presentation/screens/welcome%20page/forgot_password.dart';
 import 'package:auri_sign/features/auth/presentation/screens/welcome%20page/welcome_page.dart';
+import 'package:auri_sign/features/homepage/presentation/screens/homepage.dart';
 import 'package:flutter/material.dart';
 import 'features/auth/presentation/screens/login_form.dart';
 import 'features/auth/presentation/screens/profiling/profiling.dart';
@@ -19,13 +20,14 @@ class MyApp extends StatelessWidget {
       title: 'AuriSign',
 
       // Routes
-      initialRoute: '/',
+      initialRoute: '/home', //for testing purpose, change to '/' for welcome page
       routes: {
         '/': (context) => const WelcomePage(),
         '/login': (context) => const LoginForm(),
         '/signup': (context) => const SignupForm(),
         '/profiling': (context) => const ProfilingScreen(),
         '/forgot_password': (context) => const ForgotPasswordScreen(),
+        '/home': (context) => const HomePage(),
       },
     );
   }
