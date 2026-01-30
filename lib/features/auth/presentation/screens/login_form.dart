@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '/core/widgets/button.dart';
 import '/core/widgets/text_input_field.dart';
 import '/core/utils/validators.dart';
+import '/features/auth/presentation/viewmodels/login_view_model.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -19,6 +20,8 @@ class _LoginFormState extends State<LoginForm> {
   final passwordController = TextEditingController();
 
   bool obscurePassword = true;
+
+  final loginVM = LoginViewModel();
 
   @override
   Widget build(BuildContext context) {
@@ -117,17 +120,41 @@ class _LoginFormState extends State<LoginForm> {
                 const SizedBox(height: 20),
 
                 // Login Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: Button(
-                    text: "Get Started",
-                    onPressed: () {
-                      if (_loginFormKey.currentState!.validate()) {
-                        Navigator.pushNamed(context, '/');
-                      }
-                    },
-                  ),
+                ListenableBuilder(
+                  listenable: loginVM,
+                  builder: (context, child) {
+                    return SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: Button(
+                        text: loginVM.isLoading ? "Loading..." : "Get Started",
+                        onPressed: () async {
+                          if (loginVM.isLoading) return;
+                          if (_loginFormKey.currentState!.validate()) {
+                            await loginVM.login(
+                              email: emailController.text.trim(),
+                              password: passwordController.text.trim(),
+                            );
+                            if (loginVM.errorMessage != null) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(loginVM.errorMessage!),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                            } else if (loginVM.token != null) {
+                              // Handle successful login, e.g., save token and navigate
+                              if (context.mounted) {
+                                Navigator.pushNamed(context, '/');
+                              }
+                            }
+                          }
+                        },
+                      ),
+                    );
+                  },
                 ),
 
                 const SizedBox(height: 20),

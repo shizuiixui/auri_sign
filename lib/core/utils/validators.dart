@@ -47,17 +47,20 @@ class Validators {
       return "Password cannot contain spaces!";
     }
     // Complexity
-    bool hasLetter = RegExp(r'[A-Za-z]').hasMatch(value);
+    bool hasLower = RegExp(r'[a-z]').hasMatch(value);
+    bool hasUpper = RegExp(r'[A-Z]').hasMatch(value);
     bool hasNumber = RegExp(r'\d').hasMatch(value);
-    bool hasSpecial = RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value);
 
-    if (!hasLetter || !hasNumber || !hasSpecial) {
-      return "Password must contain:\n• 1 Letter\n• 1 Number\n• 1 Special Character";
+    if (!hasLower || !hasUpper || !hasNumber) {
+      return "Password must contain at least one uppercase letter, one lowercase letter, and one number.";
     }
     return null;
   }
 
-  static String? validateConfirmPassword(String? value, String? validatePassword) {
+  static String? validateConfirmPassword(
+    String? value,
+    String? validatePassword,
+  ) {
     if (value == null || value.isEmpty) {
       return "Please confirm your password!";
     }

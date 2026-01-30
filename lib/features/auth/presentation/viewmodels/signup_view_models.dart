@@ -1,21 +1,54 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import '/services/auth_service.dart';
 
 class SignupViewModel extends ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
+  String? _successMessage;
 
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+  String? get successMessage => _successMessage;
 
-  Future<void> signup(String email, String password) async {
+  final AuthService _authService = AuthService();
+
+  Future<void> signup({
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String password,
+    required String confirmPassword,
+  }) async {
     _isLoading = true;
     _errorMessage = null;
+    _successMessage = null;
     notifyListeners();
 
     try {
-      await Future.delayed(const Duration(seconds: 2)); 
+      final response = await _authService.signup(
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        password: password,
+        confirmPassword: confirmPassword,
+      );
+
+      if (response.statusCode == 201) {
+        _successMessage = response.data['message'] ?? 'User registered successfully.';
+      } else {
+        _errorMessage = response.data['message'] ?? 'Signup failed.';
+      }
     } catch (e) {
-      _errorMessage = "Signup failed. Please try again.";
+      if (e is DioException) {
+        if (e.response != null) {
+          _errorMessage = e.response?.data['message'] ?? 'Signup failed.';
+        } else {
+          _errorMessage = 'Network error. Please check your connection.';
+        }
+      } else {
+        _errorMessage = 'An unexpected error occurred.';
+      }
     } finally {
       _isLoading = false;
       notifyListeners();

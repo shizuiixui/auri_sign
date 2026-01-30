@@ -24,7 +24,8 @@ class _SignupFormState extends State<SignupForm> {
 
   final signupVM = SignupViewModel();
 
-  bool obscurePassword = true;
+  bool inputPassword = true;
+  bool confirmInputPassword = true;
   bool _legalDisclaimer = false;
 
   @override
@@ -127,7 +128,7 @@ class _SignupFormState extends State<SignupForm> {
                         controller: passwordController,
                         validator: (value) =>
                             Validators.validatePassword(value),
-                        obscureText: obscurePassword,
+                        obscureText: inputPassword,
                         decoration:
                             textInputField(
                               "Create a password",
@@ -136,14 +137,14 @@ class _SignupFormState extends State<SignupForm> {
                               // Toggle Password Visibility Icon
                               suffixIcon: IconButton(
                                 icon: Icon(
-                                  obscurePassword
+                                  inputPassword
                                       ? Icons.visibility_off
                                       : Icons.visibility,
                                   color: Colors.grey,
                                 ),
                                 onPressed: () {
                                   setState(() {
-                                    obscurePassword = !obscurePassword;
+                                    inputPassword = !inputPassword;
                                   });
                                 },
                               ),
@@ -160,7 +161,7 @@ class _SignupFormState extends State<SignupForm> {
                               value,
                               passwordController.text,
                             ),
-                        obscureText: obscurePassword,
+                        obscureText: confirmInputPassword,
                         decoration:
                             textInputField(
                               "Re-type your password",
@@ -169,14 +170,14 @@ class _SignupFormState extends State<SignupForm> {
                               // Toggle Password Visibility Icon
                               suffixIcon: IconButton(
                                 icon: Icon(
-                                  obscurePassword
+                                  confirmInputPassword
                                       ? Icons.visibility_off
                                       : Icons.visibility,
                                   color: Colors.grey,
                                 ),
                                 onPressed: () {
                                   setState(() {
-                                    obscurePassword = !obscurePassword;
+                                    confirmInputPassword = !confirmInputPassword;
                                   });
                                 },
                               ),
@@ -267,8 +268,11 @@ class _SignupFormState extends State<SignupForm> {
                                   return;
                                 }
                                 await signupVM.signup(
-                                  emailController.text.trim(),
-                                  passwordController.text.trim(),
+                                  firstName: firstNameController.text.trim(),
+                                  lastName: lastNameController.text.trim(),
+                                  email: emailController.text.trim(),
+                                  password: passwordController.text.trim(),
+                                  confirmPassword: confirmPasswordController.text.trim(),
                                 );
                                 if (signupVM.errorMessage != null) {
                                   if (context.mounted) {
