@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '/services/auth_service.dart';
 
 class LoginViewModel extends ChangeNotifier {
@@ -27,18 +28,25 @@ class LoginViewModel extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         _token = response.data['token'];
+        // Save token to shared preferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('auth_token', _token!);
       } else {
         _errorMessage = response.data['message'] ?? 'Login failed.';
       }
     } catch (e) {
+      print('Login Error: $e');
       if (e is DioException) {
+        print('DioException Status: ${e.response?.statusCode}');
+        print('DioException Response: ${e.response?.data}');
         if (e.response != null) {
           _errorMessage = e.response?.data['message'] ?? 'Login failed.';
         } else {
           _errorMessage = 'Network error. Please check your connection.';
         }
       } else {
-        _errorMessage = 'An unexpected error occurred.';
+        print('Non-Dio Error: $e');
+        _errorMessage = 'An unexpected error occurred: $e';
       }
     } finally {
       _isLoading = false;

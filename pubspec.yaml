@@ -45,6 +45,10 @@ dependencies:
 
   #Service Locator
   get_it: ^8.1.0
+  provider: ^6.1.5+1
+  http: ^1.6.0
+  carousel_slider: ^5.1.1
+  shared_preferences: ^2.2.2
 
 
 dev_dependencies:
@@ -99,6 +103,13 @@ flutter:
     # FAB
     - assets/images/FAB/scanner.png
 
+    # Homepage Section Images
+    - assets/images/homepage_FSL_img/common_words_FSL.png
+    - assets/images/homepage_FSL_img/letter_A_FSL.png
+    - assets/images/homepage_FSL_img/number_1_FSL.png
+
+    - assets/images/heart.png
+
   # Fonts
   fonts:
     - family: Poppins
@@ -118,4 +129,9 @@ flutter:
     - family: KantumruyPro
       fonts:
         - asset: assets/fonts/KantumruyPro-VariableFont_wght.ttf
+          weight: 400
+    
+    - family: Unna
+      fonts:
+        - asset: assets/fonts/Unna-Regular.ttf
           weight: 400

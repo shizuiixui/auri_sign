@@ -4,11 +4,33 @@ class AuthService {
   final Dio _dio = Dio(
     BaseOptions(
       baseUrl:
-          'http://192.168.1.100:5000/api', // Laptop's local IP for mobile device access
+          'http://192.168.100.10:5000/api', // Laptop's local IP for mobile device access
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
     ),
   );
+
+  Future<Response> sendOTP({required String email}) async {
+    try {
+      return await _dio.post('/otp/sendOTP', data: {'email': email});
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Response> verifyOTP({
+    required String email,
+    required String otp,
+  }) async {
+    try {
+      return await _dio.post(
+        '/otp/verifyOTP',
+        data: {'email': email, 'otp': otp},
+      );
+    } catch (e) {
+      rethrow;
+    }
+  }
 
   Future<Response> signup({
     required String firstName,

@@ -1,3 +1,4 @@
+import 'package:auri_sign/features/auth/presentation/screens/email_verification.dart';
 import 'package:flutter/material.dart';
 import '/core/widgets/button.dart';
 import '/core/widgets/text_input_field.dart';
@@ -177,7 +178,8 @@ class _SignupFormState extends State<SignupForm> {
                                 ),
                                 onPressed: () {
                                   setState(() {
-                                    confirmInputPassword = !confirmInputPassword;
+                                    confirmInputPassword =
+                                        !confirmInputPassword;
                                   });
                                 },
                               ),
@@ -272,7 +274,9 @@ class _SignupFormState extends State<SignupForm> {
                                   lastName: lastNameController.text.trim(),
                                   email: emailController.text.trim(),
                                   password: passwordController.text.trim(),
-                                  confirmPassword: confirmPasswordController.text.trim(),
+                                  confirmPassword: confirmPasswordController
+                                      .text
+                                      .trim(),
                                 );
                                 if (signupVM.errorMessage != null) {
                                   if (context.mounted) {
@@ -285,7 +289,14 @@ class _SignupFormState extends State<SignupForm> {
                                   }
                                 } else {
                                   if (context.mounted) {
-                                    Navigator.pushNamed(context, '/');
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => VerifyEmail(
+                                          email: emailController.text.trim(),
+                                        ),
+                                      ),
+                                    );
                                   }
                                 }
                               },

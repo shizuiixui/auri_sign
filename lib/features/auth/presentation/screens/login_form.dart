@@ -147,7 +147,7 @@ class _LoginFormState extends State<LoginForm> {
                             } else if (loginVM.token != null) {
                               // Handle successful login, e.g., save token and navigate
                               if (context.mounted) {
-                                Navigator.pushNamed(context, '/');
+                                Navigator.pushNamed(context, '/home');
                               }
                             }
                           }
