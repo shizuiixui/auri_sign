@@ -1,4 +1,5 @@
 import 'package:auri_sign/core/widgets/bottom_nav_bar.dart';
+import 'package:auri_sign/core/widgets/floating_action_button.dart';
 import 'package:auri_sign/features/auth/viewmodels/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -109,7 +110,11 @@ class _HomePageState extends State<HomePage> {
                                     vertical: 8,
                                   ),
                                   child: ContinueLessonCard(
-                                    title: ["Common Words", "Alphabets", "Numbers"][index],
+                                    title: [
+                                      "Common Words",
+                                      "Alphabets",
+                                      "Numbers",
+                                    ][index],
                                     progress: 0,
                                     color: const Color(0xFFE9B63B),
                                     imagePath: imgList[index],
@@ -246,6 +251,15 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             ),
+
+      // Floating Action Button
+      floatingActionButton: CustomFAB(
+        onPressed: () {
+          Navigator.pushNamed(context, '/homepage');
+        },
+      ),
+
+      // Bottom Nav Bar
       bottomNavigationBar: BottomNavBar(
         currentIndex: _selectedIndex,
         onTap: (index) {
