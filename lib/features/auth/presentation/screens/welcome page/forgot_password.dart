@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:auri_sign/core/widgets/loading_indicator.dart';
 import '/core/widgets/text_input_field.dart';
 import '/core/utils/validators.dart';
 import '/core/widgets/button.dart';
