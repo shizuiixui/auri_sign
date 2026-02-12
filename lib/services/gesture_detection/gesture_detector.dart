@@ -21,8 +21,9 @@ class GestureDetector {
   // simple stability filter
   String _lastPredicted = '';
   int _consecutiveCount = 0;
-  int _requiredConsecutive = 2;
-  double _minConfidence = 0.5;
+  int _requiredConsecutive = 1; // Changed from 2 to 1 for faster detection
+  double _minConfidence =
+      0.4; // Changed from 0.5 to 0.4 for more sensitive detection
 
   Future<void> loadModel() async {
     try {
@@ -148,9 +149,10 @@ class GestureDetector {
           final int g = _imageBuffer[srcIndex + 1];
           final int b = _imageBuffer[srcIndex + 2];
 
-          flatInput[idx++] = r / 255.0;
-          flatInput[idx++] = g / 255.0;
-          flatInput[idx++] = b / 255.0;
+          // Normalize to [-1, 1] range (common for MobileNet/Inception models)
+          flatInput[idx++] = (r / 127.5) - 1.0;
+          flatInput[idx++] = (g / 127.5) - 1.0;
+          flatInput[idx++] = (b / 127.5) - 1.0;
         }
       }
 

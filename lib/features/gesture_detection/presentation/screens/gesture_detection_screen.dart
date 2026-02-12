@@ -86,7 +86,7 @@ class _GestureDetectionScreenState extends State<GestureDetectionScreen>
           _confidenceLevel = FSLMapper.getConfidenceDescription(_confidence);
 
           // Only add to history if confidence is high enough
-          if (_confidence > 0.6 && _detectedGesture != 'Unknown') {
+          if (_confidence > 0.5 && _detectedGesture != 'Unknown') {
             if (_gestureHistory.isEmpty ||
                 _gestureHistory.last != _detectedGesture) {
               _gestureHistory.add(_detectedGesture);
@@ -149,7 +149,7 @@ class _GestureDetectionScreenState extends State<GestureDetectionScreen>
       body: _cameraService.isInitialized
           ? Column(
               children: [
-                // Camera Preview
+                // Camera Preview - LARGER (flex: 4 instead of 3)
                 Expanded(
                   flex: 3,
                   child: Container(
@@ -158,9 +158,34 @@ class _GestureDetectionScreenState extends State<GestureDetectionScreen>
                       alignment: Alignment.center,
                       children: [
                         CameraPreview(_cameraService.controller),
-                        // Gesture overlay
+                        // Detection Box Overlay - This box shows where gestures are detected
+                        // TO ADJUST THE BOX POSITION AND SIZE:
+                        // - Modify 'left' value (0-500) to move left/right
+                        // - Modify 'top' value (0-500) to move up/down
+                        // - Change width/height values to resize the detection zone
                         Positioned(
-                          bottom: 20,
+                          // Positioning from left edge - adjust this to move box horizontally
+                          left: 60,
+                          // Positioning from top edge - adjust this to move box vertically
+                          top: MediaQuery.of(context).size.height * 0.2,
+                          child: Container(
+                            // Width of the detection box - decrease by 7 pixels
+                            width: MediaQuery.of(context).size.width * 0.6 - 7,
+                            // Height of the detection box - decrease by 7 pixels
+                            height:
+                                MediaQuery.of(context).size.height * 0.35 - 7,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.grey[700]!,
+                                width: 3,
+                              ),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                        ),
+                        // Gesture overlay - moved to top for better visibility
+                        Positioned(
+                          top: 20,
                           left: 20,
                           right: 20,
                           child: Container(
@@ -226,9 +251,9 @@ class _GestureDetectionScreenState extends State<GestureDetectionScreen>
                     ),
                   ),
                 ),
-                // Gesture History and Translation
+                // Gesture History and Translation - SMALLER (flex: 1 instead of 2)
                 Expanded(
-                  flex: 2,
+                  flex: 1,
                   child: Container(
                     color: Colors.grey[100],
                     child: Column(
