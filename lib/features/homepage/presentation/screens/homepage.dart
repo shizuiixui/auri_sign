@@ -1,5 +1,3 @@
-import 'package:auri_sign/core/widgets/bottom_nav_bar.dart';
-import 'package:auri_sign/core/widgets/floating_action_button.dart';
 import 'package:auri_sign/features/auth/viewmodels/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,7 +12,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0;
   double _currentPage = 0;
 
   final List<String> imgList = [
@@ -41,6 +38,12 @@ class _HomePageState extends State<HomePage> {
         context.read<UserViewModel>().fetchUser(token);
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -95,7 +98,6 @@ class _HomePageState extends State<HomePage> {
                           controller: _pageController,
                           itemCount: imgList.length,
                           itemBuilder: (context, index) {
-                            // Stack Animation Logic
                             double relativePosition = index - _currentPage;
                             return Transform(
                               transform: Matrix4.identity()
@@ -105,10 +107,7 @@ class _HomePageState extends State<HomePage> {
                                 opacity: (1 - (relativePosition.abs() * 0.3))
                                     .clamp(0.0, 1.0),
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 8,
-                                  ),
+                                  padding: const EdgeInsets.all(8.0),
                                   child: ContinueLessonCard(
                                     title: [
                                       "Common Words",
@@ -126,7 +125,6 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       const SizedBox(height: 6),
-
                       // Pagination Dots
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -155,55 +153,29 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Section Title
                       const Padding(
                         padding: EdgeInsets.fromLTRB(24, 10, 24, 10),
                         child: Text(
                           "Daily Tracker",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w400,
-                          ),
+                          style: TextStyle(fontSize: 16, fontFamily: 'Inter'),
                         ),
                       ),
-
-                      // Horizontal Scrollable List
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         padding: const EdgeInsets.symmetric(horizontal: 24),
                         child: Row(
-                          children: [
-                            // Monday to Sunday Tracker Items
-                            const DailyTrackerItem(
-                              day: "Mon",
-                              isCompleted: false,
-                            ),
-                            const SizedBox(width: 12),
-                            const DailyTrackerItem(
-                              day: "Tue",
-                              isCompleted: false,
-                            ),
-                            const SizedBox(width: 12),
-                            const DailyTrackerItem(
-                              day: "Wed",
-                              isCompleted: false,
-                            ),
-                            const SizedBox(width: 12),
-                            const DailyTrackerItem(
-                              day: "Thu",
-                              isCompleted: false,
-                            ),
-                            const SizedBox(width: 12),
-                            const DailyTrackerItem(
-                              day: "Fri",
-                              isCompleted: false,
-                            ),
-                            const SizedBox(width: 12),
-                            const DailyTrackerItem(
-                              day: "Sat",
-                              isCompleted: false,
-                            ),
+                          children: const [
+                            DailyTrackerItem(day: "Mon", isCompleted: false),
+                            SizedBox(width: 12),
+                            DailyTrackerItem(day: "Tue", isCompleted: false),
+                            SizedBox(width: 12),
+                            DailyTrackerItem(day: "Wed", isCompleted: false),
+                            SizedBox(width: 12),
+                            DailyTrackerItem(day: "Thu", isCompleted: false),
+                            SizedBox(width: 12),
+                            DailyTrackerItem(day: "Fri", isCompleted: false),
+                            SizedBox(width: 12),
+                            DailyTrackerItem(day: "Sat", isCompleted: false),
                           ],
                         ),
                       ),
@@ -212,7 +184,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
 
-                // Vertical List (Category Sections)
+                // Category Sections
                 SliverPadding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,
@@ -251,23 +223,6 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             ),
-
-      // Floating Action Button
-      floatingActionButton: CustomFAB(
-        onPressed: () {
-          Navigator.pushNamed(context, '/gesture_detection');
-        },
-      ),
-
-      // Bottom Nav Bar
-      bottomNavigationBar: BottomNavBar(
-        currentIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-      ),
     );
   }
 }

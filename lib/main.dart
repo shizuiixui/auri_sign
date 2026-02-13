@@ -1,3 +1,4 @@
+import 'package:auri_sign/features/homepage/presentation/screens/main_screen.dart';
 import 'package:auri_sign/features/lessons/presentation/screens/alphabets/alphabet_lesson2.dart';
 import 'package:auri_sign/features/lessons/presentation/screens/alphabets/alphabet_lesson3.dart';
 import 'package:auri_sign/features/lessons/presentation/screens/alphabets/alphabet_lesson4.dart';
@@ -13,6 +14,7 @@ import 'package:auri_sign/features/lessons/presentation/viewmodels/alphabets/alp
 import 'package:auri_sign/features/lessons/presentation/viewmodels/alphabets/alphabet_lesson5_view_model.dart';
 import 'package:auri_sign/features/lessons/presentation/viewmodels/alphabets/alphabet_lesson6_view_model.dart';
 import 'package:auri_sign/features/lessons/presentation/viewmodels/alphabets/alphabet_lesson7_view_model.dart';
+import 'package:auri_sign/features/profile/presentation/screens/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -93,7 +95,7 @@ class MyApp extends StatelessWidget {
       title: 'AuriSign',
 
       // Routes
-      initialRoute: '/', // for testing purpose, change to '/' for welcome page
+      initialRoute: '/', // for testing purpose, change the '/' to page you want to start with
       routes: {
         // Welcome and Auth
         '/': (context) => const WelcomePage(),
@@ -104,7 +106,10 @@ class MyApp extends StatelessWidget {
         '/forgot_password': (context) => const ForgotPasswordScreen(),
 
         // Homepage
-        '/home': (context) => const HomePage(),
+        '/home': (context) => const NavFunction(),
+
+        // Profile
+        '/profile': (context) => const ProfilePage(),
 
         // Gesture Detection
         '/gesture_detection': (context) => const GestureDetectionScreen(),
