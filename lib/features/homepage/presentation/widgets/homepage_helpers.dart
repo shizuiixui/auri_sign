@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-// Helper Widgets for HomePage
 class HomeHeader extends StatelessWidget {
   final String firstName;
   final String? profilePicture;
@@ -178,78 +177,90 @@ class CategorySectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     bool hasBigElement = bigDisplayChar != null || bigDisplayIcon != null;
 
-    return Container(
-      height: 130,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Stack(
-        alignment: Alignment.centerLeft,
-        children: [
-          if (bigDisplayChar != null)
-            Positioned(
-              right: 20,
-              bottom: 5,
-              child: Text(
-                bigDisplayChar!,
-                style: TextStyle(
-                  fontSize: 140,
-                  height: 1,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Unna',
-                  color: Colors.white.withOpacity(0.2),
+    return GestureDetector(
+      onTap: () {
+        // Navigate to category page based on title
+        if (title.contains("Alphabets")) {
+          Navigator.pushNamed(context, '/category_alphabets');
+        } else if (title.contains("Numbers")) {
+          Navigator.pushNamed(context, '/category_numbers');
+        } else if (title.contains("Common Words")) {
+          Navigator.pushNamed(context, '/category_common_words');
+        }
+      },
+      child: Container(
+        height: 130,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Stack(
+          alignment: Alignment.centerLeft,
+          children: [
+            if (bigDisplayChar != null)
+              Positioned(
+                right: 20,
+                bottom: 5,
+                child: Text(
+                  bigDisplayChar!,
+                  style: TextStyle(
+                    fontSize: 140,
+                    height: 1,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Unna',
+                    color: Colors.white.withOpacity(0.2),
+                  ),
                 ),
               ),
-            ),
 
-          // Heart Icon
-          if (bigDisplayIcon != null)
-            Positioned(
-              right: 3,
-              bottom: 10,
-              child: Icon(
-                bigDisplayIcon,
-                size: 100,
-                color: Colors.white.withOpacity(0.3),
+            // Heart Icon
+            if (bigDisplayIcon != null)
+              Positioned(
+                right: 3,
+                bottom: 10,
+                child: Icon(
+                  bigDisplayIcon,
+                  size: 100,
+                  color: Colors.white.withOpacity(0.3),
+                ),
               ),
-            ),
 
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontFamily: 'Poppins',
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontFamily: 'Poppins',
+                      ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(right: hasBigElement ? 65.0 : 0.0),
-                  child: Image.asset(
-                    imagePath,
-                    height: 60,
-                    fit: BoxFit.contain,
+                  Padding(
+                    padding: EdgeInsets.only(right: hasBigElement ? 65.0 : 0.0),
+                    child: Image.asset(
+                      imagePath,
+                      height: 60,
+                      fit: BoxFit.contain,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

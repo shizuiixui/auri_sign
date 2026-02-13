@@ -255,7 +255,7 @@ class _HomePageState extends State<HomePage> {
       // Floating Action Button
       floatingActionButton: CustomFAB(
         onPressed: () {
-          Navigator.pushNamed(context, '/homepage');
+          Navigator.pushNamed(context, '/gesture_detection');
         },
       ),
 
