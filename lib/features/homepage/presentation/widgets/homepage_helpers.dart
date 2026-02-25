@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
+import '/core/widgets/user_stats.dart';
 
 class HomeHeader extends StatelessWidget {
   final String firstName;
   final String? profilePicture;
+  final VoidCallback onProfileTap;
 
-  const HomeHeader({super.key, required this.firstName, this.profilePicture});
+  const HomeHeader({
+    super.key, 
+    required this.firstName, 
+    this.profilePicture,
+    required this.onProfileTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -13,15 +20,18 @@ class HomeHeader extends StatelessWidget {
       children: [
         Row(
           children: [
-            CircleAvatar(
-              radius: 24,
-              backgroundColor: Colors.grey[300],
-              backgroundImage: profilePicture != null
-                  ? NetworkImage(profilePicture!)
-                  : null,
-              child: profilePicture == null
-                  ? const Icon(Icons.person, color: Colors.grey)
-                  : null,
+            GestureDetector(
+              onTap: onProfileTap,
+              child: CircleAvatar(
+                radius: 24,
+                backgroundColor: Colors.grey[300],
+                backgroundImage: profilePicture != null
+                    ? NetworkImage(profilePicture!)
+                    : null,
+                child: profilePicture == null
+                    ? const Icon(Icons.person, color: Colors.grey)
+                    : null,
+              ),
             ),
             const SizedBox(width: 12),
             Column(
@@ -51,6 +61,12 @@ class HomeHeader extends StatelessWidget {
         const Text(
           "Your Smart AI Sign Language\nLearning Companion",
           style: TextStyle(fontSize: 20, fontFamily: 'Poppins'),
+        ),
+        const SizedBox(height: 16),
+        // Inserted Stats Widget Here
+        const UserStatsRow(
+          trophyCount: 1,
+          streakCount: 0,
         ),
       ],
     );

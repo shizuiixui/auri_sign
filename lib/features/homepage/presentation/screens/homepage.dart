@@ -4,8 +4,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import '/features/homepage/presentation/widgets/homepage_helpers.dart';
 
+
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final VoidCallback onProfileTap;
+
+  const HomePage({super.key, required this.onProfileTap});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -68,6 +71,7 @@ class _HomePageState extends State<HomePage> {
                       child: HomeHeader(
                         firstName: user?.firstName ?? 'Guest',
                         profilePicture: user?.profilePicture,
+                        onProfileTap: widget.onProfileTap,
                       ),
                     ),
                   ),

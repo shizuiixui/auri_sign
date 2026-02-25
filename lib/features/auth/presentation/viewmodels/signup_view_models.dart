@@ -36,7 +36,7 @@ class SignupViewModel extends ChangeNotifier {
 
       if (response.statusCode == 201) {
         _successMessage = response.data['message'] ?? 'User registered successfully.';
-        // Send OTP after successful signup (but don't block on failure)
+        // Send OTP after successful signup
         await sendOTP(email: email);
       } else {
         _errorMessage = response.data['message'] ?? 'Signup failed.';
@@ -62,8 +62,6 @@ class SignupViewModel extends ChangeNotifier {
       await _authService.sendOTP(email: email);
       return true;
     } catch (e) {
-      // Don't overwrite the success message - OTP sending is secondary
-      // Just log the error for debugging
       print('OTP sending failed: $e');
       if (e is DioException) {
         print('DioException Status: ${e.response?.statusCode}');

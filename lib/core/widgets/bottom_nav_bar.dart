@@ -12,7 +12,6 @@ class BottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Bottom Navigation Bar
     return BottomNavigationBar(
       backgroundColor: Colors.white,
       currentIndex: currentIndex,
@@ -20,23 +19,18 @@ class BottomNavBar extends StatelessWidget {
       type: BottomNavigationBarType.fixed,
       selectedItemColor: const Color(0XFFE9B63B),
       unselectedItemColor: const Color(0XFFBEBEBE),
-
-      // Selected Label Style
       selectedLabelStyle: const TextStyle(
         fontSize: 12,
         fontFamily: 'Inter',
         fontWeight: FontWeight.w500,
       ),
-
-      // Unselected Label Style
       unselectedLabelStyle: const TextStyle(
         fontSize: 12,
         fontFamily: 'Inter',
         fontWeight: FontWeight.w500,
       ),
-
       items: [
-        // Home
+        //  Home
         BottomNavigationBarItem(
           icon: Image.asset(
             'assets/images/bottom_navbar/home.png',
@@ -51,7 +45,22 @@ class BottomNavBar extends StatelessWidget {
           label: 'Home',
         ),
 
-        // Dictionary
+        //  AI Gesture 
+        BottomNavigationBarItem(
+          icon: Image.asset(
+            'assets/images/bottom_navbar/camera.png',
+            width: 24,
+            height: 24,
+          ),
+          activeIcon: Image.asset(
+            'assets/images/bottom_navbar/camera_selected.png',
+            width: 24,
+            height: 24,
+          ),
+          label: 'AI Gesture',
+        ),
+
+        //  Dictionary
         BottomNavigationBarItem(
           icon: Image.asset(
             'assets/images/bottom_navbar/dictionary.png',
@@ -80,8 +89,6 @@ class BottomNavBar extends StatelessWidget {
           ),
           label: 'Profile'
         ),
-
-
       ],
     );
   }

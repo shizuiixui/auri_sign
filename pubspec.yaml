@@ -57,6 +57,7 @@ dependencies:
   
   # Permissions
   permission_handler: ^12.0.1
+  image_picker: ^1.2.1
 
 
 dev_dependencies:
@@ -111,9 +112,9 @@ flutter:
     - assets/images/bottom_navbar/profile_selected.png
     - assets/images/bottom_navbar/dictionary.png
     - assets/images/bottom_navbar/dictionary_selected.png
+    - assets/images/bottom_navbar/camera.png
+    - assets/images/bottom_navbar/camera_selected.png
 
-    # FAB
-    - assets/images/FAB/scanner.png
 
     # Homepage Section Images
     - assets/images/homepage_FSL_img/common_words_FSL.png

@@ -53,4 +53,16 @@ class LoginViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<bool> checkLoginStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? token = prefs.getString('auth_token');
+
+    if (token != null) {
+      _token = token;
+      notifyListeners();
+      return true;
+    }
+    return false;
+  }
 }

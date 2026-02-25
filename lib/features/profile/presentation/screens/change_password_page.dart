@@ -1,0 +1,173 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:auri_sign/features/auth/viewmodels/user_view_model.dart';
+import 'package:auri_sign/features/profile/presentation/widgets/change_password_helpers.dart';
+
+class ChangePasswordPage extends StatefulWidget {
+  const ChangePasswordPage({super.key});
+
+  @override
+  State<ChangePasswordPage> createState() => _ChangePasswordPageState();
+}
+
+class _ChangePasswordPageState extends State<ChangePasswordPage> {
+ 
+  final TextEditingController _currentPasswordController = TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
+  final TextEditingController _retypePasswordController = TextEditingController();
+
+  bool _obscureCurrent = true;
+  bool _obscureNew = true;
+  bool _obscureRetype = true;
+
+  @override
+  void dispose() {
+    _currentPasswordController.dispose();
+    _newPasswordController.dispose();
+    _retypePasswordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final userVM = context.watch<UserViewModel>();
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          "Change Your Password",
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: false,
+      ),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: IntrinsicHeight(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 40),
+
+                      CustomPasswordField(
+                        controller: _currentPasswordController,
+                        hint: "Enter your current password",
+                        isObscured: _obscureCurrent,
+                        onVisibilityToggle: () {
+                          setState(() {
+                            _obscureCurrent = !_obscureCurrent;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      CustomPasswordField(
+                        controller: _newPasswordController,
+                        hint: "Enter your new password",
+                        isObscured: _obscureNew,
+                        onVisibilityToggle: () {
+                          setState(() {
+                            _obscureNew = !_obscureNew;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      CustomPasswordField(
+                        controller: _retypePasswordController,
+                        hint: "Re-type your password",
+                        isObscured: _obscureRetype,
+                        onVisibilityToggle: () {
+                          setState(() {
+                            _obscureRetype = !_obscureRetype;
+                          });
+                        },
+                      ),
+
+                      const Spacer(),
+                      const SizedBox(height: 40),
+
+                      SizedBox(
+                        width: double.infinity,
+                        height: 55,
+                        child: ElevatedButton(
+                          onPressed: userVM.isLoading
+                              ? null
+                              : () async {
+                                  final currentPw = _currentPasswordController.text;
+                                  final newPw = _newPasswordController.text;
+                                  final retypePw = _retypePasswordController.text;
+
+                                  // Validation
+                                  if (newPw != retypePw) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'New passwords do not match!',
+                                        ),
+                                      ),
+                                    );
+                                    return;
+                                  }
+
+                                  // TODO: Call ViewModel function to change password
+                                  // await userVM.changePassword(currentPw, newPw);
+
+                                  if (context.mounted) {
+                                    Navigator.pop(context);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Password changed successfully!',
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFFFB800),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            elevation: 2,
+                          ),
+                          child: userVM.isLoading
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                              : const Text(
+                                  "Change Password",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}

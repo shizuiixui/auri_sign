@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:auri_sign/core/widgets/bottom_nav_bar.dart';
-import 'package:auri_sign/core/widgets/floating_action_button.dart';
 import 'package:auri_sign/features/profile/presentation/screens/profile.dart';
-import 'package:auri_sign/features/homepage/presentation/screens/homepage.dart'; 
+import 'package:auri_sign/features/homepage/presentation/screens/homepage.dart';
 
 class NavFunction extends StatefulWidget {
   const NavFunction({super.key});
@@ -14,34 +13,35 @@ class NavFunction extends StatefulWidget {
 class _NavFunctionState extends State<NavFunction> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = [
-    const HomePage(), // Index 0
-    const Center(child: Text("Dictionary Coming Soon")), // Index 1
-    const ProfilePage(), // Index 2
+  List<Widget> get _pages => [
+    HomePage(
+      onProfileTap: () {
+        setState(() {
+          _selectedIndex = 3; //Index 3
+        });
+      },
+    ), // Index 0
+    const SizedBox.shrink(), // Index 1
+    const Center(child: Text("Dictionary Coming Soon")), // Index 2
+    const ProfilePage(), // Index 3
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _pages,
-      ),
-
-      // Floating Action Button
-      floatingActionButton: CustomFAB(
-        onPressed: () => Navigator.pushNamed(context, '/gesture_detection'),
-      ),
-      
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      body: IndexedStack(index: _selectedIndex, children: _pages),
 
       // Bottom Navigation Bar
       bottomNavigationBar: BottomNavBar(
         currentIndex: _selectedIndex,
         onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
+          if (index == 1) {
+            Navigator.pushNamed(context, '/gesture_detection');
+          } else {
+            setState(() {
+              _selectedIndex = index;
+            });
+          }
         },
       ),
     );

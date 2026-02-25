@@ -4,7 +4,7 @@ class AuthService {
   final Dio _dio = Dio(
     BaseOptions(
       baseUrl:
-          'http://192.168.100.10:5000/api', // Laptop's local IP for mobile device access
+          'http://192.168.100.10:5000/api', // change with your laptop IP
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
     ),

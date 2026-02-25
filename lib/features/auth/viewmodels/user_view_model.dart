@@ -18,7 +18,7 @@ class UserViewModel extends ChangeNotifier {
 
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.100.10:5000/api/user/me'),
+        Uri.parse('http://192.168.100.10:5000/api/user/me'), // change with your laptop IP
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -45,7 +45,7 @@ class UserViewModel extends ChangeNotifier {
 
     try {
       await http.post(
-        Uri.parse('http://192.168.100.10:5000/api/user/logout'),
+        Uri.parse('http://192.168.100.10:5000/api/user/logout'), // change with your laptop IP
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $_token',
