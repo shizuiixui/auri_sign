@@ -28,26 +28,17 @@ class LoginViewModel extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         _token = response.data['token'];
-        // Save token to shared preferences
         final prefs = await SharedPreferences.getInstance();
+
         await prefs.setString('auth_token', _token!);
+
+        print("✅ SUCCESS: Token safely stored on device disk!");
       } else {
         _errorMessage = response.data['message'] ?? 'Login failed.';
       }
     } catch (e) {
       print('Login Error: $e');
-      if (e is DioException) {
-        print('DioException Status: ${e.response?.statusCode}');
-        print('DioException Response: ${e.response?.data}');
-        if (e.response != null) {
-          _errorMessage = e.response?.data['message'] ?? 'Login failed.';
-        } else {
-          _errorMessage = 'Network error. Please check your connection.';
-        }
-      } else {
-        print('Non-Dio Error: $e');
-        _errorMessage = 'An unexpected error occurred: $e';
-      }
+      _errorMessage = 'Network error or invalid credentials.';
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -55,14 +46,33 @@ class LoginViewModel extends ChangeNotifier {
   }
 
   Future<bool> checkLoginStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? token = prefs.getString('auth_token');
+    print("🔍 STARTING APP: Searching device disk for saved token...");
 
-    if (token != null) {
-      _token = token;
-      notifyListeners();
-      return true;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+
+      final String? savedToken = prefs.getString('auth_token');
+
+      if (savedToken != null && savedToken.isNotEmpty) {
+        print(
+          "✅ FOUND TOKEN: User is still logged in. Bypassing Welcome Page.",
+        );
+        _token = savedToken;
+        notifyListeners();
+        return true;
+      }
+
+      print("❌ NO TOKEN FOUND: User is logged out. Showing Welcome Page.");
+      return false;
+    } catch (e) {
+      print("❌ ERROR READING DISK: $e");
+      return false;
     }
-    return false;
+  }
+
+  void clearSession() {
+    _token = null;
+    notifyListeners();
+    print("🧹 SESSION CLEARED: LoginViewModel active memory has been wiped.");
   }
 }

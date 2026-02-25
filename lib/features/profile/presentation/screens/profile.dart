@@ -8,11 +8,13 @@ import 'package:auri_sign/features/profile/presentation/screens/change_password_
 import 'package:auri_sign/features/profile/presentation/screens/edit_profile_page.dart';
 import 'package:auri_sign/features/profile/presentation/screens/privacy_policy.dart';
 import 'package:auri_sign/features/profile/presentation/screens/terms_conditions.dart';
+import 'package:auri_sign/features/auth/presentation/screens/welcome page/welcome_page.dart';
 
 // ViewModels
 import 'package:auri_sign/features/profile/viewmodels/achievements_view_model.dart';
 import 'package:auri_sign/features/auth/viewmodels/user_view_model.dart';
 import 'package:auri_sign/features/profile/viewmodels/profile_view_model.dart';
+import '/features/auth/presentation/viewmodels/login_view_model.dart';
 
 // Widgets
 import '/core/widgets/user_stats.dart';
@@ -31,9 +33,9 @@ class ProfilePage extends StatelessWidget {
     final resultMessage = await profileVM.pickAndUploadImage(source);
 
     if (resultMessage != null && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(resultMessage)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(resultMessage)));
     }
   }
 
@@ -83,10 +85,13 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  void _showLogoutConfirmation(BuildContext context, UserViewModel viewModel) {
+  void _showLogoutConfirmation(
+    BuildContext parentContext,
+    UserViewModel viewModel,
+  ) {
     showDialog(
-      context: context,
-      builder: (BuildContext context) {
+      context: parentContext,
+      builder: (BuildContext dialogContext) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
@@ -98,7 +103,7 @@ class ProfilePage extends StatelessWidget {
           actionsAlignment: MainAxisAlignment.spaceEvenly,
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(dialogContext),
               child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
             ),
             ElevatedButton(
@@ -109,11 +114,18 @@ class ProfilePage extends StatelessWidget {
                 ),
               ),
               onPressed: () async {
-                Navigator.pop(context);
+                Navigator.pop(dialogContext);
+
                 await viewModel.logout();
-                if (context.mounted) {
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    '/login',
+
+                if (parentContext.mounted) {
+                  parentContext.read<LoginViewModel>().clearSession();
+
+                  Navigator.pushAndRemoveUntil(
+                    parentContext,
+                    MaterialPageRoute(
+                      builder: (context) => const WelcomePage(),
+                    ),
                     (route) => false,
                   );
                 }
@@ -168,14 +180,15 @@ class ProfilePage extends StatelessWidget {
                   backgroundImage: profileVM.selectedImage != null
                       ? FileImage(profileVM.selectedImage!) as ImageProvider
                       : (user?.profilePicture != null
-                          ? NetworkImage(user!.profilePicture!)
-                          : null),
-                  child: (profileVM.selectedImage == null &&
+                            ? NetworkImage(user!.profilePicture!)
+                            : null),
+                  child:
+                      (profileVM.selectedImage == null &&
                           user?.profilePicture == null)
                       ? const Icon(Icons.person, size: 40, color: Colors.grey)
                       : (profileVM.isUploading
-                          ? const CircularProgressIndicator(strokeWidth: 2)
-                          : null),
+                            ? const CircularProgressIndicator(strokeWidth: 2)
+                            : null),
                 ),
                 Container(
                   padding: const EdgeInsets.all(4),
@@ -239,7 +252,7 @@ class ProfilePage extends StatelessWidget {
           const SizedBox(height: 20),
 
           const ProfileSectionHeader(title: "Legal & Privacy"),
-          
+
           ProfileMenuTile(
             title: "Terms & Conditions",
             onTap: () {
@@ -266,7 +279,7 @@ class ProfilePage extends StatelessWidget {
           const SizedBox(height: 20),
 
           const ProfileSectionHeader(title: "Achievements"),
-          
+
           ProfileMenuTile(
             title: "Download Certificates",
             onTap: () {

@@ -49,7 +49,6 @@ class AppRouter {
   static Map<String, WidgetBuilder> getRoutes() {
     return {
       // Welcome and Auth
-      '/': (context) => const WelcomePage(),
       '/login': (context) => const LoginForm(),
       '/signup': (context) => const SignupForm(),
       '/verifyEmail': (context) => const VerifyEmail(email: ''),

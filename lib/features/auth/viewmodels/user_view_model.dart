@@ -1,3 +1,4 @@
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -18,7 +19,9 @@ class UserViewModel extends ChangeNotifier {
 
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.100.10:5000/api/user/me'), // change with your laptop IP
+        Uri.parse(
+          'http://192.168.100.10:5000/api/user/me',
+        ), // change with your laptop IP
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -38,12 +41,14 @@ class UserViewModel extends ChangeNotifier {
   }
 
   Future<void> logout() async {
-    if (_token == null) return;
+  _isLoading = true;
+  notifyListeners();
 
-    _isLoading = true;
-    notifyListeners();
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('auth_token');
 
-    try {
+    if (_token != null) {
       await http.post(
         Uri.parse('http://192.168.100.10:5000/api/user/logout'), // change with your laptop IP
         headers: {
@@ -51,13 +56,16 @@ class UserViewModel extends ChangeNotifier {
           'Authorization': 'Bearer $_token',
         },
       );
-      _user = null;
-      _token = null;
-    } catch (e) {
-      debugPrint("Logout Error: $e");
-    } finally {
-      _isLoading = false;
-      notifyListeners();
     }
+
+    _user = null;
+    _token = null;
+    
+  } catch (e) {
+    debugPrint("Logout Error: $e");
+  } finally {
+    _isLoading = false;
+    notifyListeners();
   }
+}
 }
