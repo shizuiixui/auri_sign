@@ -96,46 +96,90 @@ class ProfilePage extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          title: const Text("Logout", textAlign: TextAlign.center),
-          content: const Text(
-            "Are you sure you want to log out of your account?",
-          ),
-          actionsAlignment: MainAxisAlignment.spaceEvenly,
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.redAccent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+          contentPadding: EdgeInsets.zero,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(24.0),
+                child: Text(
+                  "Are you sure you want to log out of your account?",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontFamily: "Poppins",
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-              onPressed: () async {
-                Navigator.pop(dialogContext);
 
-                await viewModel.logout();
+              Divider(height: 1, thickness: 1, color: Colors.grey.shade300),
 
-                if (parentContext.mounted) {
-                  parentContext.read<LoginViewModel>().clearSession();
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
 
-                  Navigator.pushAndRemoveUntil(
-                    parentContext,
-                    MaterialPageRoute(
-                      builder: (context) => const WelcomePage(),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.zero,
                     ),
-                    (route) => false,
-                  );
-                }
-              },
-              child: const Text(
-                "Logout",
-                style: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: () async {
+                    Navigator.pop(dialogContext);
+
+                    await viewModel.logout();
+
+                    if (parentContext.mounted) {
+                      parentContext.read<LoginViewModel>().clearSession();
+
+                      Navigator.pushAndRemoveUntil(
+                        parentContext,
+                        MaterialPageRoute(
+                          builder: (context) => const WelcomePage(),
+                        ),
+                        (route) => false,
+                      );
+                    }
+                  },
+                  child: const Text(
+                    "Log out",
+                    style: TextStyle(
+                      color: Colors.redAccent,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ],
+
+              Divider(height: 1, thickness: 1, color: Colors.grey.shade300),
+
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    // Curve the bottom corners of the ripple effect to match the dialog
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(
+                        bottom: Radius.circular(20),
+                      ),
+                    ),
+                  ),
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: const Text(
+                    "Cancel",
+                    style: TextStyle(
+                      color: Colors.black87,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         );
       },
     );
@@ -297,11 +341,12 @@ class ProfilePage extends StatelessWidget {
 
           const SizedBox(height: 40),
 
-          OutlinedButton(
+          ElevatedButton(
             onPressed: () => _showLogoutConfirmation(context, userVM),
-            style: OutlinedButton.styleFrom(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
               minimumSize: const Size(double.infinity, 50),
-              side: const BorderSide(color: Colors.redAccent, width: 1.5),
+              elevation: 0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(25),
               ),
@@ -309,8 +354,9 @@ class ProfilePage extends StatelessWidget {
             child: const Text(
               "Log out",
               style: TextStyle(
-                color: Colors.redAccent,
+                color: Colors.white,
                 fontWeight: FontWeight.bold,
+                fontSize: 16,
               ),
             ),
           ),

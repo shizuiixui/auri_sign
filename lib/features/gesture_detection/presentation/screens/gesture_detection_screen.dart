@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'package:auri_sign/services/gesture_detection/gesture_detector.dart'
+import 'package:auri_sign/features/gesture_detection/gesture_detector.dart'
     as gd;
-import 'package:auri_sign/services/gesture_detection/camera_service.dart';
-import 'package:auri_sign/services/gesture_detection/fsl_mapper.dart';
+import 'package:auri_sign/features/gesture_detection/camera_service.dart';
+import 'package:auri_sign/features/gesture_detection/fsl_mapper.dart';
 
 class GestureDetectionScreen extends StatefulWidget {
   const GestureDetectionScreen({Key? key}) : super(key: key);

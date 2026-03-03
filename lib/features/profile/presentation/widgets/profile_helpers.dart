@@ -64,7 +64,7 @@ class _CompletedLessonsCarouselState extends State<CompletedLessonsCarousel> {
                     padding: const EdgeInsets.all(8.0),
                     child: ContinueLessonCard(
                       title: ["Common Words", "Alphabets", "Numbers"][index],
-                      progress: 1.0,
+                      progress: 0,
                       color: const Color(0xFFE9B63B),
                       imagePath: imgList[index],
                     ),

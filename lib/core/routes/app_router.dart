@@ -1,3 +1,4 @@
+import 'package:auri_sign/features/dictionary/presentation/screens/dictionary.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -45,6 +46,11 @@ import '/features/lessons/presentation/viewmodels/numbers/numbers_lesson1_view_m
 import '/features/lessons/presentation/viewmodels/numbers/numbers_lesson2_view_model.dart';
 import '/features/lessons/presentation/viewmodels/numbers/numbers_lesson3_view_model.dart';
 
+// Dictionary
+import 'package:auri_sign/features/dictionary/data/repositories/dictionary_repository.dart';
+import 'package:auri_sign/features/dictionary/presentation/viewmodels/dictionary_viewmodel.dart';
+import 'package:auri_sign/features/dictionary/presentation/screens/dictionary.dart';
+
 class AppRouter {
   static Map<String, WidgetBuilder> getRoutes() {
     return {
@@ -67,49 +73,60 @@ class AppRouter {
       '/category_numbers': (context) => const CategoryNumbersPage(),
       '/category_common_words': (context) => const CategoryCommonWordsPage(),
 
+      // Dictionary
+      '/dictionary': (context) {
+        final repository = DictionaryRepository(
+          baseUrl: 'http://192.168.100.10:5000/api/dictionary', // change with your laptop IP
+          authToken: 'auth_token',
+        );
+        final viewModel = DictionaryViewModel(repository);
+
+        return DictionaryPage(viewModel: viewModel);
+      },
+
       // Alphabet Lessons
       '/alphabet_lesson1': (context) => ChangeNotifierProvider(
-            create: (_) => AlphabetLesson1ViewModel(),
-            child: const AlphabetLesson1Page(),
-          ),
+        create: (_) => AlphabetLesson1ViewModel(),
+        child: const AlphabetLesson1Page(),
+      ),
       '/alphabet_lesson2': (context) => ChangeNotifierProvider(
-            create: (_) => AlphabetLesson2ViewModel(),
-            child: const AlphabetLesson2Page(),
-          ),
+        create: (_) => AlphabetLesson2ViewModel(),
+        child: const AlphabetLesson2Page(),
+      ),
       '/alphabet_lesson3': (context) => ChangeNotifierProvider(
-            create: (_) => AlphabetLesson3ViewModel(),
-            child: const AlphabetLesson3Page(),
-          ),
+        create: (_) => AlphabetLesson3ViewModel(),
+        child: const AlphabetLesson3Page(),
+      ),
       '/alphabet_lesson4': (context) => ChangeNotifierProvider(
-            create: (_) => AlphabetLesson4ViewModel(),
-            child: const AlphabetLesson4Page(),
-          ),
+        create: (_) => AlphabetLesson4ViewModel(),
+        child: const AlphabetLesson4Page(),
+      ),
       '/alphabet_lesson5': (context) => ChangeNotifierProvider(
-            create: (_) => AlphabetLesson5ViewModel(),
-            child: const AlphabetLesson5Page(),
-          ),
+        create: (_) => AlphabetLesson5ViewModel(),
+        child: const AlphabetLesson5Page(),
+      ),
       '/alphabet_lesson6': (context) => ChangeNotifierProvider(
-            create: (_) => AlphabetLesson6ViewModel(),
-            child: const AlphabetLesson6Page(),
-          ),
+        create: (_) => AlphabetLesson6ViewModel(),
+        child: const AlphabetLesson6Page(),
+      ),
       '/alphabet_lesson7': (context) => ChangeNotifierProvider(
-            create: (_) => AlphabetLesson7ViewModel(),
-            child: const AlphabetLesson7Page(),
-          ),
+        create: (_) => AlphabetLesson7ViewModel(),
+        child: const AlphabetLesson7Page(),
+      ),
 
       // Number Lessons
       '/numbers_lesson1': (context) => ChangeNotifierProvider(
-            create: (_) => NumbersLesson1ViewModel(),
-            child: const NumbersLesson1Page(),
-          ),
+        create: (_) => NumbersLesson1ViewModel(),
+        child: const NumbersLesson1Page(),
+      ),
       '/numbers_lesson2': (context) => ChangeNotifierProvider(
-            create: (_) => NumbersLesson2ViewModel(),
-            child: const NumbersLesson2Page(),
-          ),
+        create: (_) => NumbersLesson2ViewModel(),
+        child: const NumbersLesson2Page(),
+      ),
       '/numbers_lesson3': (context) => ChangeNotifierProvider(
-            create: (_) => NumbersLesson3ViewModel(),
-            child: const NumbersLesson3Page(),
-          ),
+        create: (_) => NumbersLesson3ViewModel(),
+        child: const NumbersLesson3Page(),
+      ),
     };
   }
 }
