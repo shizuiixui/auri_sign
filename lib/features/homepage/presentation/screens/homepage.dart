@@ -1,9 +1,7 @@
 import 'package:auri_sign/features/auth/viewmodels/user_view_model.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import '/features/homepage/presentation/widgets/homepage_helpers.dart';
-
 
 class HomePage extends StatefulWidget {
   final VoidCallback onProfileTap;
@@ -16,14 +14,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   double _currentPage = 0;
+  final PageController _pageController = PageController(viewportFraction: 0.85);
 
   final List<String> imgList = [
     "assets/images/homepage_FSL_img/common_words_FSL.png",
     "assets/images/homepage_FSL_img/letter_A_FSL.png",
     "assets/images/homepage_FSL_img/number_1_FSL.png",
   ];
-
-  final PageController _pageController = PageController(viewportFraction: 0.85);
 
   @override
   void initState() {
@@ -32,14 +29,6 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         _currentPage = _pageController.page!;
       });
-    });
-
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('auth_token');
-      if (token != null && mounted) {
-        context.read<UserViewModel>().fetchUser(token);
-      }
     });
   }
 

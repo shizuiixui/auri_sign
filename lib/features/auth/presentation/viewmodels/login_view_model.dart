@@ -32,7 +32,7 @@ class LoginViewModel extends ChangeNotifier {
 
         await prefs.setString('auth_token', _token!);
 
-        print("✅ SUCCESS: Token safely stored on device disk!");
+        print("SUCCESS: Token safely stored on device disk!");
       } else {
         _errorMessage = response.data['message'] ?? 'Login failed.';
       }
@@ -46,7 +46,7 @@ class LoginViewModel extends ChangeNotifier {
   }
 
   Future<bool> checkLoginStatus() async {
-    print("🔍 STARTING APP: Searching device disk for saved token...");
+    print("STARTING APP: Searching device disk for saved token...");
 
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -55,17 +55,17 @@ class LoginViewModel extends ChangeNotifier {
 
       if (savedToken != null && savedToken.isNotEmpty) {
         print(
-          "✅ FOUND TOKEN: User is still logged in. Bypassing Welcome Page.",
+          "FOUND TOKEN: User is still logged in. Bypassing Welcome Page.",
         );
         _token = savedToken;
         notifyListeners();
         return true;
       }
 
-      print("❌ NO TOKEN FOUND: User is logged out. Showing Welcome Page.");
+      print("NO TOKEN FOUND: User is logged out. Showing Welcome Page.");
       return false;
     } catch (e) {
-      print("❌ ERROR READING DISK: $e");
+      print("ERROR READING DISK: $e");
       return false;
     }
   }
@@ -73,6 +73,6 @@ class LoginViewModel extends ChangeNotifier {
   void clearSession() {
     _token = null;
     notifyListeners();
-    print("🧹 SESSION CLEARED: LoginViewModel active memory has been wiped.");
+    print("SESSION CLEARED: LoginViewModel active memory has been wiped.");
   }
 }

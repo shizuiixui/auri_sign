@@ -16,7 +16,6 @@ void main() async {
 
   // Initialize Dependency Injection
   await di.init();
-  await di.sl<LoginViewModel>().checkLoginStatus();
 
   runApp(
     MultiProvider(
@@ -44,11 +43,11 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _checkAuth();
+    _initializeApp();
   }
 
-  Future<void> _checkAuth() async {
-
+  Future<void> _initializeApp() async {
+    await context.read<UserViewModel>().initSession();
     await context.read<LoginViewModel>().checkLoginStatus();
 
     if (mounted) {
@@ -60,7 +59,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    final loginVM = context.watch<LoginViewModel>();
+    final userVM = context.watch<UserViewModel>();
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -71,7 +70,7 @@ class _MyAppState extends State<MyApp> {
                 child: CircularProgressIndicator(color: Color(0xFFFFB800)),
               ),
             )
-          : (loginVM.token != null ? const NavFunction() : const WelcomePage()),
+          : (userVM.user != null ? const NavFunction() : const WelcomePage()),
 
       routes: AppRouter.getRoutes(),
     );

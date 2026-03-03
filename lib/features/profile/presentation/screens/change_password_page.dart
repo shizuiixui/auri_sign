@@ -11,10 +11,11 @@ class ChangePasswordPage extends StatefulWidget {
 }
 
 class _ChangePasswordPageState extends State<ChangePasswordPage> {
- 
-  final TextEditingController _currentPasswordController = TextEditingController();
+  final TextEditingController _currentPasswordController =
+      TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
-  final TextEditingController _retypePasswordController = TextEditingController();
+  final TextEditingController _retypePasswordController =
+      TextEditingController();
 
   bool _obscureCurrent = true;
   bool _obscureNew = true;
@@ -108,34 +109,71 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                           onPressed: userVM.isLoading
                               ? null
                               : () async {
-                                  final currentPw = _currentPasswordController.text;
-                                  final newPw = _newPasswordController.text;
-                                  final retypePw = _retypePasswordController.text;
+                                  FocusScope.of(
+                                    context,
+                                  ).unfocus();
 
-                                  // Validation
+                                  final currentPw =
+                                      _currentPasswordController.text;
+                                  final newPw = _newPasswordController.text;
+                                  final retypePw =
+                                      _retypePasswordController.text;
+
+                                  if (currentPw.isEmpty ||
+                                      newPw.isEmpty ||
+                                      retypePw.isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'All fields are required',
+                                        ),
+                                      ),
+                                    );
+                                    return;
+                                  }
                                   if (newPw != retypePw) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                         content: Text(
                                           'New passwords do not match!',
                                         ),
+                                        backgroundColor: Colors.red,
                                       ),
                                     );
                                     return;
                                   }
-
-                                  // TODO: Call ViewModel function to change password
-                                  // await userVM.changePassword(currentPw, newPw);
-
-                                  if (context.mounted) {
-                                    Navigator.pop(context);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Password changed successfully!',
-                                        ),
-                                      ),
+                                  try {
+                                    await userVM.changePassword(
+                                      currentPassword: currentPw,
+                                      newPassword: newPw,
                                     );
+
+                                    if (context.mounted) {
+                                      Navigator.pop(
+                                        context,
+                                      );
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Password changed successfully!',
+                                          ),
+                                          backgroundColor: Colors.green,
+                                        ),
+                                      );
+                                    }
+                                  } catch (e) {
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(e.toString()),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                    }
                                   }
                                 },
                           style: ElevatedButton.styleFrom(

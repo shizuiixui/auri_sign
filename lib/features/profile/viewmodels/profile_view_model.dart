@@ -31,8 +31,7 @@ class ProfileViewModel extends ChangeNotifier {
 
       _isUploading = true;
       notifyListeners();
-
-      await uploadUseCase.execute(_selectedImage!);
+      await uploadUseCase.call(_selectedImage!);
 
       _isUploading = false;
       notifyListeners();

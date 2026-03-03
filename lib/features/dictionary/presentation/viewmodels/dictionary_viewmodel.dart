@@ -46,7 +46,7 @@ class DictionaryViewModel extends ChangeNotifier {
   Future<void> fetchData() async {
     // 1. Check if token is actually there
     if (_repository.authToken.isEmpty) {
-      print('⚠️ DICTIONARY: No token found. Aborting fetch.');
+      print('DICTIONARY: No token found. Aborting fetch.');
       errorMessage = "Please log in again.";
       isLoading = false;
       notifyListeners();
@@ -61,7 +61,7 @@ class DictionaryViewModel extends ChangeNotifier {
       try {
         signOfTheDay = await _repository.fetchSignOfTheDay();
       } catch (e) {
-        print('❌ SIGN OF THE DAY ERROR: $e');
+        print('SIGN OF THE DAY ERROR: $e');
       }
 
       _allItems = await _repository.fetchAllItems();

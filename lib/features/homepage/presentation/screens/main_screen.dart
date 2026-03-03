@@ -26,7 +26,6 @@ class _NavFunctionState extends State<NavFunction> {
   }
 
   Future<void> _initializeApp() async {
-    // 1. Get the token from SharedPreferences
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('auth_token') ?? ''; 
 
@@ -37,7 +36,6 @@ class _NavFunctionState extends State<NavFunction> {
     
     _dictionaryViewModel = DictionaryViewModel(repository);
 
-    // 3. Tell the UI we are done loading
     setState(() {
       _isInitializing = false;
     });
@@ -53,7 +51,6 @@ class _NavFunctionState extends State<NavFunction> {
     ), 
     const SizedBox.shrink(), 
     
-    // We can now safely pass the ViewModel
     DictionaryPage(viewModel: _dictionaryViewModel), 
     
     const ProfilePage(), 
@@ -61,7 +58,6 @@ class _NavFunctionState extends State<NavFunction> {
 
   @override
   Widget build(BuildContext context) {
-    // Show a loading screen while we fetch the token from storage
     if (_isInitializing) {
       return const Scaffold(
         body: Center(

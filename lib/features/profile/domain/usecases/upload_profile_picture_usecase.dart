@@ -1,16 +1,10 @@
-import 'dart:io';
-import '../repositories/user_repository.dart';
+import '../../../auth/data/repositories/user_repository.dart'; 
 
 class UploadProfilePictureUseCase {
   final UserRepository repository;
 
   UploadProfilePictureUseCase({required this.repository});
-
-  Future<String> execute(File imageFile) async {
-    try {
-      return await repository.uploadProfilePicture(imageFile);
-    } catch (e) {
-      throw Exception('Failed to upload: $e');
-    }
+  Future<String> call(dynamic file) async {
+    return await repository.uploadProfilePicture(file);
   }
 }

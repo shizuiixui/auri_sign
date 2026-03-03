@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '/core/widgets/button.dart';
 import '/core/widgets/text_input_field.dart';
 import '/core/utils/validators.dart';
 import '/features/auth/presentation/viewmodels/login_view_model.dart';
+import '/features/auth/viewmodels/user_view_model.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -131,10 +133,12 @@ class _LoginFormState extends State<LoginForm> {
                         onPressed: () async {
                           if (loginVM.isLoading) return;
                           if (_loginFormKey.currentState!.validate()) {
+                            // 1. Attempt Login
                             await loginVM.login(
                               email: emailController.text.trim(),
                               password: passwordController.text.trim(),
                             );
+
                             if (loginVM.errorMessage != null) {
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -145,9 +149,19 @@ class _LoginFormState extends State<LoginForm> {
                                 );
                               }
                             } else if (loginVM.token != null) {
-                              // Handle successful login, e.g., save token and navigate
+                              // Login Successful!
                               if (context.mounted) {
-                                Navigator.pushNamed(context, '/home');
+                                await context
+                                    .read<UserViewModel>()
+                                    .initSession();
+
+                                if (context.mounted) {
+                                  // 3. Navigate to Home
+                                  Navigator.pushReplacementNamed(
+                                    context,
+                                    '/home',
+                                  );
+                                }
                               }
                             }
                           }

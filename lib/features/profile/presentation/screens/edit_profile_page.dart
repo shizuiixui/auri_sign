@@ -12,6 +12,7 @@ class EditProfilePage extends StatefulWidget {
 
 class _EditProfilePageState extends State<EditProfilePage> {
   late TextEditingController _firstNameController;
+  late TextEditingController _lastNameController;
   late TextEditingController _emailController;
 
   @override
@@ -19,13 +20,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
     super.initState();
     final userVM = Provider.of<UserViewModel>(context, listen: false);
     final user = userVM.user;
+
     _firstNameController = TextEditingController(text: user?.firstName ?? '');
+    _lastNameController = TextEditingController(text: user?.lastName ?? '');
     _emailController = TextEditingController(text: user?.email ?? '');
   }
 
   @override
   void dispose() {
     _firstNameController.dispose();
+    _lastNameController.dispose();
     _emailController.dispose();
     super.dispose();
   }
@@ -80,6 +84,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
               const SizedBox(height: 16),
 
               EditProfileTextField(
+                controller: _lastNameController,
+                hint: 'Last Name',
+                icon: Icons.person_outline,
+              ),
+              const SizedBox(height: 16),
+
+              EditProfileTextField(
                 controller: _emailController,
                 hint: 'Email Address',
                 icon: Icons.mail_outline,
@@ -95,18 +106,50 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   onPressed: userVM.isLoading
                       ? null
                       : () async {
-                          final newFirstName = _firstNameController.text.trim();
-                          final newEmail = _emailController.text.trim();
-                          // TODO: Call ViewModel to save the data here
-                          // await userVM.updateProfile(firstName: newFirstName, email: newEmail);
+                          FocusScope.of(context).unfocus();
 
-                          if (context.mounted) {
-                            Navigator.pop(context);
+                          final newFirstName = _firstNameController.text.trim();
+                          final newLastName = _lastNameController.text.trim();
+                          final newEmail = _emailController.text.trim();
+
+                          if (newFirstName.isEmpty ||
+                              newLastName.isEmpty ||
+                              newEmail.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text('Profile updated successfully!'),
+                                content: Text('All fields are required'),
                               ),
                             );
+                            return;
+                          }
+
+                          try {
+                            await userVM.updateProfile(
+                              newFirstName: newFirstName,
+                              newLastName: newLastName,
+                              newEmail: newEmail,
+                            );
+
+                            if (context.mounted) {
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Profile updated successfully!',
+                                  ),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(e.toString()),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
                           }
                         },
                   style: ElevatedButton.styleFrom(
@@ -117,7 +160,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     elevation: 2,
                   ),
                   child: userVM.isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
                       : const Text(
                           "Continue",
                           style: TextStyle(
