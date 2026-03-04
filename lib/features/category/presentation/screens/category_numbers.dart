@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
-import '/features/category/presentation/widgets/category_helper.dart';
+import 'package:provider/provider.dart';
+import '../../../../core/di/injection_container.dart';
+import '../../../lessons/data/repositories/lesson_repository.dart';
+import '../../../lessons/presentation/viewmodels/lesson_view_model.dart';
+import '../../../lessons/presentation/screens/lesson_execution_screen.dart';
+import '../widgets/category_helper.dart';
 
 class CategoryNumbersPage extends StatefulWidget {
   const CategoryNumbersPage({super.key});
@@ -9,12 +14,25 @@ class CategoryNumbersPage extends StatefulWidget {
 }
 
 class _CategoryNumbersPageState extends State<CategoryNumbersPage> {
+  void _navigateToLesson(String lessonId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ChangeNotifierProvider(
+          create: (_) => LessonViewModel(repository: sl<LessonRepository>()),
+          child: LessonExecutionScreen(lessonId: lessonId),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0XFFF8F8F8),
       appBar: AppBar(
         title: const Text("Categories"),
+        backgroundColor: const Color(0XFFF8F8F8),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -27,40 +45,34 @@ class _CategoryNumbersPageState extends State<CategoryNumbersPage> {
             child: Column(
               children: [
                 const CategoryHeader(
-                  title:
-                      "Learn each number of Filipino Sign Language and practice your gestures with real-time recognition.",
+                  title: "Learn each number of Filipino Sign Language and practice your gestures with real-time recognition.",
                 ),
                 const SizedBox(height: 18),
-                // level 1
+
+                // Lesson 1
                 Category(
                   title: "Lesson 1",
                   description: "Learn the first four numbers",
                   status: LessonStatus.current,
-                  onTap: () {
-                    Navigator.pushNamed(context, '/numbers_lesson1');
-                  },
+                  onTap: () => _navigateToLesson("number_1"),
                 ),
                 const SizedBox(height: 16),
 
-                // level 2
+                // Lesson 2
                 Category(
                   title: "Lesson 2",
                   description: "Learn the second four numbers",
                   status: LessonStatus.locked,
-                  onTap: () {
-                    Navigator.pushNamed(context, '/numbers_lesson2');
-                  },
+                  onTap: () => _navigateToLesson("number_2"),
                 ),
                 const SizedBox(height: 16),
 
-                // level 3
+                // Lesson 3
                 Category(
                   title: "Lesson 3",
                   description: "Learn the third four numbers",
                   status: LessonStatus.locked,
-                  onTap: () {
-                    Navigator.pushNamed(context, '/numbers_lesson3');
-                  },
+                  onTap: () => _navigateToLesson("number_3"),
                 ),
               ],
             ),

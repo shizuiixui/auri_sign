@@ -43,12 +43,16 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _initializeApp();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeApp();
+    });
   }
 
   Future<void> _initializeApp() async {
     await context.read<UserViewModel>().initSession();
     await context.read<LoginViewModel>().checkLoginStatus();
+    final userViewModel = context.read<UserViewModel>();
+    await userViewModel.initSession();
 
     if (mounted) {
       setState(() {

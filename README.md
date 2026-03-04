@@ -1,16 +1,83 @@
-# auri_sign
+<div align="center">
+  <img src="assets/images/logo1.png" alt="AuriSign Logo" width="150" height="150">
+  <h1>AuriSign</h1>
+  <p>
+    <b>Bridging Communication Through AI Technology</b>
+  </p>
+  <p>
+    An interactive ecosystem designed to make Filipino Sign Language (FSL) accessible 
+    through gamified lessons, a video dictionary, and real-time AI gesture recognition.
+  </p>
 
-A new Flutter project.
+  <img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter" />
+  <img src="https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" />
+  <img src="https://img.shields.io/badge/TensorFlow-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white" alt="TensorFlow" />
+</div>
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## Overview
 
-A few resources to get you started if this is your first Flutter project:
+**AuriSign** is an AI-assisted sign language learning platform that empowers inclusive communication. By combining traditional FSL education with modern AI, the platform allows for independent practice, instant feedback, and measurable skill development across both mobile and web platforms.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## ✨ Key Features
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+* **Universal Authentication**
+    * Secure Login & Sign Up with JWT implementation.
+    * Email OTP verification for account security.
+    * Session restoration via Shared Preferences for seamless mobile access.
+
+* **AI Gesture Recognition**
+    * Real-time webcam and mobile camera-based hand sign detection.
+    * Powered by **TensorFlow.js** to validate hand movements and signs instantly.
+
+* **Structured Learning & Dictionary**
+    * Category-based curriculum (Alphabets, Numbers, Common Words).
+    * Digital dictionary with visual examples and high-quality video references.
+
+* **Progress Tracking**
+    * Personalized user profiles with learning analytics.
+    * Daily activity tracker to maintain learning streaks and consistency.
+
+---
+
+## 🛠️ Tech Stack
+
+| Component | Technology |
+| :--- | :--- |
+| **Mobile Frontend** | Flutter (Dart), Provider, GetIt, HTTP |
+| **Web Frontend** | React 18, Vite, Bootstrap |
+| **AI / ML** | TensorFlow.js (Gesture Recognition Model) |
+| **Backend** | Node.js, Express.js |
+| **Database** | MongoDB |
+| **Authentication** | JWT & Email OTP Verification |
+
+---
+
+## 📦 Installation & Setup
+
+To run the full ecosystem, you must start the **Backend Server** first, followed by the **Mobile App**.
+
+### 1. Backend Server Setup
+
+```bash
+# Clone the server repository
+git clone [https://github.com/bennybun29/AuriSign-Web.git](https://github.com/bennybun29/AuriSign-Web.git)
+
+# Navigate to the server directory
+cd AuriSign-Web/server
+
+# Install dependencies
+npm install
+
+# Start the server (Development mode)
+npm run dev
+
+2. Mobile App Setup (Flutter)
+
+Step 1: Clone the repository
+
+```bash
+git clone [https://github.com/kyranjosafat/auri_sign.git](https://github.com/kyranjosafat/auri_sign.git)
+cd auri_sign
