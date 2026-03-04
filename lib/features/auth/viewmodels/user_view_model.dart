@@ -1,6 +1,9 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+import '../../../services/api_client.dart';
 import '../models/user_models.dart';
 
 class UserViewModel extends ChangeNotifier {
@@ -16,7 +19,7 @@ class UserViewModel extends ChangeNotifier {
 
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.100.10:5000/api/user/me'),
+        Uri.parse('${ApiClient.baseUrl}/user/me'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',

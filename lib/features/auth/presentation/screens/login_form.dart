@@ -23,6 +23,22 @@ class _LoginFormState extends State<LoginForm> {
 
   final loginVM = LoginViewModel();
 
+  String _formatCooldown(int seconds) {
+    final minutes = seconds ~/ 60;
+    final remaining = seconds % 60;
+    final mm = minutes.toString().padLeft(2, '0');
+    final ss = remaining.toString().padLeft(2, '0');
+    return '$mm:$ss';
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    loginVM.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -123,13 +139,19 @@ class _LoginFormState extends State<LoginForm> {
                 ListenableBuilder(
                   listenable: loginVM,
                   builder: (context, child) {
+                    final isLocked = loginVM.isCooldown;
                     return SizedBox(
                       width: double.infinity,
                       height: 50,
                       child: Button(
-                        text: loginVM.isLoading ? "Loading..." : "Get Started",
+                        text: loginVM.isLoading
+                            ? "Loading..."
+                            : isLocked
+                            ? "Try again in ${_formatCooldown(loginVM.cooldownSeconds)}"
+                            : "Get Started",
                         onPressed: () async {
-                          if (loginVM.isLoading) return;
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          if (loginVM.isLoading || isLocked) return;
                           if (_loginFormKey.currentState!.validate()) {
                             await loginVM.login(
                               email: emailController.text.trim(),

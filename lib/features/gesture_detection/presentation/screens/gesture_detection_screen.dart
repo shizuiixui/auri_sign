@@ -1,12 +1,21 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:camera/camera.dart';
-import 'package:auri_sign/services/gesture_detection/gesture_detector.dart'
-    as gd;
-import 'package:auri_sign/services/gesture_detection/camera_service.dart';
-import 'package:auri_sign/services/gesture_detection/fsl_mapper.dart';
+import 'package:webview_flutter_android/webview_flutter_android.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+
+const String _defaultWebViewerHost = String.fromEnvironment(
+  'WEB_APP_HOST',
+  defaultValue: 'localhost',
+);
+
+const String _webViewerUrl = String.fromEnvironment(
+  'WEB_VIEWER_URL',
+  defaultValue: 'http://$_defaultWebViewerHost:5173/gesture-recognition',
+);
 
 class GestureDetectionScreen extends StatefulWidget {
-  const GestureDetectionScreen({Key? key}) : super(key: key);
+  const GestureDetectionScreen({super.key});
 
   @override
   State<GestureDetectionScreen> createState() => _GestureDetectionScreenState();
@@ -14,127 +23,142 @@ class GestureDetectionScreen extends StatefulWidget {
 
 class _GestureDetectionScreenState extends State<GestureDetectionScreen>
     with WidgetsBindingObserver {
-  late CameraService _cameraService;
-  late gd.GestureDetector _gestureDetector;
+  static const int _maxRetriesPerUrl = 10;
 
-  String _detectedGesture = 'Initializing...';
-  double _confidence = 0.0;
-  String _confidenceLevel = '';
-  List<String> _gestureHistory = [];
-  String _translatedText = '';
-  bool _isProcessing = false;
+  late final WebViewController _webViewController;
+  late final List<Uri> _candidateUrls;
+  int _loadingProgress = 0;
+  int _activeUrlIndex = 0;
+  int _mainFrameRetryCount = 0;
+  bool _retryScheduled = false;
+  String? _errorText;
+
+  Uri get _activeUri => _candidateUrls[_activeUrlIndex];
+
+  List<Uri> _buildCandidateUrls() {
+    final urls = <Uri>[
+      Uri.parse(_webViewerUrl),
+      Uri.parse('http://localhost:5173/gesture-recognition'),
+      Uri.parse('http://127.0.0.1:5173/gesture-recognition'),
+    ];
+
+    final seen = <String>{};
+    final unique = <Uri>[];
+    for (final uri in urls) {
+      final key = uri.toString();
+      if (seen.add(key)) {
+        unique.add(uri);
+      }
+    }
+
+    return unique;
+  }
+
+  void _loadCurrentUrl() {
+    _webViewController.loadRequest(_activeUri);
+  }
+
+  Future<void> _handleMainFrameError() async {
+    if (_retryScheduled) return;
+
+    if (_mainFrameRetryCount < _maxRetriesPerUrl) {
+      _retryScheduled = true;
+      _mainFrameRetryCount += 1;
+      await Future<void>.delayed(const Duration(milliseconds: 1200));
+      if (!mounted) {
+        _retryScheduled = false;
+        return;
+      }
+      _loadCurrentUrl();
+      _retryScheduled = false;
+      return;
+    }
+
+    if (_activeUrlIndex < _candidateUrls.length - 1) {
+      setState(() {
+        _activeUrlIndex += 1;
+        _mainFrameRetryCount = 0;
+        _errorText = null;
+        _loadingProgress = 0;
+      });
+      _retryScheduled = true;
+      await Future<void>.delayed(const Duration(milliseconds: 1200));
+      if (!mounted) {
+        _retryScheduled = false;
+        return;
+      }
+      _loadCurrentUrl();
+      _retryScheduled = false;
+      return;
+    }
+
+    setState(() {
+      _errorText =
+          'Unable to load web viewer. Ensure web client is running and adb reverse is active.';
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _initializeServices();
-  }
-
-  Future<void> _initializeServices() async {
-    _cameraService = CameraService();
-    _gestureDetector = gd.GestureDetector();
-
-    try {
-      // Request camera permission
-      final hasPermission = await _cameraService.requestCameraPermission();
-      if (!hasPermission) {
-        setState(() {
-          _detectedGesture = 'Camera permission denied';
-        });
-        return;
-      }
-
-      // Initialize camera
-      await _cameraService.initializeCamera();
-
-      // Load the TFLite model
-      await _gestureDetector.loadModel();
-
-      // Start image stream
-      await _cameraService.startImageStream(_processImage);
-
-      setState(() {
-        _detectedGesture = 'Ready to detect gestures';
-      });
-    } catch (e) {
-      setState(() {
-        _detectedGesture = 'Error: ${e.toString()}';
-      });
-      print('Initialization error: $e');
-    }
-  }
-
-  void _processImage(CameraImage image) async {
-    if (_isProcessing) return;
-
-    _isProcessing = true;
-
-    try {
-      final result = await _gestureDetector.runInference(image);
-
-      // Skip skipped frames
-      if (result['gesture'] == 'Skipped') {
-        _isProcessing = false;
-        return;
-      }
-
-      if (mounted) {
-        setState(() {
-          _detectedGesture = result['gesture'] ?? 'Unknown';
-          _confidence = result['confidence'] ?? 0.0;
-          _confidenceLevel = FSLMapper.getConfidenceDescription(_confidence);
-
-          // Only add to history if confidence is high enough
-          if (_confidence > 0.6 && _detectedGesture != 'Unknown') {
-            if (_gestureHistory.isEmpty ||
-                _gestureHistory.last != _detectedGesture) {
-              _gestureHistory.add(_detectedGesture);
-              _translatedText = FSLMapper.buildText(_gestureHistory);
+    _candidateUrls = _buildCandidateUrls();
+    _webViewController = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(Colors.black)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onProgress: (progress) {
+            if (!mounted) return;
+            setState(() {
+              _loadingProgress = progress;
+            });
+          },
+          onPageStarted: (_) {
+            if (!mounted) return;
+            setState(() {
+              _errorText = null;
+              _loadingProgress = 0;
+            });
+          },
+          onPageFinished: (_) {
+            if (!mounted) return;
+            setState(() {
+              _mainFrameRetryCount = 0;
+              _retryScheduled = false;
+              _loadingProgress = 100;
+            });
+          },
+          onWebResourceError: (error) {
+            if (error.isForMainFrame != true) {
+              return;
             }
-          }
-        });
-      }
-    } catch (e) {
-      print('Error processing image: $e');
-    } finally {
-      _isProcessing = false;
-    }
-  }
+            if (!mounted) return;
+            unawaited(_handleMainFrameError());
+          },
+        ),
+      )
+      ..loadRequest(_activeUri);
 
-  void _clearHistory() {
-    setState(() {
-      _gestureHistory.clear();
-      _translatedText = '';
-    });
-  }
-
-  void _undoLastGesture() {
-    if (_gestureHistory.isNotEmpty) {
-      setState(() {
-        _gestureHistory.removeLast();
-        _translatedText = FSLMapper.buildText(_gestureHistory);
+    final platformController = _webViewController.platform;
+    if (platformController is AndroidWebViewController) {
+      platformController.setMediaPlaybackRequiresUserGesture(false);
+      platformController.setOnPlatformPermissionRequest((request) {
+        request.grant();
       });
     }
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (!_cameraService.isInitialized) return;
-
-    if (state == AppLifecycleState.inactive) {
-      _cameraService.stopImageStream();
-    } else if (state == AppLifecycleState.resumed) {
-      _cameraService.startImageStream(_processImage);
+    if (state == AppLifecycleState.resumed) {
+      _webViewController.reload();
     }
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _cameraService.stopImageStream();
-    _cameraService.dispose();
-    _gestureDetector.dispose();
     super.dispose();
   }
 
@@ -142,198 +166,71 @@ class _GestureDetectionScreenState extends State<GestureDetectionScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Hand Gesture Detection'),
-        centerTitle: true,
-        elevation: 0,
+        title: const Text('Gesture Detection'),
+        actions: [
+          IconButton(
+            tooltip: 'Reload',
+            onPressed: () {
+              setState(() {
+                _errorText = null;
+                _loadingProgress = 0;
+              });
+              _webViewController.reload();
+            },
+            icon: const Icon(Icons.refresh),
+          ),
+        ],
       ),
-      body: _cameraService.isInitialized
-          ? Column(
-              children: [
-                // Camera Preview
-                Expanded(
-                  flex: 3,
-                  child: Container(
-                    color: Colors.black,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        CameraPreview(_cameraService.controller),
-                        // Gesture overlay
-                        Positioned(
-                          bottom: 20,
-                          left: 20,
-                          right: 20,
-                          child: Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Colors.black87,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: _confidence > 0.7
-                                    ? Colors.green
-                                    : Colors.orange,
-                                width: 2,
-                              ),
-                            ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  'Detected Gesture',
-                                  style: Theme.of(context).textTheme.bodySmall
-                                      ?.copyWith(color: Colors.grey[400]),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  _detectedGesture,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineSmall
-                                      ?.copyWith(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Confidence:',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall
-                                          ?.copyWith(color: Colors.grey[400]),
-                                    ),
-                                    Text(
-                                      '${(_confidence * 100).toStringAsFixed(1)}% ($_confidenceLevel)',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall
-                                          ?.copyWith(
-                                            color: Colors.greenAccent,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                // Gesture History and Translation
-                Expanded(
-                  flex: 2,
-                  child: Container(
-                    color: Colors.grey[100],
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Detected Sequence',
-                                style: Theme.of(context).textTheme.titleMedium
-                                    ?.copyWith(fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 8),
-                              Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Colors.grey[300]!),
-                                ),
-                                child: Text(
-                                  _translatedText.isEmpty
-                                      ? 'Perform gestures to build text...'
-                                      : _translatedText,
-                                  style: Theme.of(context).textTheme.bodyLarge
-                                      ?.copyWith(fontWeight: FontWeight.w500),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'History: ${_gestureHistory.join(", ")}',
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(color: Colors.grey[600]),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                // Control Buttons
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton.icon(
-                        onPressed: _undoLastGesture,
-                        icon: const Icon(Icons.undo),
-                        label: const Text('Undo'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                          foregroundColor: Colors.white,
-                        ),
-                      ),
-                      ElevatedButton.icon(
-                        onPressed: _clearHistory,
-                        icon: const Icon(Icons.clear),
-                        label: const Text('Clear'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          foregroundColor: Colors.white,
-                        ),
-                      ),
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          // Copy to clipboard functionality
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Copied: $_translatedText'),
-                              duration: const Duration(seconds: 2),
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.copy),
-                        label: const Text('Copy'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          foregroundColor: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            )
-          : Center(
+      body: Stack(
+        children: [
+          WebViewWidget(controller: _webViewController),
+          if (_loadingProgress < 100)
+            LinearProgressIndicator(value: _loadingProgress / 100.0),
+          if (_errorText != null)
+            Container(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              alignment: Alignment.center,
+              padding: const EdgeInsets.all(24),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const CircularProgressIndicator(),
-                  const SizedBox(height: 16),
+                  const Icon(Icons.error_outline, size: 40),
+                  const SizedBox(height: 12),
                   Text(
-                    _detectedGesture,
+                    _errorText!,
                     style: Theme.of(context).textTheme.bodyLarge,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Current URL: $_activeUri',
+                    style: Theme.of(context).textTheme.bodySmall,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Quick fix: run scripts/run_mobile_webview.ps1 to auto-start web app + adb reverse.',
+                    style: Theme.of(context).textTheme.bodySmall,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _errorText = null;
+                        _loadingProgress = 0;
+                        _mainFrameRetryCount = 0;
+                        _activeUrlIndex = 0;
+                      });
+                      _loadCurrentUrl();
+                    },
+                    child: const Text('Retry'),
                   ),
                 ],
               ),
             ),
+        ],
+      ),
     );
   }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '/features/category/presentation/widgets/category_helper.dart';
+import '/services/lesson_service.dart';
 
 class CategoryAlphabetsPage extends StatefulWidget {
   const CategoryAlphabetsPage({super.key});
@@ -9,6 +11,76 @@ class CategoryAlphabetsPage extends StatefulWidget {
 }
 
 class _CategoryAlphabetsPageState extends State<CategoryAlphabetsPage> {
+  bool _isLoading = true;
+  String? _errorMessage;
+  List<LessonItem> _lessons = [];
+  final LessonService _lessonService = LessonService();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLessons();
+  }
+
+  Future<void> _loadLessons() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
+    if (token == null) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Sign in to load lessons.';
+      });
+      return;
+    }
+
+    try {
+      final lessons = await _lessonService.fetchLessons(
+        token: token,
+        category: 'alphabets',
+      );
+      if (!mounted) return;
+      setState(() {
+        _lessons = lessons;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _errorMessage = 'Unable to load lessons.';
+      });
+    } finally {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _handleLessonTap(int index) {
+    const routes = [
+      '/alphabet_lesson1',
+      '/alphabet_lesson2',
+      '/alphabet_lesson3',
+      '/alphabet_lesson4',
+      '/alphabet_lesson5',
+      '/alphabet_lesson6',
+      '/alphabet_lesson7',
+    ];
+
+    if (index < routes.length) {
+      Navigator.pushNamed(context, routes[index]);
+      return;
+    }
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Lesson coming soon.')));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,82 +103,52 @@ class _CategoryAlphabetsPageState extends State<CategoryAlphabetsPage> {
                       "Learn each letter of Filipino Sign Language and practice your gestures with real-time recognition.",
                 ),
                 const SizedBox(height: 18),
-                // level 1
-                Category(
-                  title: "Lesson 1",
-                  description: "Learn the first four letters of the alphabets",
-                  status: LessonStatus.current,
-                  onTap: () {
-                    Navigator.pushNamed(context, '/alphabet_lesson1');
-                  },
-                ),
-                const SizedBox(height: 16),
+                if (_isLoading)
+                  const Text(
+                    'Loading lessons...',
+                    style: TextStyle(fontSize: 12, color: Colors.black54),
+                  ),
+                if (!_isLoading && _errorMessage != null)
+                  Text(
+                    _errorMessage!,
+                    style: const TextStyle(fontSize: 12, color: Colors.red),
+                  ),
+                if (!_isLoading && _errorMessage == null && _lessons.isEmpty)
+                  const Text(
+                    'No lessons available yet.',
+                    style: TextStyle(fontSize: 12, color: Colors.black54),
+                  ),
+                if (!_isLoading && _errorMessage == null && _lessons.isNotEmpty)
+                  ..._lessons.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final lesson = entry.value;
+                    final firstIncompleteIndex = _lessons.indexWhere(
+                      (item) => !item.completed,
+                    );
+                    final nextIndex = firstIncompleteIndex == -1
+                        ? _lessons.length
+                        : firstIncompleteIndex;
 
-                // level 2
-                Category(
-                  title: "Lesson 2",
-                  description: "Learn the second four letters of the alphabets",
-                  status: LessonStatus.locked,
-                  onTap: () {
-                    Navigator.pushNamed(context, '/alphabet_lesson2');
-                  },
-                ),
-                const SizedBox(height: 16),
+                    final status = lesson.completed
+                        ? LessonStatus.completed
+                        : (index == nextIndex
+                              ? LessonStatus.current
+                              : LessonStatus.locked);
 
-                // level 3
-                Category(
-                  title: "Lesson 3",
-                  description: "Learn the third four letters of the alphabets",
-                  status: LessonStatus.locked,
-                  onTap: () {
-                    Navigator.pushNamed(context, '/alphabet_lesson3');
-                  },
-                ),
-                const SizedBox(height: 16),
-
-                // level 4
-                Category(
-                  title: "Lesson 4",
-                  description: "Learn the fourth four letters of the alphabets",
-                  status: LessonStatus.locked,
-                  onTap: () {
-                    Navigator.pushNamed(context, '/alphabet_lesson4');
-                  },
-                ),
-                const SizedBox(height: 16),
-
-                // level 5
-                Category(
-                  title: "Lesson 5",
-                  description: "Learn the fifth four letters of the alphabets",
-                  status: LessonStatus.locked,
-                  onTap: () {
-                    Navigator.pushNamed(context, '/alphabet_lesson5');
-                  },
-                ),
-                const SizedBox(height: 16),
-
-                // level 6
-                Category(
-                  title: "Lesson 6",
-                  description: "Learn the sixth four letters of the alphabets",
-                  status: LessonStatus.locked,
-                  onTap: () {
-                    Navigator.pushNamed(context, '/alphabet_lesson6');
-                  },
-                ),
-                const SizedBox(height: 16),
-
-                // level 7
-                Category(
-                  title: "Lesson 7",
-                  description:
-                      "Learn the seventh four letters of the alphabets",
-                  status: LessonStatus.locked,
-                  onTap: () {
-                    Navigator.pushNamed(context, '/alphabet_lesson7');
-                  },
-                ),
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Category(
+                        title: lesson.title.isNotEmpty
+                            ? lesson.title
+                            : 'Lesson ${index + 1}',
+                        description: lesson.description.isNotEmpty
+                            ? lesson.description
+                            : 'Lesson details coming soon.',
+                        status: status,
+                        onTap: () => _handleLessonTap(index),
+                      ),
+                    );
+                  }),
               ],
             ),
           ),
