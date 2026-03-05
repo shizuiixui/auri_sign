@@ -21,7 +21,7 @@ The mobile app now loads the web gesture detection page in a WebView so both app
 
 ### Android (recommended for local development)
 
-Use `localhost` in WebView with `adb reverse` to keep a secure context for camera APIs (`getUserMedia`).
+Use `localhost` in WebView with automatic `adb reverse` during `flutter run` to keep a secure context for camera APIs (`getUserMedia`).
 
 1. Start web app:
 
@@ -30,19 +30,18 @@ cd ../AuriSign-Web/client
 npm run dev:mobile
 ```
 
-2. Reverse port to your connected Android device:
-
-```bash
-"%LOCALAPPDATA%\Android\Sdk\platform-tools\adb.exe" reverse tcp:5173 tcp:5173
-```
-
-3. Run Flutter app:
+2. Run Flutter app:
 
 ```bash
 flutter run -d <device-id>
 ```
 
-Default WebView URL is now `http://localhost:5173/gesture-recognition`.
+`flutter run` now auto-configures:
+- `adb reverse tcp:5173 tcp:5173` (web viewer)
+- `adb reverse tcp:5000 tcp:5000` (API server)
+
+Default WebView URL is `http://localhost:5173/gesture-recognition`.
+Default API URL is `http://localhost:5000/api`.
 
 ### One-command launcher (Windows PowerShell)
 
@@ -55,6 +54,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\run_mobile_webview.ps1 -Devic
 What it does automatically:
 - checks `adb`
 - runs `adb reverse tcp:5173 tcp:5173`
+- runs `adb reverse tcp:5000 tcp:5000`
 - starts web client if not running
 - runs Flutter with `WEB_VIEWER_URL=http://localhost:5173/gesture-recognition`
 
@@ -77,11 +77,7 @@ VS Code will automatically:
 
 Note: You still need your phone connected with USB debugging enabled, because the web model runs from your local machine.
 
-Important: If you run plain `flutter run` (without the setup task/script), the app may show "Unable to load web viewer" because `adb reverse` or the web client might not be ready yet.
-
-Safe order every time:
-1. Run setup script (`-NoFlutter`) or use the VS Code auto setup launch.
-2. Start Flutter only after setup succeeds.
+Plain `flutter run` now configures the required Android reverse tunnels automatically.
 
 ### Troubleshooting: "Unable to load web viewer"
 

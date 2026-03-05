@@ -1,6 +1,7 @@
 param(
   [string]$DeviceId = "",
   [int]$Port = 5173,
+  [int]$WebStartupTimeoutSec = 120,
   [switch]$NoFlutter
 )
 
@@ -8,6 +9,15 @@ $ErrorActionPreference = 'Stop'
 
 $flutterRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 $webClientPath = Resolve-Path (Join-Path $flutterRoot "..\AuriSign-Web\client")
+
+function Get-NpmPath {
+  $npmCommand = Get-Command npm -ErrorAction SilentlyContinue
+  if ($npmCommand) {
+    return $npmCommand.Source
+  }
+
+  throw "npm not found. Install Node.js LTS and ensure npm is in PATH."
+}
 
 function Get-AdbPath {
   $sdkAdb = Join-Path $env:LOCALAPPDATA "Android\Sdk\platform-tools\adb.exe"
@@ -66,6 +76,8 @@ if (-not [string]::IsNullOrWhiteSpace($DeviceId)) {
 
 & $adbPath reverse "tcp:$Port" "tcp:$Port" | Out-Null
 Write-Host "adb reverse enabled: tcp:$Port -> tcp:$Port"
+& $adbPath reverse "tcp:5000" "tcp:5000" | Out-Null
+Write-Host "adb reverse enabled: tcp:5000 -> tcp:5000"
 
 $webUrl = "http://localhost:$Port/gesture-recognition"
 
@@ -73,10 +85,34 @@ $portReady = Test-WebClientReady -Port $Port
 
 if (-not $portReady) {
   Write-Host "Starting web client at $webClientPath"
-  $webCommand = "Set-Location '$webClientPath'; npm run dev:mobile"
-  Start-Process powershell -ArgumentList "-NoExit", "-Command", $webCommand | Out-Null
+  $npmPath = Get-NpmPath
+  $nodeModulesPath = Join-Path $webClientPath "node_modules"
 
-  $maxAttempts = 30
+  if (-not (Test-Path $nodeModulesPath)) {
+    Write-Host "Installing web dependencies (first run)..."
+    Push-Location $webClientPath
+    try {
+      & $npmPath install --no-audit --no-fund
+    }
+    finally {
+      Pop-Location
+    }
+  }
+
+  $logDir = Join-Path $flutterRoot "build\logs"
+  New-Item -ItemType Directory -Force -Path $logDir | Out-Null
+  $stdoutLog = Join-Path $logDir "web_client_stdout.log"
+  $stderrLog = Join-Path $logDir "web_client_stderr.log"
+
+  $webProcess = Start-Process `
+    -FilePath "cmd.exe" `
+    -WorkingDirectory $webClientPath `
+    -ArgumentList @("/c", "npm", "run", "dev") `
+    -RedirectStandardOutput $stdoutLog `
+    -RedirectStandardError $stderrLog `
+    -PassThru
+
+  $maxAttempts = [Math]::Max(10, $WebStartupTimeoutSec)
   for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
     Start-Sleep -Seconds 1
     if (Test-WebClientReady -Port $Port) {
@@ -87,7 +123,17 @@ if (-not $portReady) {
 }
 
 if (-not $portReady) {
-  throw "Web client did not become reachable at $webUrl"
+  $stderrPreview = ""
+  if (Test-Path $stderrLog) {
+    $stderrPreview = (Get-Content $stderrLog -Tail 25) -join [Environment]::NewLine
+  }
+
+  $stdoutPreview = ""
+  if (Test-Path $stdoutLog) {
+    $stdoutPreview = (Get-Content $stdoutLog -Tail 25) -join [Environment]::NewLine
+  }
+
+  throw "Web client did not become reachable at $webUrl within ${WebStartupTimeoutSec}s.`nSTDERR:`n$stderrPreview`nSTDOUT:`n$stdoutPreview`nLogs: $flutterRoot\\build\\logs"
 }
 
 Write-Host "Web client ready: $webUrl"

@@ -80,8 +80,7 @@ class LoginViewModel extends ChangeNotifier {
         print('DioException Response: ${e.response?.data}');
         if (e.response != null) {
           if (e.response?.statusCode == 429) {
-            final retryAfterHeader =
-                e.response?.headers.value('retry-after');
+            final retryAfterHeader = e.response?.headers.value('retry-after');
             final retryAfterSeconds =
                 int.tryParse(retryAfterHeader ?? '') ?? 15 * 60;
             _startCooldown(retryAfterSeconds);

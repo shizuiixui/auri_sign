@@ -21,8 +21,7 @@ class GestureDetectionScreen extends StatefulWidget {
   State<GestureDetectionScreen> createState() => _GestureDetectionScreenState();
 }
 
-class _GestureDetectionScreenState extends State<GestureDetectionScreen>
-    with WidgetsBindingObserver {
+class _GestureDetectionScreenState extends State<GestureDetectionScreen> {
   static const int _maxRetriesPerUrl = 10;
 
   late final WebViewController _webViewController;
@@ -56,6 +55,17 @@ class _GestureDetectionScreenState extends State<GestureDetectionScreen>
 
   void _loadCurrentUrl() {
     _webViewController.loadRequest(_activeUri);
+  }
+
+  Future<bool> _isChromeErrorPage() async {
+    try {
+      final currentUrlRaw = await _webViewController
+          .runJavaScriptReturningResult('window.location.href');
+      final currentUrl = currentUrlRaw.toString().replaceAll('"', '');
+      return currentUrl.startsWith('chrome-error://');
+    } catch (_) {
+      return false;
+    }
   }
 
   Future<void> _handleMainFrameError() async {
@@ -101,7 +111,6 @@ class _GestureDetectionScreenState extends State<GestureDetectionScreen>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     _candidateUrls = _buildCandidateUrls();
     _webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
@@ -121,7 +130,12 @@ class _GestureDetectionScreenState extends State<GestureDetectionScreen>
               _loadingProgress = 0;
             });
           },
-          onPageFinished: (_) {
+          onPageFinished: (_) async {
+            if (await _isChromeErrorPage()) {
+              if (!mounted) return;
+              unawaited(_handleMainFrameError());
+              return;
+            }
             if (!mounted) return;
             setState(() {
               _mainFrameRetryCount = 0;
@@ -150,15 +164,7 @@ class _GestureDetectionScreenState extends State<GestureDetectionScreen>
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      _webViewController.reload();
-    }
-  }
-
-  @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -209,7 +215,7 @@ class _GestureDetectionScreenState extends State<GestureDetectionScreen>
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Quick fix: run scripts/run_mobile_webview.ps1 to auto-start web app + adb reverse.',
+                    'Quick fix: keep server + web client running, then relaunch with flutter run while device is connected.',
                     style: Theme.of(context).textTheme.bodySmall,
                     textAlign: TextAlign.center,
                   ),

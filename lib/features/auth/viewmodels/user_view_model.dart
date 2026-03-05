@@ -28,7 +28,7 @@ class UserViewModel extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
-        _user = UserModel.fromJson(data); 
+        _user = UserModel.fromJson(data);
       }
     } catch (e) {
       debugPrint("API Error: $e");
