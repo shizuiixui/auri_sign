@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+// Widgets
 import 'package:auri_sign/core/widgets/bottom_nav_bar.dart';
+
+// Screens
 import 'package:auri_sign/features/profile/presentation/screens/profile.dart';
 import 'package:auri_sign/features/homepage/presentation/screens/homepage.dart';
 import 'package:auri_sign/features/dictionary/presentation/screens/dictionary.dart';
+import 'package:auri_sign/features/gesture/presentation/screens/gesture_webview_screen.dart';
+
+// Data & ViewModels
 import 'package:auri_sign/features/dictionary/data/repositories/dictionary_repository.dart';
 import 'package:auri_sign/features/dictionary/presentation/viewmodels/dictionary_viewmodel.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class NavFunction extends StatefulWidget {
   const NavFunction({super.key});
@@ -13,6 +20,7 @@ class NavFunction extends StatefulWidget {
   @override
   State<NavFunction> createState() => _NavFunctionState();
 }
+
 class _NavFunctionState extends State<NavFunction> {
   int _selectedIndex = 0;
   
@@ -36,9 +44,11 @@ class _NavFunctionState extends State<NavFunction> {
     
     _dictionaryViewModel = DictionaryViewModel(repository);
 
-    setState(() {
-      _isInitializing = false;
-    });
+    if (mounted) {
+      setState(() {
+        _isInitializing = false;
+      });
+    }
   }
 
   List<Widget> get _pages => [
@@ -49,10 +59,9 @@ class _NavFunctionState extends State<NavFunction> {
         });
       },
     ), 
-    const SizedBox.shrink(), 
     
+    const GestureWebviewScreen(),  
     DictionaryPage(viewModel: _dictionaryViewModel), 
-    
     const ProfilePage(), 
   ];
 
@@ -67,17 +76,16 @@ class _NavFunctionState extends State<NavFunction> {
     }
 
     return Scaffold(
-      body: IndexedStack(index: _selectedIndex, children: _pages),
+      body: IndexedStack(
+        index: _selectedIndex, 
+        children: _pages
+      ),
       bottomNavigationBar: BottomNavBar(
         currentIndex: _selectedIndex,
         onTap: (index) {
-          if (index == 1) {
-            Navigator.pushNamed(context, '/gesture_detection');
-          } else {
-            setState(() {
-              _selectedIndex = index;
-            });
-          }
+          setState(() {
+            _selectedIndex = index;
+          });
         },
       ),
     );

@@ -20,7 +20,8 @@ import '/features/category/presentation/screens/category_common_words.dart';
 import '/features/category/presentation/screens/category_numbers.dart';
 
 // Gesture Detection
-import '/features/gesture_detection/presentation/screens/gesture_detection_screen.dart';
+import '/features/gesture/presentation/screens/gesture_webview_screen.dart';
+// import '/features/gesture_detection/presentation/screens/gesture_detection_screen.dart';
 
 // Dictionary
 import 'package:auri_sign/features/dictionary/data/repositories/dictionary_repository.dart';
@@ -42,7 +43,8 @@ class AppRouter {
       '/profile': (context) => const ProfilePage(),
 
       // Gesture Detection
-      '/gesture_detection': (context) => const GestureDetectionScreen(),
+        '/gesture_detection': (context) => const GestureWebviewScreen(),
+      // '/gesture_detection': (context) => const GestureDetectionScreen(),
 
       // Categories
       '/category_alphabets': (context) => const CategoryAlphabetsPage(),
