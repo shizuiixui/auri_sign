@@ -52,14 +52,8 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
         NavigationDelegate(
           onPageFinished: (String url) {
             const String css = """
-              /* 1. Hide Standard Navigation & Footer */
               .fixed-bottom, nav, header, footer, .navbar, .bottom-nav,
-              
-              /* 2. Hide the Streak Header by matching its Specific Inline Styles */
-              /* The React code uses zIndex: 5 and position: fixed at the top */
               div[style*="z-index: 5"][style*="position: fixed"][style*="top: 0"],
-              
-              /* 3. Fallback: Hide any fixed div at the top that isn't the body */
               #root > div > div[style*="position: fixed"][style*="top: 0"] { 
                 display: none !important; 
                 visibility: hidden !important;
@@ -99,7 +93,10 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("AI Gesture")),
+      appBar: AppBar(
+        title: const Text("AI Gesture"),
+        automaticallyImplyLeading: false,
+      ),
       body: Stack(
         children: [
           WebViewWidget(controller: controller),

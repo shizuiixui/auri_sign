@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:auri_sign/core/widgets/button.dart';
 import 'package:auri_sign/core/widgets/loading_indicator.dart';
 
@@ -111,11 +112,10 @@ class _ProfilingScreenState extends State<ProfilingScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // TOP BAR
             Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16.0,
-                vertical: 10,
+              padding: EdgeInsets.symmetric(
+                horizontal: 16.0.w,
+                vertical: 10.h,
               ),
               child: Row(
                 children: [
@@ -130,9 +130,9 @@ class _ProfilingScreenState extends State<ProfilingScreen> {
                         Navigator.pop(context);
                       }
                     },
-                    child: const Icon(Icons.arrow_back),
+                    child: Icon(Icons.arrow_back, size: 24.sp),
                   ),
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10.w),
                   Expanded(
                     child: LinearProgressIndicator(
                       value: (_currentPage + 1) / _profilingData.length,
@@ -140,19 +140,17 @@ class _ProfilingScreenState extends State<ProfilingScreen> {
                       backgroundColor: Colors.grey.shade200,
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10.w),
                   Text(
                     "${_currentPage + 1}/${_profilingData.length}",
-                    style: const TextStyle(
-                      fontSize: 16,
+                    style: TextStyle(
+                      fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
               ),
             ),
-
-            // MIDDLE
             Expanded(
               child: PageView.builder(
                 controller: _controller,
@@ -171,13 +169,11 @@ class _ProfilingScreenState extends State<ProfilingScreen> {
                 },
               ),
             ),
-
-            // BOTTOM
             Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: EdgeInsets.all(20.0.w),
               child: SizedBox(
                 width: double.infinity,
-                height: 50,
+                height: 50.h,
                 child: _isLoading
                     ? const LoadingIndicator()
                     : Opacity(
@@ -204,23 +200,22 @@ class _ProfilingScreenState extends State<ProfilingScreen> {
     );
   }
 
-  // Helper Widget
   Widget _buildQuestionPage(
     int pageIndex,
     String question,
     List<dynamic> options,
   ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: 20.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 20),
+          SizedBox(height: 20.h),
           Text(
             question,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 30),
+          SizedBox(height: 30.h),
           ...options.asMap().entries.map((entry) {
             int optionIndex = entry.key;
             Map<String, dynamic> optionData = entry.value;
@@ -236,8 +231,8 @@ class _ProfilingScreenState extends State<ProfilingScreen> {
                 });
               },
               child: Container(
-                margin: const EdgeInsets.only(bottom: 15),
-                padding: const EdgeInsets.all(15),
+                margin: EdgeInsets.only(bottom: 15.h),
+                padding: EdgeInsets.all(15.w),
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: isSelected ? Colors.white : Colors.transparent,
@@ -247,25 +242,25 @@ class _ProfilingScreenState extends State<ProfilingScreen> {
                         : Colors.grey.shade300,
                     width: isSelected ? 2.0 : 1.0,
                   ),
-                  borderRadius: BorderRadius.circular(30),
+                  borderRadius: BorderRadius.circular(30.r),
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
                             color: const Color(0xFFE9B63B).withOpacity(0.1),
-                            blurRadius: 4,
-                            offset: const Offset(0, 4),
+                            blurRadius: 4.r,
+                            offset: Offset(0, 4.h),
                           ),
                         ]
                       : [],
                 ),
                 child: Row(
                   children: [
-                    Image.asset(optionImage, width: 24, height: 24),
-                    const SizedBox(width: 15),
+                    Image.asset(optionImage, width: 24.w, height: 24.w),
+                    SizedBox(width: 15.w),
                     Text(
                       optionText,
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 16.sp,
                         fontWeight: isSelected
                             ? FontWeight.w600
                             : FontWeight.normal,

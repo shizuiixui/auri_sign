@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'core/di/injection_container.dart' as di;
 import 'core/routes/app_router.dart';
 
@@ -49,10 +50,10 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _initializeApp() async {
-    await context.read<UserViewModel>().initSession();
     await context.read<LoginViewModel>().checkLoginStatus();
-    final userViewModel = context.read<UserViewModel>();
-    await userViewModel.initSession();
+    if (mounted) {
+      await context.read<UserViewModel>().initSession();
+    }
 
     if (mounted) {
       setState(() {
@@ -65,18 +66,28 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     final userVM = context.watch<UserViewModel>();
 
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'AuriSign',
-      home: _isLoading
-          ? const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(color: Color(0xFFFFB800)),
-              ),
-            )
-          : (userVM.user != null ? const NavFunction() : const WelcomePage()),
-
-      routes: AppRouter.getRoutes(),
+    return ScreenUtilInit(
+      designSize: const Size(375, 812), 
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'AuriSign',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+            scaffoldBackgroundColor: Colors.white,
+          ),
+          home: _isLoading
+              ? const Scaffold(
+                  body: Center(
+                    child: CircularProgressIndicator(color: Color(0xFFFFB800)),
+                  ),
+                )
+              : (userVM.user != null ? const NavFunction() : const WelcomePage()),
+          routes: AppRouter.getRoutes(),
+        );
+      },
     );
   }
 }

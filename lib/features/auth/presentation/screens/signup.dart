@@ -1,5 +1,6 @@
 import 'package:auri_sign/features/auth/presentation/screens/email_verification.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '/core/widgets/button.dart';
 import '/core/widgets/text_input_field.dart';
 import '/core/utils/validators.dart';
@@ -40,6 +41,7 @@ class _SignupFormState extends State<SignupForm> {
     super.dispose();
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -47,7 +49,8 @@ class _SignupFormState extends State<SignupForm> {
       body: SafeArea(
         top: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 48),
+          // 2. Responsive Padding
+          padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 48.h),
           child: Form(
             key: _signupFormKey,
             child: Column(
@@ -57,27 +60,27 @@ class _SignupFormState extends State<SignupForm> {
                   child: Column(
                     children: [
                       // Sign Up Title
-                      const Text(
+                      Text(
                         "Sign Up and Start Learning",
                         style: TextStyle(
-                          fontSize: 32,
+                          fontSize: 32.sp, // 3. Responsive Font
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.bold,
                         ),
                       ),
 
-                      const SizedBox(height: 15),
+                      SizedBox(height: 15.h), // 4. Responsive Spacing
 
                       // Sign Up Subtitle
-                      const Text(
+                      Text(
                         "Create an account to save your daily goal and start your first lesson.",
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 16.sp,
                           fontFamily: 'PlusJakartaSans',
                         ),
                       ),
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20.h),
 
                       // First Name Text Field
                       TextFormField(
@@ -93,7 +96,7 @@ class _SignupFormState extends State<SignupForm> {
                         ),
                       ),
 
-                      const SizedBox(height: 14),
+                      SizedBox(height: 14.h),
 
                       // Last Name Text Field
                       TextFormField(
@@ -109,7 +112,7 @@ class _SignupFormState extends State<SignupForm> {
                         ),
                       ),
 
-                      const SizedBox(height: 14),
+                      SizedBox(height: 14.h),
 
                       // Email Text Field
                       TextFormField(
@@ -122,7 +125,7 @@ class _SignupFormState extends State<SignupForm> {
                         ),
                       ),
 
-                      const SizedBox(height: 14),
+                      SizedBox(height: 14.h),
 
                       // Password Field
                       TextFormField(
@@ -142,6 +145,7 @@ class _SignupFormState extends State<SignupForm> {
                                       ? Icons.visibility_off
                                       : Icons.visibility,
                                   color: Colors.grey,
+                                  size: 24.sp, // Scaled Icon
                                 ),
                                 onPressed: () {
                                   setState(() {
@@ -152,7 +156,7 @@ class _SignupFormState extends State<SignupForm> {
                             ),
                       ),
 
-                      const SizedBox(height: 14),
+                      SizedBox(height: 14.h),
 
                       // Confirm Password Field
                       TextFormField(
@@ -175,6 +179,7 @@ class _SignupFormState extends State<SignupForm> {
                                       ? Icons.visibility_off
                                       : Icons.visibility,
                                   color: Colors.grey,
+                                  size: 24.sp, // Scaled Icon
                                 ),
                                 onPressed: () {
                                   setState(() {
@@ -186,7 +191,7 @@ class _SignupFormState extends State<SignupForm> {
                             ),
                       ),
 
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8.h),
 
                       // Legal Disclaimer Checkbox
                       CheckboxListTile(
@@ -197,18 +202,18 @@ class _SignupFormState extends State<SignupForm> {
                             _legalDisclaimer = value;
                           });
                         },
-                        title: const Text.rich(
+                        title: Text.rich(
                           TextSpan(
                             text: 'By signing up, you agree to our ',
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 14.sp,
                               fontFamily: 'Poppins',
                             ),
                             children: [
                               TextSpan(
                                 text: 'Terms of Service ',
                                 style: TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 14.sp,
                                   fontFamily: 'Poppins',
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -216,14 +221,14 @@ class _SignupFormState extends State<SignupForm> {
                               TextSpan(
                                 text: 'and ',
                                 style: TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 14.sp,
                                   fontFamily: 'Poppins',
                                 ),
                               ),
                               TextSpan(
                                 text: 'Privacy Policy',
                                 style: TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 14.sp,
                                   fontFamily: 'Poppins',
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -237,7 +242,7 @@ class _SignupFormState extends State<SignupForm> {
                         activeColor: const Color(0xFFE9B63B),
                       ),
 
-                      const SizedBox(height: 15),
+                      SizedBox(height: 15.h),
 
                       // Sign Up Button
                       ListenableBuilder(
@@ -245,7 +250,7 @@ class _SignupFormState extends State<SignupForm> {
                         builder: (context, child) {
                           return SizedBox(
                             width: double.infinity,
-                            height: 50,
+                            height: 50.h, // Responsive Height
                             child: Button(
                               text: signupVM.isLoading
                                   ? "Loading..."
@@ -304,34 +309,34 @@ class _SignupFormState extends State<SignupForm> {
                           );
                         },
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20.h),
                       // Already have an account
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text(
+                          Text(
                             "Already have an account?",
                             style: TextStyle(
-                              fontSize: 18,
+                              fontSize: 18.sp,
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w400,
                             ),
                           ),
 
-                          const SizedBox(width: 6),
+                          SizedBox(width: 6.w),
 
                           // Login Text Button
                           GestureDetector(
                             onTap: () {
                               Navigator.pushNamed(context, '/login');
                             },
-                            child: const Text(
+                            child: Text(
                               "Login",
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 18.sp,
                                 fontFamily: 'Inter',
                                 fontWeight: FontWeight.w700,
-                                color: Color(0xFFE9B63B),
+                                color: const Color(0xFFE9B63B),
                               ),
                             ),
                           ),

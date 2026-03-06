@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '/core/widgets/button.dart';
 import '/core/widgets/text_input_field.dart';
 import '/core/utils/validators.dart';
@@ -14,10 +15,8 @@ class LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<LoginForm> {
-  // Form Key
   final _loginFormKey = GlobalKey<FormState>();
 
-  // Controllers
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
@@ -33,31 +32,34 @@ class _LoginFormState extends State<LoginForm> {
       body: SafeArea(
         top: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 50),
+          padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 50.h),
           child: Form(
             key: _loginFormKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Login Title
-                const Text(
+                Text(
                   "Welcome \nBack!",
                   style: TextStyle(
-                    fontSize: 32,
+                    fontSize: 32.sp,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.bold,
                   ),
                 ),
 
-                const SizedBox(height: 15),
+                SizedBox(height: 15.h),
 
                 // Login Subtitle
-                const Text(
+                Text(
                   "Log in to continue learning sign language and building meaningful connections.",
-                  style: TextStyle(fontSize: 16, fontFamily: 'PlusJakartaSans'),
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontFamily: 'PlusJakartaSans',
+                  ),
                 ),
 
-                const SizedBox(height: 20),
+                SizedBox(height: 20.h),
 
                 // Email Text Field
                 TextFormField(
@@ -70,7 +72,7 @@ class _LoginFormState extends State<LoginForm> {
                   ),
                 ),
 
-                const SizedBox(height: 14),
+                SizedBox(height: 14.h),
 
                 // Password Field
                 TextFormField(
@@ -88,6 +90,7 @@ class _LoginFormState extends State<LoginForm> {
                                 ? Icons.visibility_off
                                 : Icons.visibility,
                             color: Colors.grey,
+                            size: 24.sp,
                           ),
                           onPressed: () {
                             setState(() {
@@ -98,7 +101,7 @@ class _LoginFormState extends State<LoginForm> {
                       ),
                 ),
 
-                const SizedBox(height: 14),
+                SizedBox(height: 14.h),
 
                 // Forgot Password
                 Align(
@@ -107,19 +110,19 @@ class _LoginFormState extends State<LoginForm> {
                     onTap: () {
                       Navigator.pushNamed(context, '/forgot_password');
                     },
-                    child: const Text(
+                    child: Text(
                       "Forgot Password?",
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 16.sp,
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF000000),
+                        color: const Color(0xFF000000),
                       ),
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                SizedBox(height: 20.h),
 
                 // Login Button
                 ListenableBuilder(
@@ -127,13 +130,13 @@ class _LoginFormState extends State<LoginForm> {
                   builder: (context, child) {
                     return SizedBox(
                       width: double.infinity,
-                      height: 50,
+                      height: 50.h,
                       child: Button(
-                        text: loginVM.isLoading ? "Loading..." : "Get Started",
+                        text:
+                            loginVM.isLoading ? "Loading..." : "Get Started",
                         onPressed: () async {
                           if (loginVM.isLoading) return;
                           if (_loginFormKey.currentState!.validate()) {
-                            // 1. Attempt Login
                             await loginVM.login(
                               email: emailController.text.trim(),
                               password: passwordController.text.trim(),
@@ -149,14 +152,12 @@ class _LoginFormState extends State<LoginForm> {
                                 );
                               }
                             } else if (loginVM.token != null) {
-                              // Login Successful!
                               if (context.mounted) {
                                 await context
                                     .read<UserViewModel>()
                                     .initSession();
 
                                 if (context.mounted) {
-                                  // 3. Navigate to Home
                                   Navigator.pushReplacementNamed(
                                     context,
                                     '/home',
@@ -171,34 +172,34 @@ class _LoginFormState extends State<LoginForm> {
                   },
                 ),
 
-                const SizedBox(height: 20),
+                SizedBox(height: 20.h),
 
                 // Don't have an account
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
+                    Text(
                       "Don't have an account?",
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 18.sp,
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w400,
                       ),
                     ),
 
-                    const SizedBox(width: 6),
+                    SizedBox(width: 6.w),
 
                     GestureDetector(
                       onTap: () {
                         Navigator.pushNamed(context, '/signup');
                       },
-                      child: const Text(
+                      child: Text(
                         "Sign Up",
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 18.sp,
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFFE9B63B),
+                          color: const Color(0xFFE9B63B),
                         ),
                       ),
                     ),
