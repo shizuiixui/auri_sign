@@ -21,9 +21,7 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
   }
 
   Future<void> _initWebView() async {
-    // Request permissions for Camera/Microphone
     await [Permission.camera, Permission.microphone].request();
-
     const String url = 'http://localhost:5173/ai_gesture';
 
     late final PlatformWebViewControllerCreationParams params;
@@ -35,10 +33,12 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
 
     final WebViewController webViewController =
         WebViewController.fromPlatformCreationParams(params);
+
     if (webViewController.platform is AndroidWebViewController) {
       AndroidWebViewController.enableDebugging(true);
-      final androidController = webViewController.platform as AndroidWebViewController;
-      
+      final androidController =
+          webViewController.platform as AndroidWebViewController;
+
       androidController.setMediaPlaybackRequiresUserGesture(false);
       androidController.setOnPlatformPermissionRequest((request) {
         request.grant();
@@ -51,16 +51,28 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageFinished: (String url) {
-            // CSS Injection to hide unwanted UI elements
             const String css = """
-              .fixed-bottom, nav, header, footer, .navbar, .bottom-nav { 
+              /* 1. Hide Standard Navigation & Footer */
+              .fixed-bottom, nav, header, footer, .navbar, .bottom-nav,
+              
+              /* 2. Hide the Streak Header by matching its Specific Inline Styles */
+              /* The React code uses zIndex: 5 and position: fixed at the top */
+              div[style*="z-index: 5"][style*="position: fixed"][style*="top: 0"],
+              
+              /* 3. Fallback: Hide any fixed div at the top that isn't the body */
+              #root > div > div[style*="position: fixed"][style*="top: 0"] { 
                 display: none !important; 
                 visibility: hidden !important;
                 opacity: 0 !important;
                 pointer-events: none !important;
+                height: 0px !important;
+                min-height: 0px !important;
+                margin: 0px !important;
+                padding: 0px !important;
+                z-index: -9999 !important;
               }
             """;
-            
+
             webViewController.runJavaScript("""
               var style = document.createElement('style');
               style.type = 'text/css';
