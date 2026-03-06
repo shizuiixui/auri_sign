@@ -7,6 +7,7 @@ class CameraService {
   bool _isFrontCamera = false;
 
   bool get isInitialized => _isInitialized;
+  bool get isFrontCamera => _isFrontCamera;
   CameraController get controller => _cameraController;
 
   Future<bool> requestCameraPermission() async {

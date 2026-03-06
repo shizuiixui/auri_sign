@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 class ApiClient {
   static const String serverIp = String.fromEnvironment(
     'SERVER_IP',
-    defaultValue: '192.168.100.10',
+    defaultValue: 'localhost',
   );
   static const String baseUrl = 'http://$serverIp:5000/api';
 

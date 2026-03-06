@@ -49,6 +49,11 @@
 	<!-- Camera usage description for gesture detection -->
 	<key>NSCameraUsageDescription</key>
 	<string>This app requires camera access to detect and translate hand gestures to FSL.</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>

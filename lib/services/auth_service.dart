@@ -1,14 +1,8 @@
 import 'package:dio/dio.dart';
+import 'api_client.dart';
 
 class AuthService {
-  final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl:
-          'http://192.168.100.10:5000/api', // change with your laptop IP
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 10),
-    ),
-  );
+  final Dio _dio = ApiClient().dio;
 
   Future<Response> sendOTP({required String email}) async {
     try {
@@ -64,6 +58,21 @@ class AuthService {
       final response = await _dio.post(
         '/auth/login',
         data: {'email': email, 'password': password},
+      );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Response> verifyLoginMfa({
+    required String userId,
+    required String token,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/auth/verify-mfa',
+        data: {'userId': userId, 'token': token},
       );
       return response;
     } catch (e) {

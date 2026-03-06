@@ -1,29 +1,70 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../../../core/di/injection_container.dart';
-import '../../../lessons/data/repositories/lesson_repository.dart';
-import '../../../lessons/presentation/viewmodels/lesson_view_model.dart';
-import '../../../lessons/presentation/screens/lesson_execution_screen.dart';
-import '../widgets/category_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '/features/category/presentation/widgets/category_helper.dart';
+import '/services/lesson_service.dart';
 
 class CategoryCommonWordsPage extends StatefulWidget {
   const CategoryCommonWordsPage({super.key});
 
   @override
-  State<CategoryCommonWordsPage> createState() => _CategoryCommonWordsPageState();
+  State<CategoryCommonWordsPage> createState() =>
+      _CategoryCommonWordsPageState();
 }
 
 class _CategoryCommonWordsPageState extends State<CategoryCommonWordsPage> {
-  void _navigateToLesson(String lessonId) {
-    Navigator.push(
+  bool _isLoading = true;
+  String? _errorMessage;
+  List<LessonItem> _lessons = [];
+  final LessonService _lessonService = LessonService();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLessons();
+  }
+
+  Future<void> _loadLessons() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
+    if (token == null) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Sign in to load lessons.';
+      });
+      return;
+    }
+
+    try {
+      final lessons = await _lessonService.fetchLessons(
+        token: token,
+        category: 'phrases',
+      );
+      if (!mounted) return;
+      setState(() {
+        _lessons = lessons;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _errorMessage = 'Unable to load lessons.';
+      });
+    } finally {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _handleLessonTap() {
+    ScaffoldMessenger.of(
       context,
-      MaterialPageRoute(
-        builder: (_) => ChangeNotifierProvider(
-          create: (_) => LessonViewModel(repository: sl<LessonRepository>()),
-          child: LessonExecutionScreen(lessonId: lessonId),
-        ),
-      ),
-    );
+    ).showSnackBar(const SnackBar(content: Text('Lesson coming soon.')));
   }
 
   @override
@@ -32,7 +73,6 @@ class _CategoryCommonWordsPageState extends State<CategoryCommonWordsPage> {
       backgroundColor: const Color(0XFFF8F8F8),
       appBar: AppBar(
         title: const Text("Categories"),
-        backgroundColor: const Color(0XFFF8F8F8),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -45,53 +85,56 @@ class _CategoryCommonWordsPageState extends State<CategoryCommonWordsPage> {
             child: Column(
               children: [
                 const CategoryHeader(
-                  title: "Learn each common word of Filipino Sign Language and practice your gestures with real-time recognition.",
+                  title:
+                      "Learn each common word of Filipino Sign Language and practice your gestures with real-time recognition.",
                 ),
                 const SizedBox(height: 18),
+                if (_isLoading)
+                  const Text(
+                    'Loading lessons...',
+                    style: TextStyle(fontSize: 12, color: Colors.black54),
+                  ),
+                if (!_isLoading && _errorMessage != null)
+                  Text(
+                    _errorMessage!,
+                    style: const TextStyle(fontSize: 12, color: Colors.red),
+                  ),
+                if (!_isLoading && _errorMessage == null && _lessons.isEmpty)
+                  const Text(
+                    'No lessons available yet.',
+                    style: TextStyle(fontSize: 12, color: Colors.black54),
+                  ),
+                if (!_isLoading && _errorMessage == null && _lessons.isNotEmpty)
+                  ..._lessons.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final lesson = entry.value;
+                    final firstIncompleteIndex = _lessons.indexWhere(
+                      (item) => !item.completed,
+                    );
+                    final nextIndex = firstIncompleteIndex == -1
+                        ? _lessons.length
+                        : firstIncompleteIndex;
 
-                // Lesson 1
-                Category(
-                  title: "Lesson 1",
-                  description: "Learn the easiest common words",
-                  status: LessonStatus.current,
-                  onTap: () => _navigateToLesson("common_word_1"),
-                ),
-                const SizedBox(height: 16),
+                    final status = lesson.completed
+                        ? LessonStatus.completed
+                        : (index == nextIndex
+                              ? LessonStatus.current
+                              : LessonStatus.locked);
 
-                // Lesson 2
-                Category(
-                  title: "Lesson 2",
-                  description: "Learn the second set of common words",
-                  status: LessonStatus.locked,
-                  onTap: () => _navigateToLesson("common_word_2"),
-                ),
-                const SizedBox(height: 16),
-
-                // Lesson 3
-                Category(
-                  title: "Lesson 3",
-                  description: "Learn the third set of common words",
-                  status: LessonStatus.locked,
-                  onTap: () => _navigateToLesson("common_word_3"),
-                ),
-                const SizedBox(height: 16),
-
-                // Lesson 4
-                Category(
-                  title: "Lesson 4",
-                  description: "Learn the fourth set of common words",
-                  status: LessonStatus.locked,
-                  onTap: () => _navigateToLesson("common_word_4"),
-                ),
-                const SizedBox(height: 16),
-
-                // Lesson 5
-                Category(
-                  title: "Lesson 5",
-                  description: "Learn the fifth set of common words",
-                  status: LessonStatus.locked,
-                  onTap: () => _navigateToLesson("common_word_5"),
-                ),
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Category(
+                        title: lesson.title.isNotEmpty
+                            ? lesson.title
+                            : 'Lesson ${index + 1}',
+                        description: lesson.description.isNotEmpty
+                            ? lesson.description
+                            : 'Lesson details coming soon.',
+                        status: status,
+                        onTap: _handleLessonTap,
+                      ),
+                    );
+                  }),
               ],
             ),
           ),

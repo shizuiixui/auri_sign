@@ -75,7 +75,7 @@ class SignupViewModel extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      final response = await _authService.sendOTP(email: email);
+      await _authService.sendOTP(email: email);
       _successMessage = 'OTP resent successfully!';
       _errorMessage = null;
     } catch (e) {
