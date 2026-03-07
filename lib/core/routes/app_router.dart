@@ -1,6 +1,7 @@
 import 'package:auri_sign/features/dictionary/presentation/screens/dictionary.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:auri_sign/config/api_constants.dart';
 
 // Auth Screens
 import '/features/auth/presentation/screens/login_form.dart';
@@ -42,10 +43,6 @@ class AppRouter {
       '/home': (context) => const NavFunction(),
       '/profile': (context) => const ProfilePage(),
 
-      // Gesture Detection
-        '/gesture_detection': (context) => const GestureWebviewScreen(),
-      // '/gesture_detection': (context) => const GestureDetectionScreen(),
-
       // Categories
       '/category_alphabets': (context) => const CategoryAlphabetsPage(),
       '/category_numbers': (context) => const CategoryNumbersPage(),
@@ -54,7 +51,7 @@ class AppRouter {
       // Dictionary
       '/dictionary': (context) {
         final repository = DictionaryRepository(
-          baseUrl: 'http://192.168.100.10:5000/api/dictionary', // change with your laptop IP
+          baseUrl: ApiConstants.dictionary,
           authToken: 'auth_token',
         );
         final viewModel = DictionaryViewModel(repository);

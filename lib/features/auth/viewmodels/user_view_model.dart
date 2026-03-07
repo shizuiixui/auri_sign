@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/user_models.dart';
 import '../data/repositories/user_repository.dart';
+import 'package:auri_sign/config/api_constants.dart';
 
 class UserViewModel extends ChangeNotifier {
   final UserRepository _userRepository;
@@ -28,8 +29,8 @@ class UserViewModel extends ChangeNotifier {
     try {
       final response = await http.get(
         Uri.parse(
-          'http://192.168.100.10:5000/api/user/me',
-        ), // change with your laptop IP
+          ApiConstants.userProfile,
+        ),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -90,8 +91,8 @@ class UserViewModel extends ChangeNotifier {
       if (_token != null) {
         await http.post(
           Uri.parse(
-            'http://192.168.100.10:5000/api/user/logout',
-          ), // change with your laptop IP
+            ApiConstants.logout,
+          ), 
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer $_token',

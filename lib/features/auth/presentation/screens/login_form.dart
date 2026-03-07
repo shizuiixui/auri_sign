@@ -16,12 +16,9 @@ class LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<LoginForm> {
   final _loginFormKey = GlobalKey<FormState>();
-
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-
   bool obscurePassword = true;
-
   final loginVM = LoginViewModel();
 
   @override
@@ -38,7 +35,6 @@ class _LoginFormState extends State<LoginForm> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Login Title
                 Text(
                   "Welcome \nBack!",
                   style: TextStyle(
@@ -47,10 +43,7 @@ class _LoginFormState extends State<LoginForm> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-
                 SizedBox(height: 15.h),
-
-                // Login Subtitle
                 Text(
                   "Log in to continue learning sign language and building meaningful connections.",
                   style: TextStyle(
@@ -58,10 +51,7 @@ class _LoginFormState extends State<LoginForm> {
                     fontFamily: 'PlusJakartaSans',
                   ),
                 ),
-
                 SizedBox(height: 20.h),
-
-                // Email Text Field
                 TextFormField(
                   controller: emailController,
                   validator: (value) => Validators.validateEmail(value),
@@ -71,39 +61,32 @@ class _LoginFormState extends State<LoginForm> {
                     prefixIcon: Icons.email_outlined,
                   ),
                 ),
-
                 SizedBox(height: 14.h),
-
-                // Password Field
                 TextFormField(
                   controller: passwordController,
                   validator: (value) => Validators.validatePassword(value),
                   obscureText: obscurePassword,
-                  decoration:
-                      textInputField(
-                        "Create a password",
-                        prefixIcon: Icons.lock_outlined,
-                      ).copyWith(
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            obscurePassword
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                            color: Colors.grey,
-                            size: 24.sp,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              obscurePassword = !obscurePassword;
-                            });
-                          },
-                        ),
+                  decoration: textInputField(
+                    "Create a password",
+                    prefixIcon: Icons.lock_outlined,
+                  ).copyWith(
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: Colors.grey,
+                        size: 24.sp,
                       ),
+                      onPressed: () {
+                        setState(() {
+                          obscurePassword = !obscurePassword;
+                        });
+                      },
+                    ),
+                  ),
                 ),
-
                 SizedBox(height: 14.h),
-
-                // Forgot Password
                 Align(
                   alignment: Alignment.centerLeft,
                   child: GestureDetector(
@@ -121,21 +104,23 @@ class _LoginFormState extends State<LoginForm> {
                     ),
                   ),
                 ),
-
                 SizedBox(height: 20.h),
-
-                // Login Button
                 ListenableBuilder(
                   listenable: loginVM,
                   builder: (context, child) {
+                    if (loginVM.isLoading) {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFFE9B63B),
+                        ),
+                      );
+                    }
                     return SizedBox(
                       width: double.infinity,
                       height: 50.h,
                       child: Button(
-                        text:
-                            loginVM.isLoading ? "Loading..." : "Get Started",
+                        text: "Get Started",
                         onPressed: () async {
-                          if (loginVM.isLoading) return;
                           if (_loginFormKey.currentState!.validate()) {
                             await loginVM.login(
                               email: emailController.text.trim(),
@@ -171,10 +156,7 @@ class _LoginFormState extends State<LoginForm> {
                     );
                   },
                 ),
-
                 SizedBox(height: 20.h),
-
-                // Don't have an account
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -186,9 +168,7 @@ class _LoginFormState extends State<LoginForm> {
                         fontWeight: FontWeight.w400,
                       ),
                     ),
-
                     SizedBox(width: 6.w),
-
                     GestureDetector(
                       onTap: () {
                         Navigator.pushNamed(context, '/signup');

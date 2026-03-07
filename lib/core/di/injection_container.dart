@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:auri_sign/config/api_constants.dart';
 
 // Auth Imports
 import '../../features/auth/data/repositories/user_repository.dart';
@@ -20,7 +21,7 @@ final sl = GetIt.instance;
 Future<void> init() async {
   sl.registerLazySingleton<UserRepository>(
     () => UserRepository(
-      baseUrl: 'http://192.168.100.10:5000/api', // change with your laptop IP
+      baseUrl: ApiConstants.baseUrl,
     ),
   );
 
@@ -38,7 +39,7 @@ Future<void> init() async {
   // Repository 
   sl.registerLazySingleton<LessonRepository>(
     () => LessonRepository(
-      baseUrl: 'http://192.168.100.10:5000/api', // change with your laptop IP
+      baseUrl: ApiConstants.baseUrl,
     ),
   );
 

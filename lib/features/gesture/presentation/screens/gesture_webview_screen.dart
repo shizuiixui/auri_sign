@@ -2,16 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
+import 'package:auri_sign/config/api_constants.dart';
 
 class GestureWebviewScreen extends StatefulWidget {
-  const GestureWebviewScreen({super.key});
+  final String userToken;
+
+  const GestureWebviewScreen({super.key, required this.userToken});
 
   @override
   State<GestureWebviewScreen> createState() => _GestureWebviewScreenState();
 }
 
 class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
-  late final WebViewController controller;
+  WebViewController? controller;
   bool _isLoading = true;
 
   @override
@@ -20,9 +23,17 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
     _initWebView();
   }
 
+  @override
+  void dispose() {
+    controller?.loadRequest(Uri.parse('about:blank'));
+    controller?.clearCache();
+    super.dispose();
+  }
+
   Future<void> _initWebView() async {
     await [Permission.camera, Permission.microphone].request();
-    const String url = 'http://localhost:5173/ai_gesture';
+
+    const String targetUrl = ApiConstants.gestureWebviewUrl;
 
     late final PlatformWebViewControllerCreationParams params;
     if (WebViewPlatform.instance is AndroidWebViewPlatform) {
@@ -38,7 +49,6 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
       AndroidWebViewController.enableDebugging(true);
       final androidController =
           webViewController.platform as AndroidWebViewController;
-
       androidController.setMediaPlaybackRequiresUserGesture(false);
       androidController.setOnPlatformPermissionRequest((request) {
         request.grant();
@@ -51,6 +61,7 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageFinished: (String url) {
+            // CSS Injection to hide unwanted UI elements
             const String css = """
               .fixed-bottom, nav, header, footer, .navbar, .bottom-nav,
               div[style*="z-index: 5"][style*="position: fixed"][style*="top: 0"],
@@ -66,12 +77,19 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
                 z-index: -9999 !important;
               }
             """;
-
             webViewController.runJavaScript("""
               var style = document.createElement('style');
               style.type = 'text/css';
               style.innerHTML = `$css`;
               document.head.appendChild(style);
+            """);
+
+            // Inject Token
+            webViewController.runJavaScript("""
+              localStorage.setItem('token', '${widget.userToken}');
+              if (window.location.pathname === '/login' || window.location.pathname === '/') {
+                 window.location.href = '/ai_gesture';
+              }
             """);
 
             if (mounted) {
@@ -85,9 +103,13 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
           },
         ),
       )
-      ..loadRequest(Uri.parse(url));
+      ..loadRequest(Uri.parse(targetUrl));
 
-    controller = webViewController;
+    if (mounted) {
+      setState(() {
+        controller = webViewController;
+      });
+    }
   }
 
   @override
@@ -96,11 +118,25 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
       appBar: AppBar(
         title: const Text("AI Gesture"),
         automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.black),
+            tooltip: 'Reload Camera',
+            onPressed: () {
+              setState(() {
+                _isLoading = true;
+              });
+              controller?.reload();
+            },
+          ),
+        ],
       ),
       body: Stack(
         children: [
-          WebViewWidget(controller: controller),
-          if (_isLoading) const Center(child: CircularProgressIndicator()),
+          if (controller != null) WebViewWidget(controller: controller!),
+
+          if (controller == null || _isLoading)
+            const Center(child: CircularProgressIndicator()),
         ],
       ),
     );

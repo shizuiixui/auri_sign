@@ -23,7 +23,7 @@ class WelcomePage extends StatelessWidget {
                   height: 120.h,
                   decoration: const BoxDecoration(
                     image: DecorationImage(
-                      image: AssetImage('assets/images/logo1.png'),
+                      image: AssetImage('assets/images/auri_sign_logo.png'),
                       fit: BoxFit.cover,
                     ),
                   ),

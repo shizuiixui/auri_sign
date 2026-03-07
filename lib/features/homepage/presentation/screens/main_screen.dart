@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:auri_sign/config/api_constants.dart';
 
 // Widgets
 import 'package:auri_sign/core/widgets/bottom_nav_bar.dart';
@@ -25,7 +26,8 @@ class _NavFunctionState extends State<NavFunction> {
   int _selectedIndex = 0;
   
   late final DictionaryViewModel _dictionaryViewModel;
-  bool _isInitializing = true; 
+  bool _isInitializing = true;
+  String _userToken = ''; 
 
   @override
   void initState() {
@@ -36,9 +38,11 @@ class _NavFunctionState extends State<NavFunction> {
   Future<void> _initializeApp() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('auth_token') ?? ''; 
+    _userToken = token;
 
+    // 1. UPDATED TO LOCALHOST (For USB Tunnel)
     final repository = DictionaryRepository(
-      baseUrl: 'http://192.168.100.10:5000/api/dictionary', // change with your laptop IP
+      baseUrl: ApiConstants.dictionary,
       authToken: token, 
     );
     
@@ -51,20 +55,6 @@ class _NavFunctionState extends State<NavFunction> {
     }
   }
 
-  List<Widget> get _pages => [
-    HomePage(
-      onProfileTap: () {
-        setState(() {
-          _selectedIndex = 3; 
-        });
-      },
-    ), 
-    
-    const GestureWebviewScreen(),  
-    DictionaryPage(viewModel: _dictionaryViewModel), 
-    const ProfilePage(), 
-  ];
-
   @override
   Widget build(BuildContext context) {
     if (_isInitializing) {
@@ -76,9 +66,37 @@ class _NavFunctionState extends State<NavFunction> {
     }
 
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex, 
-        children: _pages
+      // 2. THE FIX: Using a Stack instead of just IndexedStack
+      body: Stack(
+        children: [
+          // BACKGROUND LAYERS (Home, Dictionary, Profile)
+          // We hide them when Camera is active, but we don't destroy them.
+          Offstage(
+            offstage: _selectedIndex == 1, // True if Camera is open
+            child: IndexedStack(
+              // Logic to skip the camera index (1) for the background stack
+              // If index is 0 (Home) -> 0
+              // If index is 2 (Dictionary) -> 1
+              // If index is 3 (Profile) -> 2
+              index: _selectedIndex > 1 ? _selectedIndex - 1 : _selectedIndex, 
+              children: [
+                 HomePage(
+                   onProfileTap: () {
+                     setState(() {
+                       _selectedIndex = 3; 
+                     });
+                   },
+                 ), 
+                 // Note: Camera is NOT in this list!
+                 DictionaryPage(viewModel: _dictionaryViewModel), 
+                 const ProfilePage(), 
+              ],
+            ),
+          ),
+          
+          if (_selectedIndex == 1)
+            GestureWebviewScreen(userToken: _userToken),
+        ],
       ),
       bottomNavigationBar: BottomNavBar(
         currentIndex: _selectedIndex,

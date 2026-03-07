@@ -1,15 +1,11 @@
 import 'package:dio/dio.dart';
+import 'package:auri_sign/config/api_constants.dart';
 
 class ApiClient {
-  static const String serverIp = String.fromEnvironment(
-    'SERVER_IP',
-    defaultValue: '192.168.100.10', // change with your laptop IP
-  );
-  static const String baseUrl = 'http://$serverIp:5000/api';
-
   final Dio dio = Dio(
     BaseOptions(
-      baseUrl: baseUrl,
+      baseUrl: ApiConstants.baseUrl,
+      
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 20),
       sendTimeout: const Duration(seconds: 10),

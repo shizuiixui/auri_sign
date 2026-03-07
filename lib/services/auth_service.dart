@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
+import 'package:auri_sign/config/api_constants.dart';
 
 class AuthService {
   final Dio _dio = Dio(
     BaseOptions(
       baseUrl:
-          'http://192.168.100.10:5000/api', // change with your laptop IP
+          ApiConstants.baseUrl,
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
     ),
