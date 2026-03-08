@@ -50,7 +50,12 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _initializeApp() async {
+    await Future.delayed(const Duration(milliseconds: 1500));
+
+    if (!mounted) return;
+
     await context.read<LoginViewModel>().checkLoginStatus();
+    
     if (mounted) {
       await context.read<UserViewModel>().initSession();
     }
@@ -67,7 +72,7 @@ class _MyAppState extends State<MyApp> {
     final userVM = context.watch<UserViewModel>();
 
     return ScreenUtilInit(
-      designSize: const Size(375, 812), 
+      designSize: const Size(375, 812),
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
@@ -76,15 +81,31 @@ class _MyAppState extends State<MyApp> {
           title: 'AuriSign',
           theme: ThemeData(
             primarySwatch: Colors.blue,
-            scaffoldBackgroundColor: Colors.white,
+            scaffoldBackgroundColor: Color(0xFFF8F8F8),
           ),
           home: _isLoading
-              ? const Scaffold(
+              ? Scaffold(
+                  backgroundColor: Color(0xFFF8F8F8),
                   body: Center(
-                    child: CircularProgressIndicator(color: Color(0xFFFFB800)),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/images/auri_sign_logo.png',
+                          width: 150,
+                          height: 150,
+                        ),
+                        const SizedBox(height: 20),
+                        const CircularProgressIndicator(
+                          color: Color(0xFFFFB800),
+                        ),
+                      ],
+                    ),
                   ),
                 )
-              : (userVM.user != null ? const NavFunction() : const WelcomePage()),
+              : (userVM.user != null
+                  ? const NavFunction()
+                  : const WelcomePage()),
           routes: AppRouter.getRoutes(),
         );
       },

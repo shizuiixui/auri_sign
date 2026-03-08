@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '/services/auth_service.dart';
 import '/features/auth/presentation/viewmodels/signup_view_models.dart';
 import '/core/widgets/button.dart';
@@ -20,6 +21,14 @@ class _VerifyEmailState extends State<VerifyEmail> {
   );
   bool _isLoading = false;
   final SignupViewModel _signupVM = SignupViewModel();
+
+  @override
+  void dispose() {
+    for (var controller in _controllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
 
   void _handleVerify() async {
     String otp = _controllers.map((controller) => controller.text).join();
@@ -53,7 +62,6 @@ class _VerifyEmailState extends State<VerifyEmail> {
         );
       }
     } catch (e) {
-      print('Verify OTP Error: $e');
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
@@ -73,41 +81,42 @@ class _VerifyEmailState extends State<VerifyEmail> {
         iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 24.w),
           child: Column(
             children: [
-              const SizedBox(height: 20),
-              const Text(
+              SizedBox(height: 20.h),
+              Text(
                 "Verify Your Email",
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 24.sp,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Poppins',
                 ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10.h),
               Text(
                 "Enter the code sent to ${widget.email}",
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.grey,
                   fontFamily: 'Poppins',
+                  fontSize: 14.sp,
                 ),
               ),
-              const SizedBox(height: 40),
+              SizedBox(height: 40.h),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: List.generate(6, (i) {
                   return SizedBox(
-                    width: 40,
-                    height: 40,
+                    width: 45.w,
+                    height: 50.h,
                     child: TextFormField(
                       controller: _controllers[i],
                       textAlign: TextAlign.center,
                       keyboardType: TextInputType.number,
-                      style: const TextStyle(
-                        fontSize: 24,
+                      style: TextStyle(
+                        fontSize: 24.sp,
                         fontWeight: FontWeight.bold,
                       ),
                       inputFormatters: [
@@ -124,8 +133,9 @@ class _VerifyEmailState extends State<VerifyEmail> {
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.white,
+                        contentPadding: EdgeInsets.zero,
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(12.r),
                           borderSide: BorderSide.none,
                         ),
                       ),
@@ -133,16 +143,17 @@ class _VerifyEmailState extends State<VerifyEmail> {
                   );
                 }),
               ),
-              const SizedBox(height: 40),
+              SizedBox(height: 40.h),
               SizedBox(
                 width: double.infinity,
+                height: 50.h,
                 child: _isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : Button(text: "Verify", onPressed: _handleVerify),
               ),
-              const SizedBox(height: 16),
-              TextButton(
-                onPressed: () async {
+              SizedBox(height: 16.h),
+              GestureDetector(
+                onTap: () async {
                   await _signupVM.resendOTP(email: widget.email);
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -159,7 +170,32 @@ class _VerifyEmailState extends State<VerifyEmail> {
                     );
                   }
                 },
-                child: const Text("Didn't receive a code? Resend"),
+                child: Padding(
+                  padding: EdgeInsets.all(8.w),
+                  child: Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "Didn't receive a code? ",
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontFamily: 'Poppins',
+                            fontSize: 14.sp,
+                          ),
+                        ),
+                        TextSpan(
+                          text: "Resend",
+                          style: TextStyle(
+                            color: const Color(0xFFFFB800),
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14.sp,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ],
           ),

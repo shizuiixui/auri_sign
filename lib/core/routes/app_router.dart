@@ -8,7 +8,7 @@ import '/features/auth/presentation/screens/login_form.dart';
 import '/features/auth/presentation/screens/profiling/profiling.dart';
 import '/features/auth/presentation/screens/email_verification.dart';
 import '/features/auth/presentation/screens/signup.dart';
-import '/features/auth/presentation/screens/welcome page/forgot_password.dart';
+import '../../features/auth/presentation/screens/forgot_password.dart';
 import '/features/auth/presentation/screens/welcome page/welcome_page.dart';
 
 // Profile

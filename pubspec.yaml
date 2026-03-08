@@ -63,7 +63,7 @@ dependencies:
   chewie: ^1.13.0
   webview_flutter: ^4.13.1
   flutter_screenutil: ^5.9.3
-
+  flutter_native_splash: ^2.4.7
 
 dev_dependencies:
   flutter_test:
@@ -79,6 +79,13 @@ flutter_launcher_icons:
   remove_alpha_ios: true
   adaptive_icon_background: "#F8F8F8"
 
+flutter_native_splash:
+  color: "#F8F8F8"
+  image: assets/images/auri_sign_logo.png
+  android_12:
+    image: assets/images/auri_sign_logo.png
+    color: "#F8F8F8"
+  fullscreen: true
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
