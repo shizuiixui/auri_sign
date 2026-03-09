@@ -11,6 +11,7 @@ import 'features/auth/viewmodels/user_view_model.dart';
 import 'features/auth/presentation/viewmodels/login_view_model.dart';
 import 'features/profile/viewmodels/achievements_view_model.dart';
 import 'features/profile/viewmodels/profile_view_model.dart';
+import 'features/profile/viewmodels/notification_schedule_view_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +26,9 @@ void main() async {
         ChangeNotifierProvider(create: (_) => di.sl<AchievementsViewModel>()),
         ChangeNotifierProvider(create: (_) => di.sl<ProfileViewModel>()),
         ChangeNotifierProvider(create: (_) => di.sl<LoginViewModel>()),
+        ChangeNotifierProvider(
+          create: (_) => di.sl<NotificationScheduleViewModel>(),
+        ),
       ],
       child: const MyApp(),
     ),
@@ -55,7 +59,7 @@ class _MyAppState extends State<MyApp> {
     if (!mounted) return;
 
     await context.read<LoginViewModel>().checkLoginStatus();
-    
+
     if (mounted) {
       await context.read<UserViewModel>().initSession();
     }

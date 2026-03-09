@@ -1,0 +1,4 @@
+enum SchedulePrecision {
+  exact,
+  inexact,
+}

@@ -1,5 +1,5 @@
 class ApiConstants {
-  static const String ipAddress = "192.168.100.10"; // change with your laptop IP address
+  static const String ipAddress = "192.168.100.81"; // change with your laptop IP address
   static const String port = "5000";
   
   // Base URL

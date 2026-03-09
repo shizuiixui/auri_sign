@@ -13,7 +13,8 @@ import 'package:auri_sign/features/auth/presentation/screens/welcome page/welcom
 // ViewModels
 import 'package:auri_sign/features/profile/viewmodels/achievements_view_model.dart';
 import 'package:auri_sign/features/auth/viewmodels/user_view_model.dart';
-import 'package:auri_sign/features/profile/viewmodels/profile_view_model.dart';
+import 'package:auri_sign/features/profile/viewmodels/notification_schedule_view_model.dart';
+import 'package:auri_sign/features/profile/domain/usecases/set_schedule_enabled_usecase.dart';
 import '/features/auth/presentation/viewmodels/login_view_model.dart';
 
 // Widgets
@@ -122,9 +123,47 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
+  Future<void> _onScheduleChanged(
+    BuildContext context,
+    NotificationScheduleViewModel notificationVM,
+    bool value,
+  ) async {
+    final result = await notificationVM.setScheduleEnabled(value);
+    if (!context.mounted) {
+      return;
+    }
+
+    if (result.status == SetScheduleStatus.permissionDenied) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Notification permission is required.'),
+        ),
+      );
+      return;
+    }
+
+    if (result.status == SetScheduleStatus.enabledInexact) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Exact alarm permission not granted. Notification may be delayed.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    if (result.status == SetScheduleStatus.failed) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update schedule: ${result.error}')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final userVM = context.watch<UserViewModel>();
+    final notificationVM = context.watch<NotificationScheduleViewModel>();
     final user = userVM.user;
 
     return Scaffold(
@@ -132,7 +171,7 @@ class ProfilePage extends StatelessWidget {
       body: SafeArea(
         child: userVM.isLoading
             ? const Center(child: CircularProgressIndicator())
-            : _buildProfileContent(context, user, userVM),
+            : _buildProfileContent(context, user, userVM, notificationVM),
       ),
     );
   }
@@ -141,8 +180,8 @@ class ProfilePage extends StatelessWidget {
     BuildContext context,
     dynamic user,
     UserViewModel userVM,
+    NotificationScheduleViewModel notificationVM,
   ) {
-    // Logic to get the first letter
     String initial = "U";
     if (user?.firstName != null && user!.firstName!.isNotEmpty) {
       initial = user.firstName![0].toUpperCase();
@@ -154,7 +193,6 @@ class ProfilePage extends StatelessWidget {
         children: [
           SizedBox(height: 40.h),
 
-          // 👇 UPDATED: Yellow Fill with White Text
           Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
@@ -168,13 +206,13 @@ class ProfilePage extends StatelessWidget {
             ),
             child: CircleAvatar(
               radius: 50.r,
-              backgroundColor: const Color(0xFFFFB800), // Solid Brand Yellow
+              backgroundColor: const Color(0xFFFFB800),
               child: Text(
                 initial,
                 style: TextStyle(
                   fontSize: 45.sp,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white, // White Text for high contrast
+                  color: Colors.white,
                   fontFamily: 'Poppins',
                 ),
               ),
@@ -226,6 +264,21 @@ class ProfilePage extends StatelessWidget {
                 ),
               );
             },
+          ),
+
+          SizedBox(height: 20.h),
+
+          const ProfileSectionHeader(title: "Notifications"),
+
+          ProfileSwitchTile(
+            title: "Daily Reminder",
+            subtitle: "Turn on/off daily reminder notification",
+            value: notificationVM.isScheduleEnabled,
+            onChanged: notificationVM.isUpdatingSchedule
+                ? null
+                : (value) {
+                    _onScheduleChanged(context, notificationVM, value);
+                  },
           ),
 
           SizedBox(height: 20.h),
