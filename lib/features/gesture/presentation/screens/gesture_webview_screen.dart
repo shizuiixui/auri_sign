@@ -30,6 +30,43 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
     super.dispose();
   }
 
+  // CSS Injection
+  void _injectCSS(WebViewController controller) {
+    const String css = """
+      /* Hide standard web layout and UI components immediately */
+      nav, header, footer, .navbar, .bottom-nav, .sidebar, 
+      .badge, .streak-container, [class*='badge'], [class*='streak'] { 
+        display: none !important; 
+        visibility: hidden !important;
+        height: 0px !important;
+        pointer-events: none !important;
+        opacity: 0 !important;
+      }
+      
+      .container-fluid, .container {
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      
+      body {
+        background-color: #fff !important; 
+        overflow-x: hidden;
+      }
+    """;
+
+    controller.runJavaScript("""
+      (function() {
+        var style = document.getElementById('injected-mobile-css');
+        if (!style) {
+          style = document.createElement('style');
+          style.id = 'injected-mobile-css';
+          document.head.appendChild(style);
+        }
+        style.innerHTML = `$css`;
+      })();
+    """);
+  }
+
   Future<void> _initWebView() async {
     await [Permission.camera, Permission.microphone].request();
 
@@ -46,7 +83,6 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
         WebViewController.fromPlatformCreationParams(params);
 
     if (webViewController.platform is AndroidWebViewController) {
-      AndroidWebViewController.enableDebugging(true);
       final androidController =
           webViewController.platform as AndroidWebViewController;
       androidController.setMediaPlaybackRequiresUserGesture(false);
@@ -58,33 +94,18 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
     webViewController
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0x00000000))
+      ..setUserAgent(
+        "Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Mobile Safari/537.36",
+      )
       ..setNavigationDelegate(
         NavigationDelegate(
+          onPageStarted: (String url) {
+            _injectCSS(webViewController);
+          },
           onPageFinished: (String url) {
-            // CSS Injection to hide unwanted UI elements
-            const String css = """
-              .fixed-bottom, nav, header, footer, .navbar, .bottom-nav,
-              div[style*="z-index: 5"][style*="position: fixed"][style*="top: 0"],
-              #root > div > div[style*="position: fixed"][style*="top: 0"] { 
-                display: none !important; 
-                visibility: hidden !important;
-                opacity: 0 !important;
-                pointer-events: none !important;
-                height: 0px !important;
-                min-height: 0px !important;
-                margin: 0px !important;
-                padding: 0px !important;
-                z-index: -9999 !important;
-              }
-            """;
-            webViewController.runJavaScript("""
-              var style = document.createElement('style');
-              style.type = 'text/css';
-              style.innerHTML = `$css`;
-              document.head.appendChild(style);
-            """);
+            _injectCSS(webViewController);
 
-            // Inject Token
+            // Token and Routing Injection
             webViewController.runJavaScript("""
               localStorage.setItem('token', '${widget.userToken}');
               if (window.location.pathname === '/login' || window.location.pathname === '/') {
@@ -116,16 +137,18 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("AI Gesture"),
+        title: const Text(
+          "AI Gesture",
+          style: TextStyle(color: Colors.black,),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.black),
-            tooltip: 'Reload Camera',
             onPressed: () {
-              setState(() {
-                _isLoading = true;
-              });
+              setState(() => _isLoading = true);
               controller?.reload();
             },
           ),
@@ -135,8 +158,14 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
         children: [
           if (controller != null) WebViewWidget(controller: controller!),
 
+          // Loading Overlay
           if (controller == null || _isLoading)
-            const Center(child: CircularProgressIndicator()),
+            Container(
+              color: Colors.white,
+              child: const Center(
+                child: CircularProgressIndicator(color: Color(0xFFE9B63B)),
+              ),
+            ),
         ],
       ),
     );

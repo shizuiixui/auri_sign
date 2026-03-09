@@ -25,7 +25,7 @@ class ApiConstants {
   static const String uploadProfilePicture = "$baseUrl/user/upload-profile-picture";
 
   // AI Gesture WebView
-  static const String gestureWebviewUrl = 'http://localhost:5173/ai_gesture';
+  static const String gestureWebviewUrl = 'http://localhost:5173/ai_gesture/mobile';
 
   
 } 

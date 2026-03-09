@@ -13,7 +13,6 @@ import 'package:auri_sign/features/auth/presentation/screens/welcome page/welcom
 // ViewModels
 import 'package:auri_sign/features/profile/viewmodels/achievements_view_model.dart';
 import 'package:auri_sign/features/auth/viewmodels/user_view_model.dart';
-import 'package:auri_sign/features/profile/viewmodels/profile_view_model.dart';
 import '/features/auth/presentation/viewmodels/login_view_model.dart';
 
 // Widgets
@@ -154,7 +153,7 @@ class ProfilePage extends StatelessWidget {
         children: [
           SizedBox(height: 40.h),
 
-          // 👇 UPDATED: Yellow Fill with White Text
+          // Yellow Fill with White Text
           Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
@@ -168,13 +167,13 @@ class ProfilePage extends StatelessWidget {
             ),
             child: CircleAvatar(
               radius: 50.r,
-              backgroundColor: const Color(0xFFFFB800), // Solid Brand Yellow
+              backgroundColor: const Color(0xFFFFB800),
               child: Text(
                 initial,
                 style: TextStyle(
                   fontSize: 45.sp,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white, // White Text for high contrast
+                  color: Colors.white, 
                   fontFamily: 'Poppins',
                 ),
               ),

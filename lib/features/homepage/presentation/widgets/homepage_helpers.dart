@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '/core/widgets/user_stats.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '/core/widgets/user_stats.dart'; // Ensure this path is correct for your UserStatsRow
 
 class HomeHeader extends StatelessWidget {
   final String firstName;
@@ -7,172 +8,119 @@ class HomeHeader extends StatelessWidget {
   final VoidCallback onProfileTap;
 
   const HomeHeader({
-    super.key, 
-    required this.firstName, 
+    super.key,
+    required this.firstName,
     this.profilePicture,
     required this.onProfileTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Logic to get the first letter
+    String initial = "U";
+    if (firstName.isNotEmpty) {
+      initial = firstName[0].toUpperCase();
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             GestureDetector(
               onTap: onProfileTap,
-              child: CircleAvatar(
-                radius: 24,
-                backgroundColor: Colors.grey[300],
-                backgroundImage: profilePicture != null
-                    ? NetworkImage(profilePicture!)
-                    : null,
-                child: profilePicture == null
-                    ? const Icon(Icons.person, color: Colors.grey)
-                    : null,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Hi",
-                  style: TextStyle(fontSize: 16, fontFamily: 'Poppins'),
+              child: Container(
+                width: 50.w,
+                height: 50.w,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFFFB800).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-                Text(
-                  "$firstName!",
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                child: CircleAvatar(
+                  backgroundColor: const Color(0xFFFFB800),
+                  child: Text(
+                    initial,
+                    style: TextStyle(
+                      fontSize: 24.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontFamily: 'Poppins',
+                    ),
                   ),
                 ),
-              ],
+              ),
             ),
+            SizedBox(width: 12.w),
+
+            // Name Section
+            Padding(
+              padding: EdgeInsets.only(top: 3.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Hello,",
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontFamily: 'Poppins',
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  Text(
+                    "$firstName!",
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Poppins',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
             const Spacer(),
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.notifications_outlined),
+
+            // Notification Icon (Kept as requested)
+            Padding(
+              padding: EdgeInsets.only(top: 4.h),
+              child: IconButton(
+                onPressed: () {},
+                icon: Icon(Icons.notifications_outlined, size: 24.sp),
+              ),
             ),
           ],
         ),
-        const SizedBox(height: 20),
-        const Text(
+        SizedBox(height: 20.h),
+
+        Text(
           "Your Smart AI Sign Language\nLearning Companion",
-          style: TextStyle(fontSize: 20, fontFamily: 'Poppins'),
+          style: TextStyle(
+            fontSize: 20.sp,
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w500,
+          ),
         ),
-        const SizedBox(height: 16),
-        // Inserted Stats Widget Here
-        const UserStatsRow(
-          trophyCount: 1,
-          streakCount: 0,
-        ),
+
+        SizedBox(height: 16.h),
+
+        // User Stats
+        const UserStatsRow(trophyCount: 1, streakCount: 0),
       ],
     );
   }
 }
 
-// Continue Lesson Card Widget
-class ContinueLessonCard extends StatelessWidget {
-  final String title;
-  final double progress;
-  final Color color;
-  final String imagePath;
+// -----------------------------------------------------------
+// Keep your existing Card widgets below this line unchanged
+// -----------------------------------------------------------
 
-  const ContinueLessonCard({
-    super.key,
-    required this.title,
-    required this.progress,
-    required this.color,
-    required this.imagePath,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          // Image Top, Title Bottom
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Image.asset(imagePath, fit: BoxFit.contain),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                // Title at the bottom
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Progress Ring
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              SizedBox(
-                width: 70,
-                height: 70,
-                child: CircularProgressIndicator(
-                  value: progress,
-                  strokeWidth: 6,
-                  backgroundColor: Colors.white.withOpacity(0.4),
-                  valueColor: const AlwaysStoppedAnimation(Color(0xFF3B82F6)),
-                ),
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "${(progress * 100).toInt()}%",
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const Text(
-                    "complete",
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.white70,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// Category Section Card Widget
 class CategorySectionCard extends StatelessWidget {
   final String title;
   final Color color;
@@ -195,7 +143,6 @@ class CategorySectionCard extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        // Navigate to category page based on title
         if (title.contains("Alphabets")) {
           Navigator.pushNamed(context, '/category_alphabets');
         } else if (title.contains("Numbers")) {
@@ -205,11 +152,11 @@ class CategorySectionCard extends StatelessWidget {
         }
       },
       child: Container(
-        height: 130,
+        height: 130.h,
         width: double.infinity,
         decoration: BoxDecoration(
           color: color,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
@@ -223,12 +170,12 @@ class CategorySectionCard extends StatelessWidget {
           children: [
             if (bigDisplayChar != null)
               Positioned(
-                right: 20,
-                bottom: 5,
+                right: 20.w,
+                bottom: 5.h,
                 child: Text(
                   bigDisplayChar!,
                   style: TextStyle(
-                    fontSize: 140,
+                    fontSize: 140.sp,
                     height: 1,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Unna',
@@ -236,39 +183,39 @@ class CategorySectionCard extends StatelessWidget {
                   ),
                 ),
               ),
-
-            // Heart Icon
             if (bigDisplayIcon != null)
               Positioned(
-                right: 3,
-                bottom: 10,
+                right: 3.w,
+                bottom: 10.h,
                 child: Icon(
                   bigDisplayIcon,
-                  size: 100,
+                  size: 100.sp,
                   color: Colors.white.withOpacity(0.3),
                 ),
               ),
-
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
                     child: Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
+                        fontSize: 18.sp,
                         fontFamily: 'Poppins',
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.only(right: hasBigElement ? 65.0 : 0.0),
+                    padding: EdgeInsets.only(
+                      right: hasBigElement ? 65.0.w : 0.0,
+                    ),
                     child: Image.asset(
                       imagePath,
-                      height: 60,
+                      height: 60.h,
                       fit: BoxFit.contain,
                     ),
                   ),
@@ -282,7 +229,6 @@ class CategorySectionCard extends StatelessWidget {
   }
 }
 
-// Daily Tracker Item Widget
 class DailyTrackerItem extends StatelessWidget {
   final String day;
   final bool isCompleted;
@@ -296,39 +242,37 @@ class DailyTrackerItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 65,
-      height: 70,
+      width: 65.w,
+      height: 70.h,
       decoration: BoxDecoration(
         color: const Color(0xFF3B82F6),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             day,
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
-              fontSize: 16,
+              fontSize: 16.sp,
               fontWeight: FontWeight.w500,
               fontFamily: 'Poppins',
             ),
           ),
-          const SizedBox(height: 4),
-
-          // Checkmark or Empty Space
+          SizedBox(height: 4.h),
           if (isCompleted)
             Container(
-              height: 24,
-              width: 24,
+              height: 24.w,
+              width: 24.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.white, width: 1.5),
               ),
-              child: const Icon(Icons.check, size: 16, color: Colors.white),
+              child: Icon(Icons.check, size: 16.sp, color: Colors.white),
             )
           else
-            const SizedBox(height: 24),
+            SizedBox(height: 24.w),
         ],
       ),
     );

@@ -1,6 +1,4 @@
-import 'package:auri_sign/features/dictionary/presentation/screens/dictionary.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:auri_sign/config/api_constants.dart';
 
 // Auth Screens
@@ -9,7 +7,6 @@ import '/features/auth/presentation/screens/profiling/profiling.dart';
 import '/features/auth/presentation/screens/email_verification.dart';
 import '/features/auth/presentation/screens/signup.dart';
 import '../../features/auth/presentation/screens/forgot_password.dart';
-import '/features/auth/presentation/screens/welcome page/welcome_page.dart';
 
 // Profile
 import '/features/homepage/presentation/screens/main_screen.dart';
@@ -19,10 +16,6 @@ import '/features/profile/presentation/screens/profile.dart';
 import '/features/category/presentation/screens/category_alphabet.dart';
 import '/features/category/presentation/screens/category_common_words.dart';
 import '/features/category/presentation/screens/category_numbers.dart';
-
-// Gesture Detection
-import '/features/gesture/presentation/screens/gesture_webview_screen.dart';
-// import '/features/gesture_detection/presentation/screens/gesture_detection_screen.dart';
 
 // Dictionary
 import 'package:auri_sign/features/dictionary/data/repositories/dictionary_repository.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../../core/di/injection_container.dart'; // Ensure this points to your sl
+import '../../../../core/di/injection_container.dart';
 import '../../../lessons/data/repositories/lesson_repository.dart';
 import '../../../lessons/presentation/viewmodels/lesson_view_model.dart';
 import '../../../lessons/presentation/screens/lesson_execution_screen.dart';
@@ -55,7 +55,7 @@ class _CategoryAlphabetsPageState extends State<CategoryAlphabetsPage> {
                   title: "Lesson 1",
                   description: "Learn the first four letters of the alphabets",
                   status: LessonStatus.current,
-                  onTap: () => _navigateToLesson("lesson-a-d"), // Changed from alphabet_1
+                  onTap: () => _navigateToLesson("lesson-a-d"),
                 ),
                 const SizedBox(height: 16),
 

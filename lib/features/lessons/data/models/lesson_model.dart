@@ -19,6 +19,16 @@ class LessonStep {
       metadata: json['metadata'],
     );
   }
+
+  // 👇 ADD THIS METHOD TO FIX THE ERROR
+  Map<String, dynamic> toJson() {
+    return {
+      'stepNumber': stepNumber,
+      'stepType': stepType,
+      'content': content,
+      'metadata': metadata,
+    };
+  }
 }
 
 class StartLessonResponse {

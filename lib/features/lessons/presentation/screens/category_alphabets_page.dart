@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../lessons/data/repositories/lesson_repository.dart';
 import '../../../lessons/presentation/viewmodels/lesson_view_model.dart';
@@ -28,9 +29,6 @@ class _CategoryAlphabetsPageState extends State<CategoryAlphabetsPage> {
     if (targetId == "alphabet_1") {
       targetId = "lesson-a-d";
     }
-
-    debugPrint("🚀 NAVIGATING TO LESSON ID: $targetId");
-
     await Navigator.push(
       context,
       MaterialPageRoute(
@@ -53,12 +51,15 @@ class _CategoryAlphabetsPageState extends State<CategoryAlphabetsPage> {
     return Scaffold(
       backgroundColor: const Color(0XFFF8F8F8),
       appBar: AppBar(
-        title: const Text("Alphabets"),
+        title: Text(
+          "Alphabets",
+          style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
+        ),
         backgroundColor: const Color(0XFFF8F8F8),
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: Colors.black, size: 24.w),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -77,19 +78,23 @@ class _CategoryAlphabetsPageState extends State<CategoryAlphabetsPage> {
   Widget _buildErrorState(String error) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: EdgeInsets.all(24.0.w),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 48, color: Colors.red),
-            const SizedBox(height: 16),
-            Text("Error: $error", textAlign: TextAlign.center),
-            const SizedBox(height: 16),
+            Icon(Icons.error_outline, size: 48.w, color: Colors.red),
+            SizedBox(height: 16.h),
+            Text(
+              "Error: $error",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 16.sp),
+            ),
+            SizedBox(height: 16.h),
             ElevatedButton(
               onPressed: () => context
                   .read<CategoryViewModel>()
                   .fetchCategoryProgress("Alphabets"),
-              child: const Text("Retry"),
+              child: Text("Retry", style: TextStyle(fontSize: 16.sp)),
             ),
           ],
         ),
@@ -100,14 +105,14 @@ class _CategoryAlphabetsPageState extends State<CategoryAlphabetsPage> {
   Widget _buildLessonList(CategoryViewModel vm) {
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16.w),
         child: Column(
           children: [
             const CategoryHeader(
               title:
                   "Learn each letter of Filipino Sign Language and practice your gestures.",
             ),
-            const SizedBox(height: 18),
+            SizedBox(height: 18.h),
             if (vm.categoryData != null &&
                 vm.categoryData!.lessonProgress.isNotEmpty)
               ...vm.categoryData!.lessonProgress.map((lesson) {
@@ -121,7 +126,7 @@ class _CategoryAlphabetsPageState extends State<CategoryAlphabetsPage> {
                 }
 
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
+                  padding: EdgeInsets.only(bottom: 16.h),
                   child: Category(
                     title: lesson.title,
                     description: "Score: ${lesson.score}%",
@@ -133,11 +138,11 @@ class _CategoryAlphabetsPageState extends State<CategoryAlphabetsPage> {
                 );
               })
             else
-              const Padding(
-                padding: EdgeInsets.only(top: 50),
+              Padding(
+                padding: EdgeInsets.only(top: 50.h),
                 child: Text(
                   "No lessons found for this category.",
-                  style: TextStyle(color: Colors.grey),
+                  style: TextStyle(color: Colors.grey, fontSize: 16.sp),
                 ),
               ),
           ],

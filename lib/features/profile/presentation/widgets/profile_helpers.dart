@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '/core/widgets/continue_lesson_card.dart';
 
 class CompletedLessonsCarousel extends StatefulWidget {
   const CompletedLessonsCarousel({super.key});
@@ -12,10 +14,11 @@ class _CompletedLessonsCarouselState extends State<CompletedLessonsCarousel> {
   late PageController _pageController;
   double _currentPage = 0.0;
 
+  // Alphabets, Numbers, Common Words
   final List<String> imgList = [
-    'assets/images/homepage_FSL_img/common_words_FSL.png',
     "assets/images/homepage_FSL_img/letter_A_FSL.png",
     "assets/images/homepage_FSL_img/number_1_FSL.png",
+    "assets/images/homepage_FSL_img/common_words_FSL.png",
   ];
 
   @override
@@ -35,20 +38,38 @@ class _CompletedLessonsCarouselState extends State<CompletedLessonsCarousel> {
     super.dispose();
   }
 
+  void _handleLessonTap(int index) {
+    switch (index) {
+      case 0:
+        Navigator.pushNamed(context, '/category_alphabets');
+        break;
+      case 1:
+        Navigator.pushNamed(context, '/category_numbers');
+        break;
+      case 2:
+        Navigator.pushNamed(context, '/category_common_words');
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.only(bottom: 10, left: 4),
+        Padding(
+          padding: EdgeInsets.only(bottom: 10.h, left: 4.w),
           child: Text(
-            "Completed Lessons",
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            "Continue Lessons",
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         SizedBox(
-          height: 150,
+          height: 150.h,
           child: PageView.builder(
             controller: _pageController,
             itemCount: imgList.length,
@@ -56,17 +77,24 @@ class _CompletedLessonsCarouselState extends State<CompletedLessonsCarousel> {
               double relativePosition = index - _currentPage;
               return Transform(
                 transform: Matrix4.identity()
-                  ..translate(relativePosition * -20.0)
+                  ..translate(relativePosition * -20.0.w)
                   ..scale(1 - (relativePosition.abs() * 0.1)),
                 child: Opacity(
                   opacity: (1 - (relativePosition.abs() * 0.3)).clamp(0.0, 1.0),
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ContinueLessonCard(
-                      title: ["Common Words", "Alphabets", "Numbers"][index],
-                      progress: 0,
-                      color: const Color(0xFFE9B63B),
-                      imagePath: imgList[index],
+                    padding: EdgeInsets.all(8.0.w),
+                    child: GestureDetector(
+                      onTap: () => _handleLessonTap(index),
+                      child: ContinueLessonCard(
+                        title: ["Alphabets", "Numbers", "Common Words"][index],
+                        progress: 0,
+                        color: [
+                          const Color(0xFFE9B63B), // Yellow
+                          const Color(0xFF3B82F6), // Blue
+                          const Color(0xFFEF4444), // Red
+                        ][index],
+                        imagePath: imgList[index],
+                      ),
                     ),
                   ),
                 ),
@@ -74,120 +102,25 @@ class _CompletedLessonsCarouselState extends State<CompletedLessonsCarousel> {
             },
           ),
         ),
-        const SizedBox(height: 6),
+        SizedBox(height: 6.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(imgList.length, (index) {
             bool isActive = _currentPage.round() == index;
             return AnimatedContainer(
               duration: const Duration(milliseconds: 300),
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              height: 6,
-              width: isActive ? 20 : 6,
+              margin: EdgeInsets.symmetric(horizontal: 4.w),
+              height: 6.h,
+              width: isActive ? 20.w : 6.w,
               decoration: BoxDecoration(
                 color: isActive ? const Color(0xFF3B82F6) : Colors.grey[300],
-                borderRadius: BorderRadius.circular(3),
+                borderRadius: BorderRadius.circular(3.r),
               ),
             );
           }),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10.h),
       ],
-    );
-  }
-}
-
-class ContinueLessonCard extends StatelessWidget {
-  final String title;
-  final double progress;
-  final Color color;
-  final String imagePath;
-
-  const ContinueLessonCard({
-    super.key,
-    required this.title,
-    required this.progress,
-    required this.color,
-    required this.imagePath,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Image.asset(imagePath, fit: BoxFit.contain),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              SizedBox(
-                width: 70,
-                height: 70,
-                child: CircularProgressIndicator(
-                  value: progress,
-                  strokeWidth: 6,
-                  backgroundColor: Colors.white.withOpacity(0.4),
-                  valueColor: const AlwaysStoppedAnimation(Color(0xFF3B82F6)),
-                ),
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "${(progress * 100).toInt()}%",
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const Text(
-                    "complete",
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.white70,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
     );
   }
 }
@@ -202,10 +135,14 @@ class ProfileSectionHeader extends StatelessWidget {
     return Align(
       alignment: Alignment.centerLeft,
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 10, left: 4),
+        padding: EdgeInsets.only(bottom: 10.h, left: 4.w),
         child: Text(
           title,
-          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 16.sp,
+            fontFamily: 'Inter',
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
@@ -216,27 +153,26 @@ class ProfileMenuTile extends StatelessWidget {
   final String title;
   final VoidCallback? onTap;
 
-  const ProfileMenuTile({
-    super.key,
-    required this.title,
-    this.onTap,
-  });
+  const ProfileMenuTile({super.key, required this.title, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(color: Colors.grey.shade200),
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(30.r),
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-        title: Text(title, style: const TextStyle(fontSize: 15)),
-        trailing: const Icon(
+        contentPadding: EdgeInsets.symmetric(horizontal: 20.w),
+        title: Text(
+          title,
+          style: TextStyle(fontSize: 15.sp, fontFamily: 'Inter'),
+        ),
+        trailing: Icon(
           Icons.arrow_forward_ios,
-          size: 14,
+          size: 14.sp,
           color: Colors.grey,
         ),
         onTap: onTap,

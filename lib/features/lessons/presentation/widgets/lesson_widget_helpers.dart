@@ -1,9 +1,13 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter_android/webview_flutter_android.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:auri_sign/config/api_constants.dart';
 import '../../data/models/lesson_model.dart';
 import '../viewmodels/lesson_view_model.dart';
 import '../../../dictionary/presentation/widgets/dictionary_video_player_helpers.dart';
 
-// Helper Widgets
 BoxDecoration lessonBoxDecoration() {
   return BoxDecoration(
     color: Colors.white,
@@ -19,7 +23,6 @@ BoxDecoration lessonBoxDecoration() {
   );
 }
 
-// Buttons
 class LessonPrimaryButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
@@ -86,7 +89,8 @@ class LessonSecondaryButton extends StatelessWidget {
   }
 }
 
-// Introduction Widget
+// --- CONTENT WIDGETS ---
+
 class IntroductionStepWidget extends StatelessWidget {
   final LessonStep step;
   final VoidCallback onNext;
@@ -100,18 +104,15 @@ class IntroductionStepWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-
     return Column(
       children: [
         const Spacer(),
-
         Container(
           height: screenHeight * 0.35,
           width: double.infinity,
           alignment: Alignment.center,
           padding: const EdgeInsets.all(24),
           decoration: lessonBoxDecoration(),
-
           child: SingleChildScrollView(
             child: Text(
               step.content,
@@ -124,9 +125,7 @@ class IntroductionStepWidget extends StatelessWidget {
             ),
           ),
         ),
-
         const Spacer(),
-
         LessonPrimaryButton(text: "Next", onPressed: onNext),
         const SizedBox(height: 20),
       ],
@@ -134,7 +133,6 @@ class IntroductionStepWidget extends StatelessWidget {
   }
 }
 
-// Learning Step Widget
 class LearningStepWidget extends StatelessWidget {
   final LessonStep step;
   final VoidCallback onNext;
@@ -224,20 +222,16 @@ class LearningStepWidget extends StatelessWidget {
             ],
           ),
         ),
-
         const Spacer(),
-
         LessonPrimaryButton(text: "Next", onPressed: onNext),
         const SizedBox(height: 12),
         LessonSecondaryButton(text: "Back", onPressed: onBack),
-
         const SizedBox(height: 20),
       ],
     );
   }
 }
 
-// Quiz Widget
 class QuizStepWidget extends StatelessWidget {
   final LessonStep step;
   final LessonViewModel vm;
@@ -271,7 +265,7 @@ class QuizStepWidget extends StatelessWidget {
           decoration: lessonBoxDecoration(),
           child: videoUrl.isNotEmpty
               ? DictionaryVideoPlayer(
-                  key: ValueKey(videoUrl), 
+                  key: ValueKey(videoUrl),
                   videoUrl: videoUrl,
                 )
               : Center(
@@ -291,7 +285,6 @@ class QuizStepWidget extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 20),
-
         ...choicesData.map((choice) {
           final String choiceText = choice['text'] ?? '';
           final String choiceId = choice['id'] ?? choiceText;
@@ -303,7 +296,6 @@ class QuizStepWidget extends StatelessWidget {
           Color textColor = Colors.black;
 
           if (vm.isAnswerSubmitted) {
-            // 🎯 POST-SUBMISSION LOGIC
             if (isCorrect) {
               borderColor = Colors.green;
               bgColor = Colors.green.shade50;
@@ -343,9 +335,7 @@ class QuizStepWidget extends StatelessWidget {
             ),
           );
         }).toList(),
-
         const Spacer(),
-
         if (vm.isAnswerSubmitted)
           Padding(
             padding: const EdgeInsets.only(bottom: 10),
@@ -364,7 +354,6 @@ class QuizStepWidget extends StatelessWidget {
               ),
             ),
           ),
-
         if (!vm.isAnswerSubmitted)
           LessonPrimaryButton(
             text: "Submit Answer",
@@ -382,82 +371,135 @@ class QuizStepWidget extends StatelessWidget {
   }
 }
 
-// GESTURE CHECK WIDGET ---
-
-class GestureCheckStepWidget extends StatelessWidget {
+class GestureCheckStepWidget extends StatefulWidget {
   final LessonStep step;
+  final String userToken;
   final VoidCallback onNext;
+
   const GestureCheckStepWidget({
     super.key,
     required this.step,
+    required this.userToken,
     required this.onNext,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Text(
-          "Gesture Check",
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'Poppins',
-          ),
-        ),
+  State<GestureCheckStepWidget> createState() => _GestureCheckStepWidgetState();
+}
 
-        Text(step.content),
-        const SizedBox(height: 20),
-        Expanded(
-          child: Container(
-            width: double.infinity,
-            decoration: lessonBoxDecoration(),
-            child: Stack(
-              children: [
-                const Center(child: Text("Camera Feed Placeholder")),
-                Positioned(
-                  bottom: 20,
-                  left: 20,
-                  right: 20,
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFF4D9),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Column(
-                      children: [
-                        const Text(
-                          "Confidence: 0%",
-                          style: TextStyle(fontSize: 12),
-                        ),
-                        const SizedBox(height: 4),
-                        LinearProgressIndicator(
-                          value: 0.1,
-                          backgroundColor: Colors.grey[300],
-                          color: Colors.green,
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          "Hold steady 0s/5s",
-                          style: TextStyle(fontSize: 10),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+class _GestureCheckStepWidgetState extends State<GestureCheckStepWidget> {
+  WebViewController? controller;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _initWebView();
+  }
+
+  Future<void> _initWebView() async {
+    await [Permission.camera, Permission.microphone].request();
+
+    final String targetUrl = "${ApiConstants.gestureWebviewUrl}/check";
+
+    late final PlatformWebViewControllerCreationParams params;
+    if (WebViewPlatform.instance is AndroidWebViewPlatform) {
+      params = AndroidWebViewControllerCreationParams();
+    } else {
+      params = const PlatformWebViewControllerCreationParams();
+    }
+
+    final WebViewController webViewController =
+        WebViewController.fromPlatformCreationParams(params);
+
+    if (webViewController.platform is AndroidWebViewController) {
+      AndroidWebViewController.enableDebugging(true);
+      final androidController =
+          webViewController.platform as AndroidWebViewController;
+      androidController.setMediaPlaybackRequiresUserGesture(false);
+      androidController.setOnPlatformPermissionRequest((request) {
+        request.grant();
+      });
+    }
+
+    webViewController
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(const Color(0x00000000))
+      ..setUserAgent("Mozilla/5.0 (Linux; Android 10; Mobile) AuriSignApp")
+      ..addJavaScriptChannel(
+        'LessonBridge',
+        onMessageReceived: (JavaScriptMessage message) {
+          if (message.message == 'success') {
+            Future.delayed(const Duration(seconds: 1), () {
+              if (mounted) widget.onNext();
+            });
+          }
+        },
+      )
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageFinished: (String url) {
+            _injectConfiguration(webViewController);
+            if (mounted) {
+              setState(() => _isLoading = false);
+            }
+          },
+          onWebResourceError: (WebResourceError error) {
+            debugPrint("WebView Error: ${error.description}");
+          },
         ),
-        const SizedBox(height: 20),
-        LessonPrimaryButton(text: "Start Check", onPressed: onNext),
+      )
+      ..loadRequest(Uri.parse(targetUrl));
+
+    if (mounted) {
+      setState(() {
+        controller = webViewController;
+      });
+    }
+  }
+
+  void _injectConfiguration(WebViewController controller) {
+    const String css = """
+      nav, header, footer, .navbar, .bottom-nav { display: none !important; }
+      .container-fluid { padding: 0 !important; margin: 0 !important; }
+      body { background-color: #fff; }
+    """;
+    controller.runJavaScript("""
+      var style = document.createElement('style');
+      style.innerHTML = `$css`;
+      document.head.appendChild(style);
+    """);
+
+    final String stepJson = jsonEncode(widget.step.toJson());
+    
+    controller.runJavaScript("""
+      localStorage.setItem('token', '${widget.userToken}');
+      localStorage.setItem('currentLessonStep', JSON.stringify($stepJson));
+      
+      window.notifyFlutterSuccess = function() {
+        if(window.LessonBridge) {
+          window.LessonBridge.postMessage('success');
+        }
+      };
+    """);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        if (controller != null) WebViewWidget(controller: controller!),
+        if (_isLoading || controller == null)
+          const Center(
+            child: CircularProgressIndicator(color: Color(0xFFE9B63B)),
+          ),
       ],
     );
   }
 }
 
-// RESULT WIDGET
+// RESULT WIDGET 
+
 class LessonResultWidget extends StatelessWidget {
   final LessonViewModel vm;
   const LessonResultWidget({super.key, required this.vm});
@@ -490,7 +532,7 @@ class LessonResultWidget extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      "${vm.finalScore}%", // Uses API Final Score
+                      "${vm.finalScore}%",
                       style: const TextStyle(
                         fontSize: 48,
                         color: Color(0xFFE9B63B),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '/features/homepage/presentation/widgets/homepage_helpers.dart';
+import '/core/widgets/continue_lesson_card.dart';
 
 class HomePage extends StatefulWidget {
   final VoidCallback onProfileTap;
@@ -14,41 +15,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  double _currentPage = 0;
-  final PageController _pageController = PageController(viewportFraction: 0.85);
-
-  // Updated Order: Alphabets, Numbers, Common Words
-  final List<String> imgList = [
-    "assets/images/homepage_FSL_img/letter_A_FSL.png",
-    "assets/images/homepage_FSL_img/number_1_FSL.png",
-    "assets/images/homepage_FSL_img/common_words_FSL.png",
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController.addListener(() {
-      setState(() {
-        _currentPage = _pageController.page!;
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     final userVM = context.watch<UserViewModel>();
     final user = userVM.user;
-
-    String initial = "U";
-    if (user?.firstName != null && user!.firstName!.isNotEmpty) {
-      initial = user.firstName![0].toUpperCase();
-    }
 
     return Scaffold(
       backgroundColor: const Color(0XFFF8F8F8),
@@ -63,150 +33,18 @@ class _HomePageState extends State<HomePage> {
                   child: SafeArea(
                     bottom: false,
                     child: Padding(
-                      padding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w, 20.h),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Hello,",
-                                style: TextStyle(
-                                  fontSize: 16.sp,
-                                  color: Colors.grey[600],
-                                  fontFamily: 'Poppins',
-                                ),
-                              ),
-                              Text(
-                                user?.firstName ?? "Guest",
-                                style: TextStyle(
-                                  fontSize: 24.sp,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Poppins',
-                                ),
-                              ),
-                            ],
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(top: 12.h),
-                            child: GestureDetector(
-                              onTap: widget.onProfileTap,
-                              child: Container(
-                                width: 50.w,
-                                height: 50.w,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(
-                                        0xFFFFB800,
-                                      ).withOpacity(0.3),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: CircleAvatar(
-                                  backgroundColor: const Color(0xFFFFB800),
-                                  child: Text(
-                                    initial,
-                                    style: TextStyle(
-                                      fontSize: 24.sp,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      fontFamily: 'Poppins',
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                      padding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w, 10.h),
+                      child: HomeHeader(
+                        firstName: user?.firstName ?? "Guest",
+                        profilePicture: user?.profilePicture,
+                        onProfileTap: widget.onProfileTap,
                       ),
                     ),
                   ),
                 ),
 
                 // Carousel Section
-                SliverToBoxAdapter(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 24.w,
-                          vertical: 10.h,
-                        ),
-                        child: Text(
-                          "Continue Lessons",
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 150.h,
-                        child: PageView.builder(
-                          controller: _pageController,
-                          itemCount: imgList.length,
-                          itemBuilder: (context, index) {
-                            double relativePosition = index - _currentPage;
-                            return Transform(
-                              transform: Matrix4.identity()
-                                ..translate(relativePosition * -20.0)
-                                ..scale(1 - (relativePosition.abs() * 0.1)),
-                              child: Opacity(
-                                opacity: (1 - (relativePosition.abs() * 0.3))
-                                    .clamp(0.0, 1.0),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: ContinueLessonCard(
-                                    title: [
-                                      "Alphabets",
-                                      "Numbers",
-                                      "Common Words",
-                                    ][index],
-                                    progress: 0,
-                                    color: [
-                                      const Color(0xFFE9B63B), // Yellow
-                                      const Color(0xFF3B82F6), // Blue
-                                      const Color(0xFFEF4444), // Red
-                                    ][index],
-                                    imagePath: imgList[index],
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      SizedBox(height: 6.h),
-                      // Pagination Dots
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(imgList.length, (index) {
-                          bool isActive = _currentPage.round() == index;
-                          return AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            margin: EdgeInsets.symmetric(horizontal: 4.w),
-                            height: 6.h,
-                            width: isActive ? 20.w : 6.w,
-                            decoration: BoxDecoration(
-                              color: isActive
-                                  ? const Color(0xFF3B82F6)
-                                  : Colors.grey[300],
-                              borderRadius: BorderRadius.circular(3.r),
-                            ),
-                          );
-                        }),
-                      ),
-                    ],
-                  ),
-                ),
+                const SliverToBoxAdapter(child: HomeCarouselSection()),
 
                 // Daily Tracker Section
                 SliverToBoxAdapter(
@@ -220,6 +58,7 @@ class _HomePageState extends State<HomePage> {
                           style: TextStyle(
                             fontSize: 16.sp,
                             fontFamily: 'Inter',
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
@@ -265,32 +104,53 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
 
-                // Category Sections
+                // 4. Categories Title
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 24.w,
+                      vertical: 4.h,
+                    ),
+                    child: Text(
+                      "Category Sections",
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+
+                // 5. Category List
                 SliverPadding(
                   padding: EdgeInsets.symmetric(
                     horizontal: 24.w,
-                    vertical: 20.h,
+                    vertical: 15.h,
                   ),
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
-                      CategorySectionCard(
+                      const CategorySectionCard(
                         title: "Alphabets",
-                        color: const Color(0xFFE9B63B), // Yellow
-                        imagePath: imgList[0],
+                        color: Color(0xFFE9B63B), // Yellow
+                        imagePath:
+                            "assets/images/homepage_FSL_img/letter_A_FSL.png",
                         bigDisplayChar: "A",
                       ),
                       SizedBox(height: 20.h),
-                      CategorySectionCard(
+                      const CategorySectionCard(
                         title: "Numbers",
-                        color: const Color(0xFF3B82F6), // Blue
-                        imagePath: imgList[1],
+                        color: Color(0xFF3B82F6), // Blue
+                        imagePath:
+                            "assets/images/homepage_FSL_img/number_1_FSL.png",
                         bigDisplayChar: "1",
                       ),
                       SizedBox(height: 20.h),
-                      CategorySectionCard(
+                      const CategorySectionCard(
                         title: "Common Words",
-                        color: const Color(0xFFEF4444), // Red
-                        imagePath: imgList[2],
+                        color: Color(0xFFEF4444), // Red
+                        imagePath:
+                            "assets/images/homepage_FSL_img/common_words_FSL.png",
                         bigDisplayIcon: Icons.favorite,
                       ),
                     ]),
@@ -298,6 +158,128 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             ),
+    );
+  }
+}
+
+class HomeCarouselSection extends StatefulWidget {
+  const HomeCarouselSection({super.key});
+
+  @override
+  State<HomeCarouselSection> createState() => _HomeCarouselSectionState();
+}
+
+class _HomeCarouselSectionState extends State<HomeCarouselSection> {
+  double _currentPage = 0;
+  final PageController _pageController = PageController(viewportFraction: 0.85);
+
+  final List<String> imgList = [
+    "assets/images/homepage_FSL_img/letter_A_FSL.png",
+    "assets/images/homepage_FSL_img/number_1_FSL.png",
+    "assets/images/homepage_FSL_img/common_words_FSL.png",
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController.addListener(() {
+      if (mounted) {
+        setState(() {
+          _currentPage = _pageController.page!;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _handleLessonTap(int index) {
+    switch (index) {
+      case 0:
+        Navigator.pushNamed(context, '/category_alphabets');
+        break;
+      case 1:
+        Navigator.pushNamed(context, '/category_numbers');
+        break;
+      case 2:
+        Navigator.pushNamed(context, '/category_common_words');
+        break;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 10.h),
+          child: Text(
+            "Continue Lessons",
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 150.h,
+          child: PageView.builder(
+            controller: _pageController,
+            itemCount: imgList.length,
+            itemBuilder: (context, index) {
+              double relativePosition = index - _currentPage;
+              return Transform(
+                transform: Matrix4.identity()
+                  ..translate(relativePosition * -20.0)
+                  ..scale(1 - (relativePosition.abs() * 0.1)),
+                child: Opacity(
+                  opacity: (1 - (relativePosition.abs() * 0.3)).clamp(0.0, 1.0),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: GestureDetector(
+                      onTap: () => _handleLessonTap(index),
+                      child: ContinueLessonCard(
+                        title: ["Alphabets", "Numbers", "Common Words"][index],
+                        progress: 0,
+                        color: [
+                          const Color(0xFFE9B63B), // Yellow
+                          const Color(0xFF3B82F6), // Blue
+                          const Color(0xFFEF4444), // Red
+                        ][index],
+                        imagePath: imgList[index],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        SizedBox(height: 6.h),
+        // Pagination Dots
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(imgList.length, (index) {
+            bool isActive = _currentPage.round() == index;
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              margin: EdgeInsets.symmetric(horizontal: 4.w),
+              height: 6.h,
+              width: isActive ? 20.w : 6.w,
+              decoration: BoxDecoration(
+                color: isActive ? const Color(0xFF3B82F6) : Colors.grey[300],
+                borderRadius: BorderRadius.circular(3.r),
+              ),
+            );
+          }),
+        ),
+      ],
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:auri_sign/features/auth/viewmodels/user_view_model.dart'; 
 import '../../data/models/lesson_model.dart';
 import '../viewmodels/lesson_view_model.dart';
 import '../widgets/lesson_widget_helpers.dart';
@@ -25,6 +26,7 @@ class _LessonExecutionScreenState extends State<LessonExecutionScreen> {
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<LessonViewModel>();
+    final userToken = context.select<UserViewModel, String?>((u) => u.user?.token) ?? "";
 
     if (vm.isLoading) {
       return const Scaffold(
@@ -82,22 +84,22 @@ class _LessonExecutionScreenState extends State<LessonExecutionScreen> {
           ),
         ],
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: _buildStepContent(step, vm),
-        ),
-      ),
+      // Remove padding for Gesture Check to allow full screen camera
+      body: step.stepType == 'gestureCheck'
+          ? _buildStepContent(step, vm, userToken)
+          : SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: _buildStepContent(step, vm, userToken),
+              ),
+            ),
     );
   }
 
-  Widget _buildStepContent(LessonStep step, LessonViewModel vm) {
+  Widget _buildStepContent(LessonStep step, LessonViewModel vm, String token) {
     switch (step.stepType) {
       case 'introduction':
         final videoUrl = step.metadata?['videoUrl']?.toString() ?? '';
-
-        debugPrint("🔍 STEP ${step.stepNumber} DETECTED URL: '$videoUrl'");
-
         if (videoUrl.isNotEmpty) {
           return LearningStepWidget(
             step: step,
@@ -106,12 +108,17 @@ class _LessonExecutionScreenState extends State<LessonExecutionScreen> {
           );
         }
         return IntroductionStepWidget(step: step, onNext: vm.nextStep);
+      
       case 'multipleChoice':
       case 'quiz':
         return QuizStepWidget(step: step, vm: vm);
 
       case 'gestureCheck':
-        return GestureCheckStepWidget(step: step, onNext: vm.nextStep);
+        return GestureCheckStepWidget(
+          step: step,
+          userToken: token,
+          onNext: vm.nextStep,
+        );
 
       default:
         return Center(child: Text("Unknown step type: ${step.stepType}"));

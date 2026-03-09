@@ -35,7 +35,7 @@ Future<void> init() async {
   sl.registerFactory(() => AchievementsViewModel());
   sl.registerFactory(() => ProfileViewModel(uploadUseCase: sl()));
 
-  // 3. Lessons & Categories 
+  // Lessons & Categories 
   // Repository 
   sl.registerLazySingleton<LessonRepository>(
     () => LessonRepository(
