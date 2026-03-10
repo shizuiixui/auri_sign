@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '/features/homepage/presentation/widgets/homepage_helpers.dart';
 import '/core/widgets/continue_lesson_card.dart';
+import 'package:auri_sign/features/profile/viewmodels/notification_schedule_view_model.dart';
+import 'package:auri_sign/features/notifications/presentation/viewmodels/notification_center_view_model.dart';
 
 class HomePage extends StatefulWidget {
   final VoidCallback onProfileTap;
@@ -19,6 +21,12 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final userVM = context.watch<UserViewModel>();
     final user = userVM.user;
+    final scheduleVM = context.watch<NotificationScheduleViewModel>();
+    final centerVM = context.read<NotificationCenterViewModel>();
+    final isAlarmEnabled = scheduleVM.schedule != null;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      centerVM.catchUp8AMNotification(isAlarmEnabled);
+    });
 
     return Scaffold(
       backgroundColor: const Color(0XFFF8F8F8),

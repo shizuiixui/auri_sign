@@ -1,22 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 import 'core/di/injection_container.dart' as di;
 import 'core/routes/app_router.dart';
-
 import 'features/homepage/presentation/screens/main_screen.dart';
 import 'features/auth/presentation/screens/welcome page/welcome_page.dart';
-
 import 'features/auth/viewmodels/user_view_model.dart';
 import 'features/auth/presentation/viewmodels/login_view_model.dart';
 import 'features/profile/viewmodels/achievements_view_model.dart';
 import 'features/profile/viewmodels/profile_view_model.dart';
+import 'package:auri_sign/features/profile/viewmodels/notification_schedule_view_model.dart';
+import 'package:auri_sign/features/notifications/presentation/viewmodels/notification_center_view_model.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+@pragma('vm:entry-point')
+void notificationTapBackground(NotificationResponse notificationResponse) {
+  debugPrint(
+    "Notification tapped in background: ${notificationResponse.payload}",
+  );
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize Dependency Injection
+  tz.initializeTimeZones();
+  tz.setLocalLocation(tz.getLocation('Asia/Manila'));
   await di.init();
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  const InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+  );
+  [];
+  await flutterLocalNotificationsPlugin.initialize(
+    initializationSettings,
+    onDidReceiveNotificationResponse: (details) {
+      // Handle foreground taps
+      debugPrint("Notification tapped in foreground: ${details.payload}");
+    },
+    onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
+  );
 
   runApp(
     MultiProvider(
@@ -25,6 +52,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => di.sl<AchievementsViewModel>()),
         ChangeNotifierProvider(create: (_) => di.sl<ProfileViewModel>()),
         ChangeNotifierProvider(create: (_) => di.sl<LoginViewModel>()),
+        ChangeNotifierProvider(create: (_) => di.sl<NotificationScheduleViewModel>()),
+        ChangeNotifierProvider(create: (_) => NotificationCenterViewModel()),
       ],
       child: const MyApp(),
     ),
@@ -55,7 +84,7 @@ class _MyAppState extends State<MyApp> {
     if (!mounted) return;
 
     await context.read<LoginViewModel>().checkLoginStatus();
-    
+
     if (mounted) {
       await context.read<UserViewModel>().initSession();
     }
@@ -81,11 +110,11 @@ class _MyAppState extends State<MyApp> {
           title: 'AuriSign',
           theme: ThemeData(
             primarySwatch: Colors.blue,
-            scaffoldBackgroundColor: Color(0xFFF8F8F8),
+            scaffoldBackgroundColor: const Color(0xFFF8F8F8),
           ),
           home: _isLoading
               ? Scaffold(
-                  backgroundColor: Color(0xFFF8F8F8),
+                  backgroundColor: const Color(0xFFF8F8F8),
                   body: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -104,8 +133,8 @@ class _MyAppState extends State<MyApp> {
                   ),
                 )
               : (userVM.user != null
-                  ? const NavFunction()
-                  : const WelcomePage()),
+                    ? const NavFunction()
+                    : const WelcomePage()),
           routes: AppRouter.getRoutes(),
         );
       },

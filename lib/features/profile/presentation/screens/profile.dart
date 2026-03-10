@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart'; // Ensure plugin is available for the test
 
 // Screens
 import 'package:auri_sign/features/profile/presentation/screens/achievements.dart';
@@ -14,13 +15,48 @@ import 'package:auri_sign/features/auth/presentation/screens/welcome page/welcom
 import 'package:auri_sign/features/profile/viewmodels/achievements_view_model.dart';
 import 'package:auri_sign/features/auth/viewmodels/user_view_model.dart';
 import '/features/auth/presentation/viewmodels/login_view_model.dart';
+import 'package:auri_sign/features/profile/viewmodels/notification_schedule_view_model.dart';
 
 // Widgets
 import '/core/widgets/user_stats.dart';
 import 'package:auri_sign/features/profile/presentation/widgets/profile_helpers.dart';
 
+// Use Cases
+import 'package:auri_sign/features/profile/domain/usecases/set_schedule_enabled_usecase.dart';
+
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
+
+  // Handler for Daily Reminder Switch
+  Future<void> _onScheduleChanged(
+    BuildContext context,
+    NotificationScheduleViewModel notificationVM,
+    bool value,
+  ) async {
+    final result = await notificationVM.setScheduleEnabled(value);
+    
+    if (!context.mounted) return;
+
+    if (result.status == SetScheduleStatus.permissionDenied) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Notification permission is required.')),
+      );
+      return;
+    }
+
+    if (result.status == SetScheduleStatus.enabledInexact) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Exact alarm permission not granted. Notification may be delayed.')),
+      );
+      return;
+    }
+
+    if (result.status == SetScheduleStatus.failed) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update schedule: ${result.error}')),
+      );
+    }
+  }
 
   void _showLogoutConfirmation(
     BuildContext parentContext,
@@ -124,6 +160,7 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userVM = context.watch<UserViewModel>();
+    final notificationVM = context.watch<NotificationScheduleViewModel>();
     final user = userVM.user;
 
     return Scaffold(
@@ -131,7 +168,7 @@ class ProfilePage extends StatelessWidget {
       body: SafeArea(
         child: userVM.isLoading
             ? const Center(child: CircularProgressIndicator())
-            : _buildProfileContent(context, user, userVM),
+            : _buildProfileContent(context, user, userVM, notificationVM),
       ),
     );
   }
@@ -140,6 +177,7 @@ class ProfilePage extends StatelessWidget {
     BuildContext context,
     dynamic user,
     UserViewModel userVM,
+    NotificationScheduleViewModel notificationVM,
   ) {
     // Logic to get the first letter
     String initial = "U";
@@ -225,6 +263,14 @@ class ProfilePage extends StatelessWidget {
                 ),
               );
             },
+          ),
+          
+          // Practice Reminder Switch
+          ProfileSwitchTile(
+            title: "Daily Practice Reminder",
+            subtitle: "Remind me to practice daily",
+            value: notificationVM.schedule != null,
+            onChanged: (value) => _onScheduleChanged(context, notificationVM, value),
           ),
 
           SizedBox(height: 20.h),

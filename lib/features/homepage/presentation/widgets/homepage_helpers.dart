@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '/core/widgets/user_stats.dart'; // Ensure this path is correct for your UserStatsRow
+import '/core/widgets/user_stats.dart';
+import 'package:provider/provider.dart';
+import 'package:auri_sign/features/notifications/presentation/viewmodels/notification_center_view_model.dart';
+import 'package:auri_sign/features/notifications/presentation/screens/notifications_page.dart';
 
 class HomeHeader extends StatelessWidget {
   final String firstName;
@@ -87,16 +90,62 @@ class HomeHeader extends StatelessWidget {
 
             const Spacer(),
 
-            // Notification Icon (Kept as requested)
-            Padding(
-              padding: EdgeInsets.only(top: 4.h),
-              child: IconButton(
-                onPressed: () {},
-                icon: Icon(Icons.notifications_outlined, size: 24.sp),
-              ),
+            // Notification Icon
+          Padding(
+            padding: EdgeInsets.only(top: 4.h),
+            child: Consumer<NotificationCenterViewModel>(
+              builder: (context, notificationVM, child) {
+                final unreadCount = notificationVM.unreadCount;
+
+                return IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const NotificationsPage(),
+                      ),
+                    );
+                  },
+                  icon: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Icon(Icons.notifications_outlined, size: 24.sp),
+                    
+                      if (unreadCount > 0)
+                        Positioned(
+                          right: -2,
+                          top: -4, 
+                          child: Container(
+                            padding: EdgeInsets.all(4.w),
+                            decoration: const BoxDecoration(
+                              color: Colors.redAccent,
+                              shape: BoxShape.circle,
+                            ),
+                            constraints: BoxConstraints(
+                              minWidth: 16.w,
+                              minHeight: 16.w,
+                            ),
+                            child: Center(
+                              child: Text(
+                                unreadCount > 9 ? '9+' : unreadCount.toString(),
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                );
+              },
             ),
-          ],
-        ),
+          ),
+        ],
+      ),
         SizedBox(height: 20.h),
 
         Text(
@@ -116,10 +165,6 @@ class HomeHeader extends StatelessWidget {
     );
   }
 }
-
-// -----------------------------------------------------------
-// Keep your existing Card widgets below this line unchanged
-// -----------------------------------------------------------
 
 class CategorySectionCard extends StatelessWidget {
   final String title;
