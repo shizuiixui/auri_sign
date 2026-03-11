@@ -1,21 +1,27 @@
-class CategoryProgressResponse {
+class DetailedCategoryProgress {
+  final bool success;
   final String category;
   final int totalLessons;
   final int completedLessons;
+  final bool isCompleted;
   final List<LessonProgressItem> lessonProgress;
 
-  CategoryProgressResponse({
+  DetailedCategoryProgress({
+    required this.success,
     required this.category,
     required this.totalLessons,
     required this.completedLessons,
+    required this.isCompleted,
     required this.lessonProgress,
   });
 
-  factory CategoryProgressResponse.fromJson(Map<String, dynamic> json) {
-    return CategoryProgressResponse(
+  factory DetailedCategoryProgress.fromJson(Map<String, dynamic> json) {
+    return DetailedCategoryProgress(
+      success: json['success'] ?? false,
       category: json['category'] ?? '',
-      totalLessons: json['totalLessons'] ?? 0,
-      completedLessons: json['completedLessons'] ?? 0,
+      totalLessons: (json['totalLessons'] as num?)?.toInt() ?? 0,
+      completedLessons: (json['completedLessons'] as num?)?.toInt() ?? 0,
+      isCompleted: json['isCompleted'] ?? false,
       lessonProgress:
           (json['lessonProgress'] as List?)
               ?.map((item) => LessonProgressItem.fromJson(item))
@@ -29,31 +35,52 @@ class LessonProgressItem {
   final String lessonId;
   final String title;
   final String status;
-  final bool isUnlocked;
   final int score;
+  final bool isUnlocked;
 
   LessonProgressItem({
     required this.lessonId,
     required this.title,
     required this.status,
-    required this.isUnlocked,
     required this.score,
+    required this.isUnlocked,
   });
 
   factory LessonProgressItem.fromJson(Map<String, dynamic> json) {
-    final lessonMap = json['lesson'] as Map<String, dynamic>?;
-    final progressMap = json['userProgress'] as Map<String, dynamic>?;
+    final lessonData = json['lesson'] ?? {};
+    final progressData = json['userProgress'];
 
     return LessonProgressItem(
-      lessonId: (lessonMap?['id'] ?? lessonMap?['_id'] ?? 'ID_NOT_FOUND')
-          .toString(),
-
-      title: lessonMap?['title'] ?? 'Unknown Lesson',
-      status: progressMap != null
-          ? progressMap['status']
-          : (json['isUnlocked'] == true ? 'current' : 'locked'),
+      lessonId: lessonData['id'] ?? '',
+      title: lessonData['title'] ?? '',
+      status: progressData != null ? progressData['status'] : 'locked',
+      score: progressData != null
+          ? (progressData['scorePercentage'] as num?)?.toInt() ?? 0
+          : 0,
       isUnlocked: json['isUnlocked'] ?? false,
-      score: progressMap != null ? (progressMap['scorePercentage'] ?? 0) : 0,
+    );
+  }
+}
+
+class CategorySummary {
+  final String category;
+  final int totalLessons;
+  final int completedLessons;
+  final bool isCompleted;
+
+  CategorySummary({
+    required this.category,
+    required this.totalLessons,
+    required this.completedLessons,
+    required this.isCompleted,
+  });
+
+  factory CategorySummary.fromJson(Map<String, dynamic> json) {
+    return CategorySummary(
+      category: json['category'] ?? '',
+      totalLessons: (json['totalLessons'] as num?)?.toInt() ?? 0,
+      completedLessons: (json['completedLessons'] as num?)?.toInt() ?? 0,
+      isCompleted: json['isCompleted'] ?? false,
     );
   }
 }

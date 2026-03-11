@@ -12,11 +12,6 @@ import '../../features/auth/presentation/screens/forgot_password.dart';
 import '/features/homepage/presentation/screens/main_screen.dart';
 import '/features/profile/presentation/screens/profile.dart';
 
-// Category
-import '/features/category/presentation/screens/category_alphabet.dart';
-import '/features/category/presentation/screens/category_common_words.dart';
-import '/features/category/presentation/screens/category_numbers.dart';
-
 // Dictionary
 import 'package:auri_sign/features/dictionary/data/repositories/dictionary_repository.dart';
 import 'package:auri_sign/features/dictionary/presentation/viewmodels/dictionary_viewmodel.dart';
@@ -35,11 +30,6 @@ class AppRouter {
       // Homepage & Profile
       '/home': (context) => const NavFunction(),
       '/profile': (context) => const ProfilePage(),
-
-      // Categories
-      '/category_alphabets': (context) => const CategoryAlphabetsPage(),
-      '/category_numbers': (context) => const CategoryNumbersPage(),
-      '/category_common_words': (context) => const CategoryCommonWordsPage(),
 
       // Dictionary
       '/dictionary': (context) {

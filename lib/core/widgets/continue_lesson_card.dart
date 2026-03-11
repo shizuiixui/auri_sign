@@ -2,20 +2,26 @@ import 'package:flutter/material.dart';
 
 class ContinueLessonCard extends StatelessWidget {
   final String title;
-  final double progress;
+  final int completedLessons;
+  final int totalLessons;
   final Color color;
   final String imagePath;
 
   const ContinueLessonCard({
     super.key,
     required this.title,
-    required this.progress,
+    required this.completedLessons,
+    required this.totalLessons,
     required this.color,
     required this.imagePath,
   });
 
   @override
   Widget build(BuildContext context) {
+    double ringProgress = totalLessons == 0
+        ? 0.0
+        : (completedLessons / totalLessons);
+
     return Container(
       decoration: BoxDecoration(
         color: color,
@@ -63,7 +69,7 @@ class ContinueLessonCard extends StatelessWidget {
                 width: 70,
                 height: 70,
                 child: CircularProgressIndicator(
-                  value: progress,
+                  value: ringProgress,
                   strokeWidth: 6,
                   backgroundColor: Colors.white.withOpacity(0.4),
                   valueColor: const AlwaysStoppedAnimation(Colors.white),
@@ -73,15 +79,15 @@ class ContinueLessonCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "${(progress * 100).toInt()}%",
+                    "$completedLessons/$totalLessons",
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
                   const Text(
-                    "complete",
+                    "Lessons",
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w400,

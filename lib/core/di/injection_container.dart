@@ -20,7 +20,6 @@ import '../../features/profile/domain/repositories/notification_schedule_reposit
 
 // Lesson Imports
 import '../../features/lessons/data/repositories/lesson_repository.dart';
-import '../../features/lessons/presentation/viewmodels/lesson_view_model.dart';
 import '../../features/lessons/presentation/viewmodels/category_view_model.dart';
 
 // Use Cases
@@ -74,9 +73,8 @@ Future<void> init() async {
   sl.registerFactory<CategoryViewModel>(
     () => CategoryViewModel(repository: sl()),
   );
-
-  sl.registerFactory<LessonViewModel>(() => LessonViewModel(repository: sl()));
-
+  
+  // Notifications
   sl.registerFactory(
     () => NotificationScheduleViewModel(
       getScheduleUseCase: sl(),

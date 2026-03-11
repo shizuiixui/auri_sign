@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 import '/core/widgets/continue_lesson_card.dart';
+import 'package:auri_sign/features/lessons/presentation/viewmodels/category_view_model.dart';
+import 'package:auri_sign/features/lessons/data/models/category_progress_model.dart';
+import 'package:auri_sign/features/lessons/presentation/screens/category_details_page.dart';
 
 class CompletedLessonsCarousel extends StatefulWidget {
   const CompletedLessonsCarousel({super.key});
@@ -30,6 +34,11 @@ class _CompletedLessonsCarouselState extends State<CompletedLessonsCarousel> {
         _currentPage = _pageController.page!;
       });
     });
+
+    // 🎯 Trigger the fetch when the carousel loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<CategoryViewModel>().fetchAllCategoriesSummary();
+    });
   }
 
   @override
@@ -41,19 +50,53 @@ class _CompletedLessonsCarouselState extends State<CompletedLessonsCarousel> {
   void _handleLessonTap(int index) {
     switch (index) {
       case 0:
-        Navigator.pushNamed(context, '/category_alphabets');
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const CategoryDetailsPage(
+              title: "Alphabets",
+              apiCategoryName: "Alphabets",
+              webCategorySlug: "alphabets",
+              description:
+                  "Learn each letter of Filipino Sign Language and practice your gestures.",
+            ),
+          ),
+        );
         break;
       case 1:
-        Navigator.pushNamed(context, '/category_numbers');
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const CategoryDetailsPage(
+              title: "Numbers",
+              apiCategoryName: "Numbers",
+              webCategorySlug: "numbers",
+              description:
+                  "Learn how to sign numbers in Filipino Sign Language.",
+            ),
+          ),
+        );
         break;
       case 2:
-        Navigator.pushNamed(context, '/category_common_words');
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const CategoryDetailsPage(
+              title: "Common Words",
+              apiCategoryName: "Phrases/Words",
+              webCategorySlug: "phrases-words",
+              description: "Learn everyday phrases and common words in FSL.",
+            ),
+          ),
+        );
         break;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final vm = context.watch<CategoryViewModel>();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -75,6 +118,30 @@ class _CompletedLessonsCarouselState extends State<CompletedLessonsCarousel> {
             itemCount: imgList.length,
             itemBuilder: (context, index) {
               double relativePosition = index - _currentPage;
+
+              String apiCategoryName = [
+                "Alphabets",
+                "Numbers",
+                "Phrases/Words",
+              ][index];
+              int completed = 0;
+              int total = 0;
+
+              if (vm.categorySummaries.isNotEmpty) {
+                final summary = vm.categorySummaries.firstWhere(
+                  (s) => s.category == apiCategoryName,
+                  orElse: () => CategorySummary(
+                    category: apiCategoryName,
+                    totalLessons: 0,
+                    completedLessons: 0,
+                    isCompleted: false,
+                  ),
+                );
+
+                completed = summary.completedLessons;
+                total = summary.totalLessons;
+              }
+
               return Transform(
                 transform: Matrix4.identity()
                   ..translate(relativePosition * -20.0.w)
@@ -87,7 +154,8 @@ class _CompletedLessonsCarouselState extends State<CompletedLessonsCarousel> {
                       onTap: () => _handleLessonTap(index),
                       child: ContinueLessonCard(
                         title: ["Alphabets", "Numbers", "Common Words"][index],
-                        progress: 0,
+                        completedLessons: completed,
+                        totalLessons: total,
                         color: [
                           const Color(0xFFE9B63B), // Yellow
                           const Color(0xFF3B82F6), // Blue
@@ -206,12 +274,19 @@ class ProfileSwitchTile extends StatelessWidget {
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-        title: Text(title, style: const TextStyle(fontSize: 15, fontFamily: 'Inter')),
+        title: Text(
+          title,
+          style: const TextStyle(fontSize: 15, fontFamily: 'Inter'),
+        ),
         subtitle: subtitle == null
             ? null
             : Text(
                 subtitle!,
-                style: TextStyle(fontSize: 12, color: Colors.grey[600], fontFamily: 'Inter'),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                  fontFamily: 'Inter',
+                ),
               ),
         trailing: Switch(
           value: value,

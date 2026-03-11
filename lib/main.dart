@@ -14,6 +14,7 @@ import 'features/profile/viewmodels/achievements_view_model.dart';
 import 'features/profile/viewmodels/profile_view_model.dart';
 import 'package:auri_sign/features/profile/viewmodels/notification_schedule_view_model.dart';
 import 'package:auri_sign/features/notifications/presentation/viewmodels/notification_center_view_model.dart';
+import '../../features/lessons/presentation/viewmodels/category_view_model.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -52,8 +53,11 @@ void main() async {
         ChangeNotifierProvider(create: (_) => di.sl<AchievementsViewModel>()),
         ChangeNotifierProvider(create: (_) => di.sl<ProfileViewModel>()),
         ChangeNotifierProvider(create: (_) => di.sl<LoginViewModel>()),
-        ChangeNotifierProvider(create: (_) => di.sl<NotificationScheduleViewModel>()),
+        ChangeNotifierProvider(
+          create: (_) => di.sl<NotificationScheduleViewModel>(),
+        ),
         ChangeNotifierProvider(create: (_) => NotificationCenterViewModel()),
+        ChangeNotifierProvider(create: (_) => di.sl<CategoryViewModel>()),
       ],
       child: const MyApp(),
     ),

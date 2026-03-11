@@ -69,15 +69,9 @@ class _NavFunctionState extends State<NavFunction> {
       // 2. THE FIX: Using a Stack instead of just IndexedStack
       body: Stack(
         children: [
-          // BACKGROUND LAYERS (Home, Dictionary, Profile)
-          // We hide them when Camera is active, but we don't destroy them.
           Offstage(
-            offstage: _selectedIndex == 1, // True if Camera is open
+            offstage: _selectedIndex == 1,
             child: IndexedStack(
-              // Logic to skip the camera index (1) for the background stack
-              // If index is 0 (Home) -> 0
-              // If index is 2 (Dictionary) -> 1
-              // If index is 3 (Profile) -> 2
               index: _selectedIndex > 1 ? _selectedIndex - 1 : _selectedIndex, 
               children: [
                  HomePage(

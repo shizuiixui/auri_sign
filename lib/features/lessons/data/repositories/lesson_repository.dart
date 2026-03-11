@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import '../models/lesson_model.dart';
 import '../models/category_progress_model.dart';
+import 'package:flutter/foundation.dart';
 
 class LessonRepository {
   final String baseUrl;
@@ -18,73 +18,45 @@ class LessonRepository {
     };
   }
 
-  Future<StartLessonResponse> startLesson(String lessonId) async {
+  Future<DetailedCategoryProgress> getCategoryProgress(String categoryName, [String? token]) async {
     final headers = await _getHeaders();
-    final url = Uri.parse('$baseUrl/lessons/lessons/$lessonId/start');
-
-    print("🚀 ATTEMPTING TO START LESSON");
-    print("📍 URL: $url");
-    print("🔑 LESSON ID SENT: '$lessonId'");
-
-    final response = await http.post(url, headers: headers);
-
-    print("📥 RESPONSE CODE: ${response.statusCode}");
-    print("📥 RESPONSE BODY: ${response.body}");
-
-    if (response.statusCode == 200) {
-      return StartLessonResponse.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to start lesson: ${response.body}');
-    }
-  }
-
-  Future<SubmitAnswerResponse> submitAnswer({
-    required String lessonId,
-    required int stepNumber,
-    required dynamic userAnswer,
-    double? confidence,
-  }) async {
-    final headers = await _getHeaders();
-
-    final Map<String, dynamic> body = {
-      "stepNumber": stepNumber,
-      "userAnswer": userAnswer,
-    };
-
-    if (confidence != null) {
-      body["confidence"] = confidence;
+    if (token != null && token.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $token';
     }
 
-    final response = await http.post(
-      Uri.parse('$baseUrl/lessons/lessons/$lessonId/submit-answer'),
-      headers: headers,
-      body: jsonEncode(body),
-    );
-
-    if (response.statusCode == 200) {
-      return SubmitAnswerResponse.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to submit answer: ${response.body}');
-    }
-  }
-
-  Future<CategoryProgressResponse> getCategoryProgress(
-    String categoryName,
-  ) async {
-    final headers = await _getHeaders();
     final encodedCategory = Uri.encodeComponent(categoryName);
+    final url = Uri.parse('$baseUrl/lessons/user/categories/$encodedCategory/progress');
 
-    final response = await http.get(
-      Uri.parse('$baseUrl/lessons/user/categories/$encodedCategory/progress'),
-      headers: headers,
-    );
-    print("📡 RAW CATEGORY DATA: ${response.body}");
+    final response = await http.get(url, headers: headers);
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      return CategoryProgressResponse.fromJson(data);
+      return DetailedCategoryProgress.fromJson(data);
     } else {
       throw Exception('Failed to load category progress');
     }
+  }
+
+  Future<List<CategorySummary>> getAllCategoriesProgress() async {
+    final headers = await _getHeaders();
+    final url = Uri.parse('$baseUrl/lessons/user/categories/progress');
+
+    debugPrint("🚀 FETCHING CAROUSEL SUMMARY: $url");
+
+    try {
+      final response = await http.get(url, headers: headers);
+      
+      debugPrint("📥 CAROUSEL STATUS CODE: ${response.statusCode}");
+      debugPrint("📥 CAROUSEL DATA: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final categories = data['categories'] as List? ?? [];
+        return categories.map((c) => CategorySummary.fromJson(c)).toList();
+      }
+    } catch (e) {
+      debugPrint('❌ Error fetching carousel progress: $e');
+    }
+    return [];
   }
 }

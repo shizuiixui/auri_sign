@@ -1,46 +1,75 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../../core/di/injection_container.dart';
-import '../../../lessons/data/repositories/lesson_repository.dart';
-import '../../../lessons/presentation/viewmodels/lesson_view_model.dart';
 import '../../../lessons/presentation/viewmodels/category_view_model.dart';
 import '../../../lessons/presentation/screens/lesson_execution_screen.dart';
 import '../widgets/category_helper.dart';
+import '/features/auth/viewmodels/user_view_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class CategoryAlphabetsPage extends StatefulWidget {
-  const CategoryAlphabetsPage({super.key});
+class CategoryDetailsPage extends StatefulWidget {
+  final String title; 
+  final String
+  apiCategoryName;
+  final String
+  webCategorySlug;
+  final String description; 
+
+  const CategoryDetailsPage({
+    super.key,
+    required this.title,
+    required this.apiCategoryName,
+    required this.webCategorySlug,
+    required this.description,
+  });
 
   @override
-  State<CategoryAlphabetsPage> createState() => _CategoryAlphabetsPageState();
+  State<CategoryDetailsPage> createState() => _CategoryDetailsPageState();
 }
 
-class _CategoryAlphabetsPageState extends State<CategoryAlphabetsPage> {
+class _CategoryDetailsPageState extends State<CategoryDetailsPage> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<CategoryViewModel>().fetchCategoryProgress("Alphabets");
+      // 🔄 DYNAMIC: Fetches progress based on whatever category was passed in
+      context.read<CategoryViewModel>().fetchCategoryProgress(
+        widget.apiCategoryName,
+      );
     });
   }
 
   void _navigateToLesson(String lessonId) async {
     String targetId = lessonId;
     if (targetId == "alphabet_1") {
-      targetId = "lesson-a-d";
+      targetId = "lesson-a-d"; // Keep your specific alphabet fallback
     }
+
+    String myToken = context.read<UserViewModel>().user?.token ?? "";
+    if (myToken.isEmpty) {
+      final prefs = await SharedPreferences.getInstance();
+      myToken = prefs.getString('auth_token') ?? "";
+    }
+
+    if (!mounted) return;
+
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => ChangeNotifierProvider(
-          create: (_) => LessonViewModel(repository: sl<LessonRepository>()),
-          child: LessonExecutionScreen(lessonId: targetId),
+        builder: (_) => LessonExecutionScreen(
+          lessonId: targetId,
+          category: widget
+              .webCategorySlug, // 🔄 DYNAMIC: Uses the right React URL slug
+          userToken: myToken,
         ),
       ),
     );
 
     if (mounted) {
-      context.read<CategoryViewModel>().fetchCategoryProgress("Alphabets");
+      // Refresh the specific category when returning
+      context.read<CategoryViewModel>().fetchCategoryProgress(
+        widget.apiCategoryName,
+      );
     }
   }
 
@@ -51,8 +80,9 @@ class _CategoryAlphabetsPageState extends State<CategoryAlphabetsPage> {
     return Scaffold(
       backgroundColor: const Color(0XFFF8F8F8),
       appBar: AppBar(
+        // 🔄 DYNAMIC TITLE
         title: Text(
-          "Alphabets",
+          widget.title,
           style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
         ),
         backgroundColor: const Color(0XFFF8F8F8),
@@ -77,27 +107,24 @@ class _CategoryAlphabetsPageState extends State<CategoryAlphabetsPage> {
 
   Widget _buildErrorState(String error) {
     return Center(
-      child: Padding(
-        padding: EdgeInsets.all(24.0.w),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, size: 48.w, color: Colors.red),
-            SizedBox(height: 16.h),
-            Text(
-              "Error: $error",
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16.sp),
-            ),
-            SizedBox(height: 16.h),
-            ElevatedButton(
-              onPressed: () => context
-                  .read<CategoryViewModel>()
-                  .fetchCategoryProgress("Alphabets"),
-              child: Text("Retry", style: TextStyle(fontSize: 16.sp)),
-            ),
-          ],
-        ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.error_outline, size: 48.w, color: Colors.red),
+          SizedBox(height: 16.h),
+          Text(
+            "Error: $error",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 16.sp),
+          ),
+          SizedBox(height: 16.h),
+          ElevatedButton(
+            onPressed: () => context
+                .read<CategoryViewModel>()
+                .fetchCategoryProgress(widget.apiCategoryName),
+            child: Text("Retry", style: TextStyle(fontSize: 16.sp)),
+          ),
+        ],
       ),
     );
   }
@@ -108,10 +135,8 @@ class _CategoryAlphabetsPageState extends State<CategoryAlphabetsPage> {
         padding: EdgeInsets.all(16.w),
         child: Column(
           children: [
-            const CategoryHeader(
-              title:
-                  "Learn each letter of Filipino Sign Language and practice your gestures.",
-            ),
+            // 🔄 DYNAMIC DESCRIPTION
+            CategoryHeader(title: widget.description),
             SizedBox(height: 18.h),
             if (vm.categoryData != null &&
                 vm.categoryData!.lessonProgress.isNotEmpty)
