@@ -207,6 +207,13 @@ class ProfilePage extends StatelessWidget {
     UserViewModel userVM,
     ProfileViewModel profileVM,
   ) {
+    if (!profileVM.hasLoadedLearningStats &&
+        !profileVM.isLoadingLearningStats) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        profileVM.loadLearningStats();
+      });
+    }
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
@@ -258,9 +265,14 @@ class ProfilePage extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [UserStatsRow(trophyCount: 1, streakCount: 0)],
+            children: [
+              UserStatsRow(
+                trophyCount: profileVM.badgeCount,
+                streakCount: profileVM.streakCount,
+              ),
+            ],
           ),
 
           const SizedBox(height: 32),

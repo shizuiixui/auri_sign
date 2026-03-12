@@ -45,7 +45,7 @@ class LessonService {
     required String token,
     String? category,
   }) async {
-    final path = category != null ? '/lessons/$category' : '/lessons';
+    final path = category != null ? 'lessons/$category' : 'lessons';
     final response = await _dio.get(
       path,
       options: Options(headers: {'Authorization': 'Bearer $token'}),

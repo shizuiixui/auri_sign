@@ -23,9 +23,9 @@ class NavFunction extends StatefulWidget {
 
 class _NavFunctionState extends State<NavFunction> {
   int _selectedIndex = 0;
-  
+
   late final DictionaryViewModel _dictionaryViewModel;
-  bool _isInitializing = true; 
+  bool _isInitializing = true;
 
   @override
   void initState() {
@@ -35,13 +35,14 @@ class _NavFunctionState extends State<NavFunction> {
 
   Future<void> _initializeApp() async {
     final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('auth_token') ?? ''; 
+    final token = prefs.getString('auth_token') ?? '';
 
     final repository = DictionaryRepository(
-      baseUrl: 'http://192.168.100.10:5000/api/dictionary', // change with your laptop IP
-      authToken: token, 
+      baseUrl:
+          'http://192.168.1.100:5000/api/dictionary', // change with your laptop IP
+      authToken: token,
     );
-    
+
     _dictionaryViewModel = DictionaryViewModel(repository);
 
     if (mounted) {
@@ -55,14 +56,14 @@ class _NavFunctionState extends State<NavFunction> {
     HomePage(
       onProfileTap: () {
         setState(() {
-          _selectedIndex = 3; 
+          _selectedIndex = 3;
         });
       },
-    ), 
-    
-    const GestureWebviewScreen(),  
-    DictionaryPage(viewModel: _dictionaryViewModel), 
-    const ProfilePage(), 
+    ),
+
+    const GestureWebviewScreen(),
+    DictionaryPage(viewModel: _dictionaryViewModel),
+    const ProfilePage(),
   ];
 
   @override
@@ -76,10 +77,7 @@ class _NavFunctionState extends State<NavFunction> {
     }
 
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex, 
-        children: _pages
-      ),
+      body: IndexedStack(index: _selectedIndex, children: _pages),
       bottomNavigationBar: BottomNavBar(
         currentIndex: _selectedIndex,
         onTap: (index) {

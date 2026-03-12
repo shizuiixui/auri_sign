@@ -28,7 +28,7 @@ class UserViewModel extends ChangeNotifier {
     try {
       final response = await http.get(
         Uri.parse(
-          'http://192.168.100.10:5000/api/user/me',
+          'http://192.168.1.100:5000/api/user/me',
         ), // change with your laptop IP
         headers: {
           'Content-Type': 'application/json',
@@ -90,7 +90,7 @@ class UserViewModel extends ChangeNotifier {
       if (_token != null) {
         await http.post(
           Uri.parse(
-            'http://192.168.100.10:5000/api/user/logout',
+            'http://192.168.1.100:5000/api/user/logout',
           ), // change with your laptop IP
           headers: {
             'Content-Type': 'application/json',

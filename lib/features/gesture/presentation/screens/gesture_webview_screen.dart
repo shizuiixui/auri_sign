@@ -11,7 +11,12 @@ class GestureWebviewScreen extends StatefulWidget {
 }
 
 class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
-  late final WebViewController controller;
+  static const String _webViewerUrl = String.fromEnvironment(
+    'WEB_VIEWER_URL',
+    defaultValue: 'http://192.168.1.100:5173/gesture-recognition',
+  );
+
+  WebViewController? controller;
   bool _isLoading = true;
 
   @override
@@ -24,7 +29,7 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
     // Request permissions for Camera/Microphone
     await [Permission.camera, Permission.microphone].request();
 
-    const String url = 'http://localhost:5173/ai_gesture';
+    const String url = _webViewerUrl;
 
     late final PlatformWebViewControllerCreationParams params;
     if (WebViewPlatform.instance is AndroidWebViewPlatform) {
@@ -37,8 +42,9 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
         WebViewController.fromPlatformCreationParams(params);
     if (webViewController.platform is AndroidWebViewController) {
       AndroidWebViewController.enableDebugging(true);
-      final androidController = webViewController.platform as AndroidWebViewController;
-      
+      final androidController =
+          webViewController.platform as AndroidWebViewController;
+
       androidController.setMediaPlaybackRequiresUserGesture(false);
       androidController.setOnPlatformPermissionRequest((request) {
         request.grant();
@@ -60,7 +66,7 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
                 pointer-events: none !important;
               }
             """;
-            
+
             webViewController.runJavaScript("""
               var style = document.createElement('style');
               style.type = 'text/css';
@@ -82,6 +88,10 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
       ..loadRequest(Uri.parse(url));
 
     controller = webViewController;
+
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -90,7 +100,10 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
       appBar: AppBar(title: const Text("AI Gesture")),
       body: Stack(
         children: [
-          WebViewWidget(controller: controller),
+          if (controller != null)
+            WebViewWidget(controller: controller!)
+          else
+            const Center(child: CircularProgressIndicator()),
           if (_isLoading) const Center(child: CircularProgressIndicator()),
         ],
       ),

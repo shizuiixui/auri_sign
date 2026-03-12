@@ -43,7 +43,7 @@ class AppRouter {
       '/profile': (context) => const ProfilePage(),
 
       // Gesture Detection
-        '/gesture_detection': (context) => const GestureWebviewScreen(),
+      '/gesture_detection': (context) => const GestureWebviewScreen(),
       // '/gesture_detection': (context) => const GestureDetectionScreen(),
 
       // Categories
@@ -54,7 +54,8 @@ class AppRouter {
       // Dictionary
       '/dictionary': (context) {
         final repository = DictionaryRepository(
-          baseUrl: 'http://192.168.100.10:5000/api/dictionary', // change with your laptop IP
+          baseUrl:
+              'http://192.168.1.100:5000/api/dictionary', // change with your laptop IP
           authToken: 'auth_token',
         );
         final viewModel = DictionaryViewModel(repository);

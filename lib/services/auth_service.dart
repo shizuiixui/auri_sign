@@ -3,8 +3,7 @@ import 'package:dio/dio.dart';
 class AuthService {
   final Dio _dio = Dio(
     BaseOptions(
-      baseUrl:
-          'http://192.168.100.10:5000/api', // change with your laptop IP
+      baseUrl: 'http://192.168.1.100:5000/api/', // change with your laptop IP
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
     ),
@@ -12,7 +11,7 @@ class AuthService {
 
   Future<Response> sendOTP({required String email}) async {
     try {
-      return await _dio.post('/otp/sendOTP', data: {'email': email});
+      return await _dio.post('otp/sendOTP', data: {'email': email});
     } catch (e) {
       rethrow;
     }
@@ -24,7 +23,7 @@ class AuthService {
   }) async {
     try {
       return await _dio.post(
-        '/otp/verifyOTP',
+        'otp/verifyOTP',
         data: {'email': email, 'otp': otp},
       );
     } catch (e) {
@@ -41,7 +40,7 @@ class AuthService {
   }) async {
     try {
       final response = await _dio.post(
-        '/auth/signup',
+        'auth/signup',
         data: {
           'firstName': firstName,
           'lastName': lastName,
@@ -62,7 +61,7 @@ class AuthService {
   }) async {
     try {
       final response = await _dio.post(
-        '/auth/login',
+        'auth/login',
         data: {'email': email, 'password': password},
       );
       return response;

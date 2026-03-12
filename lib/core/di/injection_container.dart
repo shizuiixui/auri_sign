@@ -5,12 +5,12 @@ import '../../features/auth/data/repositories/user_repository.dart';
 import '../../features/auth/viewmodels/user_view_model.dart';
 import '../../features/auth/presentation/viewmodels/login_view_model.dart';
 
-// Profile Imports 
+// Profile Imports
 import '../../features/profile/viewmodels/achievements_view_model.dart';
 import '../../features/profile/viewmodels/profile_view_model.dart';
 import '../../features/profile/domain/usecases/upload_profile_picture_usecase.dart';
 
-// Lesson Imports 
+// Lesson Imports
 import '../../features/lessons/data/repositories/lesson_repository.dart';
 import '../../features/lessons/presentation/viewmodels/lesson_view_model.dart';
 import '../../features/lessons/presentation/viewmodels/category_view_model.dart';
@@ -20,12 +20,12 @@ final sl = GetIt.instance;
 Future<void> init() async {
   sl.registerLazySingleton<UserRepository>(
     () => UserRepository(
-      baseUrl: 'http://192.168.100.10:5000/api', // change with your laptop IP
+      baseUrl: 'http://192.168.1.100:5000/api', // change with your laptop IP
     ),
   );
 
   sl.registerLazySingleton(() => UploadProfilePictureUseCase(repository: sl()));
-  
+
   // ViewModels
   sl.registerFactory(() => UserViewModel(sl()));
   sl.registerFactory(() => LoginViewModel());
@@ -34,11 +34,11 @@ Future<void> init() async {
   sl.registerFactory(() => AchievementsViewModel());
   sl.registerFactory(() => ProfileViewModel(uploadUseCase: sl()));
 
-  // 3. Lessons & Categories 
-  // Repository 
+  // 3. Lessons & Categories
+  // Repository
   sl.registerLazySingleton<LessonRepository>(
     () => LessonRepository(
-      baseUrl: 'http://192.168.100.10:5000/api', // change with your laptop IP
+      baseUrl: 'http://192.168.1.100:5000/api', // change with your laptop IP
     ),
   );
 
@@ -48,7 +48,5 @@ Future<void> init() async {
   );
 
   // Lesson ViewModel
-  sl.registerFactory<LessonViewModel>(
-    () => LessonViewModel(repository: sl()),
-  );
+  sl.registerFactory<LessonViewModel>(() => LessonViewModel(repository: sl()));
 }

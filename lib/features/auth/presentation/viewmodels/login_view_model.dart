@@ -27,18 +27,52 @@ class LoginViewModel extends ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
-        _token = response.data['token'];
+        final data = response.data;
+        if (data is Map<String, dynamic> && data['mfaRequired'] == true) {
+          _errorMessage =
+              'This account requires MFA verification. MFA login is not yet supported in the mobile app.';
+          return;
+        }
+
+        _token = data is Map<String, dynamic> ? data['token'] as String? : null;
+
+        if (_token == null || _token!.isEmpty) {
+          _errorMessage = 'Login response did not include a token.';
+          return;
+        }
+
         final prefs = await SharedPreferences.getInstance();
 
         await prefs.setString('auth_token', _token!);
 
         print("SUCCESS: Token safely stored on device disk!");
       } else {
-        _errorMessage = response.data['message'] ?? 'Login failed.';
+        final data = response.data;
+        _errorMessage = data is Map<String, dynamic>
+            ? (data['message']?.toString() ?? 'Login failed.')
+            : 'Login failed.';
       }
     } catch (e) {
       print('Login Error: $e');
-      _errorMessage = 'Network error or invalid credentials.';
+      if (e is DioException) {
+        final statusCode = e.response?.statusCode;
+        final responseData = e.response?.data;
+
+        if (responseData is Map<String, dynamic> &&
+            responseData['message'] != null) {
+          _errorMessage = responseData['message'].toString();
+        } else if (statusCode == 401) {
+          _errorMessage = 'Invalid credentials.';
+        } else if (statusCode == 403) {
+          _errorMessage = 'Please verify your email before logging in.';
+        } else if (statusCode == 429) {
+          _errorMessage = 'Too many login attempts. Please try again later.';
+        } else {
+          _errorMessage = 'Network error or server unavailable.';
+        }
+      } else {
+        _errorMessage = 'Network error or invalid credentials.';
+      }
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -54,9 +88,7 @@ class LoginViewModel extends ChangeNotifier {
       final String? savedToken = prefs.getString('auth_token');
 
       if (savedToken != null && savedToken.isNotEmpty) {
-        print(
-          "FOUND TOKEN: User is still logged in. Bypassing Welcome Page.",
-        );
+        print("FOUND TOKEN: User is still logged in. Bypassing Welcome Page.");
         _token = savedToken;
         notifyListeners();
         return true;
