@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:auri_sign/core/widgets/button.dart';
 import 'package:auri_sign/core/widgets/loading_indicator.dart';
+import 'package:auri_sign/features/auth/presentation/screens/signup.dart';
 
 class ProfilingScreen extends StatefulWidget {
   const ProfilingScreen({super.key});
@@ -97,11 +98,23 @@ class _ProfilingScreenState extends State<ProfilingScreen> {
         _isLoading = true;
       });
 
-      await Future.delayed(const Duration(seconds: 2));
+      await Future.delayed(const Duration(seconds: 1));
 
       if (!mounted) return;
+      int motivation = (_selectedAnswers[0] ?? 0) + 1;
+      int communication = (_selectedAnswers[1] ?? 0) + 1;
+      int dailyTime = (_selectedAnswers[2] ?? 0) + 1;
 
-      Navigator.pushReplacementNamed(context, '/signup');
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SignupForm(
+            motivation: motivation,
+            communicationContext: communication,
+            dailyTime: dailyTime,
+          ),
+        ),
+      );
     }
   }
 

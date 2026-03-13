@@ -19,6 +19,9 @@ class SignupViewModel extends ChangeNotifier {
     required String email,
     required String password,
     required String confirmPassword,
+    int? motivation,
+    int? communicationContext,
+    int? dailyTime,
   }) async {
     _isLoading = true;
     _errorMessage = null;
@@ -32,6 +35,9 @@ class SignupViewModel extends ChangeNotifier {
         email: email,
         password: password,
         confirmPassword: confirmPassword,
+        motivation: motivation,
+        communicationContext: communicationContext,
+        dailyTime: dailyTime,
       );
 
       if (response.statusCode == 201) {

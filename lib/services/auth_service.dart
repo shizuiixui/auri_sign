@@ -39,17 +39,33 @@ class AuthService {
     required String email,
     required String password,
     required String confirmPassword,
+    int? motivation,
+    int? communicationContext,
+    int? dailyTime,
   }) async {
     try {
+      // Base user data
+      final Map<String, dynamic> requestData = {
+        'firstName': firstName,
+        'lastName': lastName,
+        'email': email,
+        'password': password,
+        'confirmPassword': confirmPassword,
+      };
+
+      // Profiling data
+      if (motivation != null && communicationContext != null && dailyTime != null) {
+        requestData['profiling'] = {
+          'motivation': motivation,
+          'communicationContext': communicationContext,
+          'dailyTime': dailyTime,
+        };
+      }
+
+      // Send via Dio
       final response = await _dio.post(
         '/auth/signup',
-        data: {
-          'firstName': firstName,
-          'lastName': lastName,
-          'email': email,
-          'password': password,
-          'confirmPassword': confirmPassword,
-        },
+        data: requestData,
       );
       return response;
     } catch (e) {

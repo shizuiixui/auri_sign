@@ -7,7 +7,17 @@ import '/core/utils/validators.dart';
 import '/features/auth/presentation/viewmodels/signup_view_models.dart';
 
 class SignupForm extends StatefulWidget {
-  const SignupForm({super.key});
+  // 🎯 NEW: We opened the door to accept the profiling data from the previous screens!
+  final int? motivation;
+  final int? communicationContext;
+  final int? dailyTime;
+
+  const SignupForm({
+    super.key,
+    this.motivation,
+    this.communicationContext,
+    this.dailyTime,
+  });
 
   @override
   State<SignupForm> createState() => _SignupFormState();
@@ -49,7 +59,6 @@ class _SignupFormState extends State<SignupForm> {
       body: SafeArea(
         top: false,
         child: SingleChildScrollView(
-          // 2. Responsive Padding
           padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 48.h),
           child: Form(
             key: _signupFormKey,
@@ -63,13 +72,12 @@ class _SignupFormState extends State<SignupForm> {
                       Text(
                         "Sign Up and Start Learning",
                         style: TextStyle(
-                          fontSize: 32.sp, // 3. Responsive Font
+                          fontSize: 32.sp,
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-
-                      SizedBox(height: 15.h), // 4. Responsive Spacing
+                      SizedBox(height: 15.h),
 
                       // Sign Up Subtitle
                       Text(
@@ -79,7 +87,6 @@ class _SignupFormState extends State<SignupForm> {
                           fontFamily: 'PlusJakartaSans',
                         ),
                       ),
-
                       SizedBox(height: 20.h),
 
                       // First Name Text Field
@@ -95,7 +102,6 @@ class _SignupFormState extends State<SignupForm> {
                           prefixIcon: Icons.person,
                         ),
                       ),
-
                       SizedBox(height: 14.h),
 
                       // Last Name Text Field
@@ -111,7 +117,6 @@ class _SignupFormState extends State<SignupForm> {
                           prefixIcon: Icons.person,
                         ),
                       ),
-
                       SizedBox(height: 14.h),
 
                       // Email Text Field
@@ -124,7 +129,6 @@ class _SignupFormState extends State<SignupForm> {
                           prefixIcon: Icons.email_outlined,
                         ),
                       ),
-
                       SizedBox(height: 14.h),
 
                       // Password Field
@@ -138,14 +142,13 @@ class _SignupFormState extends State<SignupForm> {
                               "Create a password",
                               prefixIcon: Icons.lock_outlined,
                             ).copyWith(
-                              // Toggle Password Visibility Icon
                               suffixIcon: IconButton(
                                 icon: Icon(
                                   inputPassword
                                       ? Icons.visibility_off
                                       : Icons.visibility,
                                   color: Colors.grey,
-                                  size: 24.sp, // Scaled Icon
+                                  size: 24.sp,
                                 ),
                                 onPressed: () {
                                   setState(() {
@@ -155,7 +158,6 @@ class _SignupFormState extends State<SignupForm> {
                               ),
                             ),
                       ),
-
                       SizedBox(height: 14.h),
 
                       // Confirm Password Field
@@ -172,14 +174,13 @@ class _SignupFormState extends State<SignupForm> {
                               "Re-type your password",
                               prefixIcon: Icons.lock_outlined,
                             ).copyWith(
-                              // Toggle Password Visibility Icon
                               suffixIcon: IconButton(
                                 icon: Icon(
                                   confirmInputPassword
                                       ? Icons.visibility_off
                                       : Icons.visibility,
                                   color: Colors.grey,
-                                  size: 24.sp, // Scaled Icon
+                                  size: 24.sp,
                                 ),
                                 onPressed: () {
                                   setState(() {
@@ -190,7 +191,6 @@ class _SignupFormState extends State<SignupForm> {
                               ),
                             ),
                       ),
-
                       SizedBox(height: 8.h),
 
                       // Legal Disclaimer Checkbox
@@ -241,7 +241,6 @@ class _SignupFormState extends State<SignupForm> {
                         dense: true,
                         activeColor: const Color(0xFFE9B63B),
                       ),
-
                       SizedBox(height: 15.h),
 
                       // Sign Up Button
@@ -250,19 +249,18 @@ class _SignupFormState extends State<SignupForm> {
                         builder: (context, child) {
                           return SizedBox(
                             width: double.infinity,
-                            height: 50.h, // Responsive Height
+                            height: 50.h,
                             child: Button(
                               text: signupVM.isLoading
                                   ? "Loading..."
                                   : "Start Learning",
                               onPressed: () async {
-                                // Prevent Multiple Submissions
                                 if (signupVM.isLoading) return;
-                                // Validate Form
+
                                 if (!_signupFormKey.currentState!.validate()) {
                                   return;
                                 }
-                                // Validate Checkbox
+
                                 if (!_legalDisclaimer) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
@@ -282,7 +280,12 @@ class _SignupFormState extends State<SignupForm> {
                                   confirmPassword: confirmPasswordController
                                       .text
                                       .trim(),
+                                  motivation: widget.motivation,
+                                  communicationContext:
+                                      widget.communicationContext,
+                                  dailyTime: widget.dailyTime,
                                 );
+
                                 if (signupVM.errorMessage != null) {
                                   if (context.mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
@@ -310,6 +313,7 @@ class _SignupFormState extends State<SignupForm> {
                         },
                       ),
                       SizedBox(height: 20.h),
+
                       // Already have an account
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -322,10 +326,7 @@ class _SignupFormState extends State<SignupForm> {
                               fontWeight: FontWeight.w400,
                             ),
                           ),
-
                           SizedBox(width: 6.w),
-
-                          // Login Text Button
                           GestureDetector(
                             onTap: () {
                               Navigator.pushNamed(context, '/login');
