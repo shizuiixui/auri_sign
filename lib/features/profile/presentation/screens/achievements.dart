@@ -1,98 +1,150 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:auri_sign/features/profile/presentation/widgets/achievement_helpers.dart'; 
+import 'package:auri_sign/features/profile/presentation/widgets/achievement_helpers.dart';
 import 'package:auri_sign/features/profile/viewmodels/achievements_view_model.dart';
 
-class AchievementsPage extends StatelessWidget {
+class AchievementsPage extends StatefulWidget {
   const AchievementsPage({super.key});
+
+  @override
+  State<AchievementsPage> createState() => _AchievementsPageState();
+}
+
+class _AchievementsPageState extends State<AchievementsPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AchievementsViewModel>().fetchAchievements();
+    });
+  }
+
+  // showLockDialogWarning
+  void _showLockDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        title: const Center(
+          child: Text(
+            "No Certificate Available Yet",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        content: const Text(
+          "You need to finish this category before downloading a certificate.",
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Colors.grey),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10, left: 10, right: 10),
+            child: SizedBox(
+              width: double.infinity,
+              height: 45,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFFB800),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  elevation: 0,
+                ),
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  "Go To Lessons",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<AchievementsViewModel>();
 
+    // countCompletedCategoriesForHeader
+    int completedCategories = viewModel.categories
+        .where(
+          (c) => c.completedLessons >= c.totalLessons && c.totalLessons > 0,
+        )
+        .length;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0XFFF8F8F8),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0XFFF8F8F8),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          "Achievements",
+          "Download Certificates",
           style: TextStyle(
             color: Colors.black,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-
-            ...viewModel.categories.map((category) {
-              final isExpanded = viewModel.isExpanded(category.id);
-
-              return Column(
+      body: viewModel.isLoading
+          ? const Center(
+              child: CircularProgressIndicator(color: Color(0xFFFFB800)),
+            )
+          : SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  AchievementProgressCard(
-                    title: category.title,
-                    progress: category.progress,
-                    subtitle: category.subtitle,
-                    isExpanded: isExpanded,
-                    onTap: () => viewModel.toggleExpanded(category.id),
+                  const Text(
+                    "Completed categories are clickable. Incomplete categories are disabled.",
+                    style: TextStyle(fontSize: 16, height: 1.4),
                   ),
-                  if (isExpanded)
-                    ExpandedLessonsList(
-                      totalLessons: category.totalLessons,
+                  const SizedBox(height: 16),
+                  Text(
+                    "Completed categories: $completedCategories/${viewModel.categories.length}",
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  ...viewModel.categories.map((category) {
+                    return CertificateCard(
+                      categoryName: category.title,
                       completedLessons: category.completedLessons,
-                    ),
+                      totalLessons: category.totalLessons,
+                      onDownload: () {
+                        if (category.completedLessons < category.totalLessons ||
+                            category.totalLessons == 0) {
+                          _showLockDialog(context);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                "Downloading certificate for ${category.title}...",
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                    );
+                  }),
+
+                  const SizedBox(height: 50),
                 ],
-              );
-            }),
-
-            const SizedBox(height: 24),
-
-            Container(
-              width: double.infinity,
-              height: 55,
-              decoration: BoxDecoration(
-                color: viewModel.isCertificateUnlocked
-                    ? const Color(0xFFFFB800)
-                    : Colors.grey[300],
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Download Certificate",
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Icon(
-                      viewModel.isCertificateUnlocked
-                          ? Icons.download
-                          : Icons.lock_outline,
-                      color: Colors.white.withOpacity(0.9),
-                      size: 18,
-                    ),
-                  ],
-                ),
               ),
             ),
-            const SizedBox(height: 30),
-          ],
-        ),
-      ),
     );
   }
 }

@@ -8,12 +8,10 @@ import '/features/auth/viewmodels/user_view_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CategoryDetailsPage extends StatefulWidget {
-  final String title; 
-  final String
-  apiCategoryName;
-  final String
-  webCategorySlug;
-  final String description; 
+  final String title;
+  final String apiCategoryName;
+  final String webCategorySlug;
+  final String description;
 
   const CategoryDetailsPage({
     super.key,
@@ -32,7 +30,7 @@ class _CategoryDetailsPageState extends State<CategoryDetailsPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // 🔄 DYNAMIC: Fetches progress based on whatever category was passed in
+      // Fetches progress
       context.read<CategoryViewModel>().fetchCategoryProgress(
         widget.apiCategoryName,
       );
@@ -42,7 +40,7 @@ class _CategoryDetailsPageState extends State<CategoryDetailsPage> {
   void _navigateToLesson(String lessonId) async {
     String targetId = lessonId;
     if (targetId == "alphabet_1") {
-      targetId = "lesson-a-d"; // Keep your specific alphabet fallback
+      targetId = "lesson-a-d";
     }
 
     String myToken = context.read<UserViewModel>().user?.token ?? "";
@@ -58,8 +56,7 @@ class _CategoryDetailsPageState extends State<CategoryDetailsPage> {
       MaterialPageRoute(
         builder: (_) => LessonExecutionScreen(
           lessonId: targetId,
-          category: widget
-              .webCategorySlug, // 🔄 DYNAMIC: Uses the right React URL slug
+          category: widget.webCategorySlug,
           userToken: myToken,
         ),
       ),
@@ -80,14 +77,12 @@ class _CategoryDetailsPageState extends State<CategoryDetailsPage> {
     return Scaffold(
       backgroundColor: const Color(0XFFF8F8F8),
       appBar: AppBar(
-        // 🔄 DYNAMIC TITLE
         title: Text(
           widget.title,
           style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
         ),
         backgroundColor: const Color(0XFFF8F8F8),
         elevation: 0,
-        centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black, size: 24.w),
           onPressed: () => Navigator.pop(context),
@@ -154,7 +149,8 @@ class _CategoryDetailsPageState extends State<CategoryDetailsPage> {
                   padding: EdgeInsets.only(bottom: 16.h),
                   child: Category(
                     title: lesson.title,
-                    description: "Score: ${lesson.score}%",
+                    description:
+                        "${lesson.description}\n\nScore: ${lesson.score}%",
                     status: uiStatus,
                     onTap: lesson.isUnlocked
                         ? () => _navigateToLesson(lesson.lessonId)

@@ -34,7 +34,7 @@ class ProfilePage extends StatelessWidget {
     bool value,
   ) async {
     final result = await notificationVM.setScheduleEnabled(value);
-    
+
     if (!context.mounted) return;
 
     if (result.status == SetScheduleStatus.permissionDenied) {
@@ -46,7 +46,11 @@ class ProfilePage extends StatelessWidget {
 
     if (result.status == SetScheduleStatus.enabledInexact) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Exact alarm permission not granted. Notification may be delayed.')),
+        const SnackBar(
+          content: Text(
+            'Exact alarm permission not granted. Notification may be delayed.',
+          ),
+        ),
       );
       return;
     }
@@ -85,11 +89,7 @@ class ProfilePage extends StatelessWidget {
                   ),
                 ),
               ),
-              Divider(
-                height: 1.h,
-                thickness: 1.h,
-                color: Colors.grey.shade300,
-              ),
+              Divider(height: 1.h, thickness: 1.h, color: Colors.grey.shade300),
               SizedBox(
                 width: double.infinity,
                 child: TextButton(
@@ -123,11 +123,7 @@ class ProfilePage extends StatelessWidget {
                   ),
                 ),
               ),
-              Divider(
-                height: 1.h,
-                thickness: 1.h,
-                color: Colors.grey.shade300,
-              ),
+              Divider(height: 1.h, thickness: 1.h, color: Colors.grey.shade300),
               SizedBox(
                 width: double.infinity,
                 child: TextButton(
@@ -211,7 +207,7 @@ class ProfilePage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 45.sp,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white, 
+                  color: Colors.white,
                   fontFamily: 'Poppins',
                 ),
               ),
@@ -232,7 +228,7 @@ class ProfilePage extends StatelessWidget {
 
           const Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [UserStatsRow(trophyCount: 1, streakCount: 0)],
+            children: [UserStatsRow()],
           ),
 
           SizedBox(height: 32.h),
@@ -264,13 +260,14 @@ class ProfilePage extends StatelessWidget {
               );
             },
           ),
-          
+
           // Practice Reminder Switch
           ProfileSwitchTile(
             title: "Daily Practice Reminder",
             subtitle: "Remind me to practice daily",
             value: notificationVM.schedule != null,
-            onChanged: (value) => _onScheduleChanged(context, notificationVM, value),
+            onChanged: (value) =>
+                _onScheduleChanged(context, notificationVM, value),
           ),
 
           SizedBox(height: 20.h),
@@ -345,10 +342,7 @@ class ProfilePage extends StatelessWidget {
             onPressed: () {},
             child: Text(
               "Delete Account",
-              style: TextStyle(
-                color: Colors.redAccent,
-                fontSize: 14.sp,
-              ),
+              style: TextStyle(color: Colors.redAccent, fontSize: 14.sp),
             ),
           ),
           SizedBox(height: 20.h),

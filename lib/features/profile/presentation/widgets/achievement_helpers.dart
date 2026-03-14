@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// achievementProgressCard
 class AchievementProgressCard extends StatelessWidget {
   final String title;
   final double progress;
@@ -77,6 +78,7 @@ class AchievementProgressCard extends StatelessWidget {
   }
 }
 
+// expandedLessonsList
 class ExpandedLessonsList extends StatelessWidget {
   final int totalLessons;
   final int completedLessons;
@@ -96,7 +98,7 @@ class ExpandedLessonsList extends StatelessWidget {
         lessons.add(
           ActiveLessonStep(
             title: "Lesson $i Completed",
-            subtitle: "0/4 completed", // Static Data
+            subtitle: "Completed", 
             progress: 1.0,
             number: i,
           ),
@@ -114,6 +116,7 @@ class ExpandedLessonsList extends StatelessWidget {
   }
 }
 
+// verticalStepLine
 class VerticalStepLine extends StatelessWidget {
   const VerticalStepLine({super.key});
 
@@ -123,6 +126,7 @@ class VerticalStepLine extends StatelessWidget {
   }
 }
 
+// activeLessonStep
 class ActiveLessonStep extends StatelessWidget {
   final String title;
   final String subtitle;
@@ -186,6 +190,7 @@ class ActiveLessonStep extends StatelessWidget {
   }
 }
 
+// inactiveLessonStep
 class InactiveLessonStep extends StatelessWidget {
   final String title;
   final int number;
@@ -223,6 +228,7 @@ class InactiveLessonStep extends StatelessWidget {
   }
 }
 
+// lessonCoin
 class LessonCoin extends StatelessWidget {
   final bool isActive;
   final int number;
@@ -268,6 +274,150 @@ class LessonCoin extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// certificateCardUi
+class CertificateCard extends StatelessWidget {
+  final String categoryName;
+  final int completedLessons;
+  final int totalLessons;
+  final VoidCallback onDownload;
+
+  const CertificateCard({
+    super.key,
+    required this.categoryName,
+    required this.completedLessons,
+    required this.totalLessons,
+    required this.onDownload,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // checkIfCategoryIsFullyCompleted
+    bool isCompleted = completedLessons >= totalLessons && totalLessons > 0;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // leftSideInfo
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade50,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFFFFB800).withOpacity(0.5)),
+                  ),
+                  child: Text(
+                    categoryName,
+                    style: const TextStyle(
+                      fontSize: 12, 
+                      fontWeight: FontWeight.bold, 
+                      color: Color(0xFFB8860B),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  "$completedLessons/$totalLessons lessons completed",
+                  style: TextStyle(fontSize: 13, color: Colors.grey[700], fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  isCompleted ? "Completed" : "Not yet completed",
+                  style: TextStyle(
+                    fontSize: 12, 
+                    color: isCompleted ? Colors.green : Colors.grey,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // rightSideButtons
+          Column(
+            children: [
+              _ActionButton(
+                text: "Download PDF",
+                color: const Color(0xFFFFB800),
+                textColor: Colors.white,
+                onPressed: onDownload,
+              ),
+              const SizedBox(height: 8),
+              _ActionButton(
+                text: "Verify",
+                color: Colors.white,
+                textColor: Colors.grey.shade700,
+                borderColor: Colors.grey.shade300,
+                onPressed: isCompleted ? () {
+                  // verifyActionLogicHere
+                } : null,
+              ),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+}
+
+// actionButtonHelperForCertificates
+class _ActionButton extends StatelessWidget {
+  final String text;
+  final Color color;
+  final Color textColor;
+  final Color? borderColor;
+  final VoidCallback? onPressed;
+
+  const _ActionButton({
+    required this.text,
+    required this.color,
+    required this.textColor,
+    this.borderColor,
+    this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 110,
+      height: 32,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          foregroundColor: textColor,
+          elevation: 0,
+          side: borderColor != null ? BorderSide(color: borderColor!) : null,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+          padding: EdgeInsets.zero,
+        ),
+        onPressed: onPressed,
+        child: Text(
+          text, 
+          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }

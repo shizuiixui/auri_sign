@@ -8,6 +8,7 @@ import '/core/widgets/continue_lesson_card.dart';
 import 'package:auri_sign/features/lessons/presentation/screens/category_details_page.dart';
 import '/../features/lessons/presentation/viewmodels/category_view_model.dart';
 import 'package:auri_sign/features/lessons/data/models/category_progress_model.dart';
+import 'package:auri_sign/features/homepage/presentation/widgets/daily_tracker.dart';
 
 class HomeHeader extends StatelessWidget {
   final String firstName;
@@ -161,7 +162,7 @@ class HomeHeader extends StatelessWidget {
 
         SizedBox(height: 16.h),
 
-        const UserStatsRow(trophyCount: 1, streakCount: 0),
+        const UserStatsRow(),
       ],
     );
   }
@@ -319,7 +320,6 @@ class DailyTrackerItem extends StatelessWidget {
   }
 }
 
-// ✅ MOVED: Home Carousel Section is now safely tucked away in the helpers!
 class HomeCarouselSection extends StatefulWidget {
   const HomeCarouselSection({super.key});
 

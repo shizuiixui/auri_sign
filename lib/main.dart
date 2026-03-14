@@ -15,6 +15,8 @@ import 'features/profile/viewmodels/profile_view_model.dart';
 import 'package:auri_sign/features/profile/viewmodels/notification_schedule_view_model.dart';
 import 'package:auri_sign/features/notifications/presentation/viewmodels/notification_center_view_model.dart';
 import '../../features/lessons/presentation/viewmodels/category_view_model.dart';
+import 'package:auri_sign/features/profile/viewmodels/streak_view_model.dart';
+import 'package:auri_sign/features/profile/viewmodels/badges_view_model.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -58,6 +60,8 @@ void main() async {
         ),
         ChangeNotifierProvider(create: (_) => NotificationCenterViewModel()),
         ChangeNotifierProvider(create: (_) => di.sl<CategoryViewModel>()),
+        ChangeNotifierProvider(create: (_) => StreakViewModel()),
+        ChangeNotifierProvider(create: (_) => BadgesViewModel()),
       ],
       child: const MyApp(),
     ),

@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import 'package:auri_sign/config/api_constants.dart';
+import 'package:auri_sign/features/lessons/presentation/viewmodels/category_view_model.dart';
+import 'package:auri_sign/features/profile/viewmodels/streak_view_model.dart';
 
 class LessonExecutionScreen extends StatefulWidget {
   final String category;
@@ -41,7 +44,7 @@ class _LessonExecutionScreenState extends State<LessonExecutionScreen> {
     await [Permission.camera, Permission.microphone].request();
     if (!mounted) return;
 
-    // 1. Setup the target URL with the auth token parameter
+    // Setup the target URL with the auth token parameter
     final String baseTargetUrl = ApiConstants.lessonWebviewUrl(
       widget.category,
       widget.lessonId,
@@ -68,14 +71,20 @@ class _LessonExecutionScreenState extends State<LessonExecutionScreen> {
       );
     }
 
-    // 🌉 THE BRIDGE: This listens for messages from the React web app
+    // 🎯 This listens for messages from the React web app
     webViewController.addJavaScriptChannel(
       'FlutterChannel',
       onMessageReceived: (JavaScriptMessage message) {
         if (message.message == 'exit_lesson') {
-          debugPrint("🚪 Web requested exit. Closing Flutter screen.");
-          if (mounted && Navigator.canPop(context)) {
-            Navigator.pop(context); // Goes back to CategoryAlphabetsPage
+          debugPrint("🚪 Web requested exit. Fetching new data and closing Flutter screen.");
+          
+          if (mounted) {
+            context.read<CategoryViewModel>().fetchAllCategoriesSummary();
+            context.read<StreakViewModel>().fetchStreakInfo();
+
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context); // Goes back to CategoryAlphabetsPage
+            }
           }
         }
       },
@@ -84,7 +93,6 @@ class _LessonExecutionScreenState extends State<LessonExecutionScreen> {
     webViewController
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(Colors.white)
-      // Added 'AuriSignMobile' to the User Agent so React knows it's inside the app
       ..setUserAgent(
         "Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Mobile Safari/537.36 AuriSignMobile",
       )
@@ -125,9 +133,7 @@ class _LessonExecutionScreenState extends State<LessonExecutionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      // 4. NO FLUTTER APP BAR: Let the React app's header act as the native header
       body: SafeArea(
-        // SafeArea prevents the React header from hiding under the phone's top notch
         child: Stack(
           children: [
             if (controller != null) WebViewWidget(controller: controller!),

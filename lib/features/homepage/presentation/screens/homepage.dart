@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '/features/homepage/presentation/widgets/homepage_helpers.dart';
+import '/features/homepage/presentation/widgets/daily_tracker.dart';
 import 'package:auri_sign/features/profile/viewmodels/notification_schedule_view_model.dart';
 import 'package:auri_sign/features/notifications/presentation/viewmodels/notification_center_view_model.dart';
 import 'package:auri_sign/features/lessons/presentation/screens/category_details_page.dart';
 import '/../features/lessons/presentation/viewmodels/category_view_model.dart';
+import 'package:auri_sign/features/profile/viewmodels/streak_view_model.dart';
 
 class HomePage extends StatefulWidget {
   final VoidCallback onProfileTap;
@@ -30,7 +32,7 @@ class _HomePageState extends State<HomePage> {
               apiCategoryName: "Alphabets",
               webCategorySlug: "alphabets",
               description:
-                  "Learn each letter of Filipino Sign Language and practice your gestures.",
+                  "Learn the 26 letters of the Filipino Sign Language alphabet.",
             ),
           ),
         );
@@ -44,7 +46,7 @@ class _HomePageState extends State<HomePage> {
               apiCategoryName: "Numbers",
               webCategorySlug: "numbers",
               description:
-                  "Learn how to sign numbers in Filipino Sign Language.",
+                  "Learn numbers from 1 to 100 in Filipino Sign Language.",
             ),
           ),
         );
@@ -57,7 +59,8 @@ class _HomePageState extends State<HomePage> {
               title: "Common Words",
               apiCategoryName: "Phrases/Words",
               webCategorySlug: "phrases-words",
-              description: "Learn everyday phrases and common words in FSL.",
+              description:
+                  "Learn common phrases and words in Filipino Sign Language.",
             ),
           ),
         );
@@ -66,17 +69,23 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final scheduleVM = context.read<NotificationScheduleViewModel>();
+      final centerVM = context.read<NotificationCenterViewModel>();
+      final isAlarmEnabled = scheduleVM.schedule != null;
+
+      centerVM.catchUp8AMNotification(isAlarmEnabled);
+      context.read<CategoryViewModel>().fetchAllCategoriesSummary();
+      context.read<StreakViewModel>().fetchStreakInfo();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final userVM = context.watch<UserViewModel>();
     final user = userVM.user;
-    final scheduleVM = context.watch<NotificationScheduleViewModel>();
-    final centerVM = context.read<NotificationCenterViewModel>();
-    final isAlarmEnabled = scheduleVM.schedule != null;
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      centerVM.catchUp8AMNotification(isAlarmEnabled);
-      context.read<CategoryViewModel>().fetchAllCategoriesSummary();
-    });
 
     return Scaffold(
       backgroundColor: const Color(0XFFF8F8F8),
@@ -106,59 +115,9 @@ class _HomePageState extends State<HomePage> {
 
                 // 3. Daily Tracker Section
                 SliverToBoxAdapter(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(24.w, 10.h, 24.w, 10.h),
-                        child: Text(
-                          "Daily Tracker",
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        padding: EdgeInsets.symmetric(horizontal: 24.w),
-                        child: Row(
-                          children: [
-                            const DailyTrackerItem(
-                              day: "Mon",
-                              isCompleted: false,
-                            ),
-                            SizedBox(width: 12.w),
-                            const DailyTrackerItem(
-                              day: "Tue",
-                              isCompleted: false,
-                            ),
-                            SizedBox(width: 12.w),
-                            const DailyTrackerItem(
-                              day: "Wed",
-                              isCompleted: false,
-                            ),
-                            SizedBox(width: 12.w),
-                            const DailyTrackerItem(
-                              day: "Thu",
-                              isCompleted: false,
-                            ),
-                            SizedBox(width: 12.w),
-                            const DailyTrackerItem(
-                              day: "Fri",
-                              isCompleted: false,
-                            ),
-                            SizedBox(width: 12.w),
-                            const DailyTrackerItem(
-                              day: "Sat",
-                              isCompleted: false,
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 20.h),
-                    ],
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(24.w, 10.h, 0.w, 10.h),
+                    child: const DailyTrackerSection(),
                   ),
                 ),
 

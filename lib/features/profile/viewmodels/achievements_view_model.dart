@@ -1,42 +1,112 @@
 import 'package:flutter/material.dart';
+import 'package:auri_sign/config/api_constants.dart';
+import 'package:auri_sign/features/lessons/data/repositories/lesson_repository.dart';
 import '../models/achievement_category.dart';
 
 class AchievementsViewModel extends ChangeNotifier {
-  final List<AchievementCategory> categories = [
+  bool isLoading = false;
+  String? errorMessage;
+
+  final LessonRepository _lessonRepo = LessonRepository(
+    baseUrl: ApiConstants.baseUrl,
+  );
+
+  // defaultCategories
+  List<AchievementCategory> categories = [
     AchievementCategory(
       id: 'alphabets',
       title: 'Alphabets',
-      totalLessons: 7,
+      totalLessons: 9,
       completedLessons: 0,
     ),
     AchievementCategory(
       id: 'numbers',
       title: 'Numbers',
-      totalLessons: 2,
+      totalLessons: 4,
       completedLessons: 0,
     ),
     AchievementCategory(
       id: 'phrases',
       title: 'Phrases',
-      totalLessons: 3,
+      totalLessons: 9,
       completedLessons: 0,
     ),
   ];
 
-  final Map<String, bool> _expandedStates = {'alphabets': true};
-
-  bool isExpanded(String id) => _expandedStates[id] ?? false;
-
-  void toggleExpanded(String id) {
-    _expandedStates[id] = !isExpanded(id);
-    notifyListeners();
+  String _toApiCategoryName(String categoryId) {
+    switch (categoryId) {
+      case 'alphabets':
+        return 'Alphabets';
+      case 'numbers':
+        return 'Numbers';
+      case 'phrases':
+        return 'Phrases/Words';
+      default:
+        return categoryId;
+    }
   }
 
-  bool get isCertificateUnlocked {
-    return categories.every((cat) => cat.completedLessons == cat.totalLessons);
+  Future<void> fetchAchievements() async {
+    // preventDoubleFetchingRaceCondition
+    if (isLoading) return;
+
+    isLoading = true;
+    errorMessage = null;
+    notifyListeners(); // showSpinner
+
+    try {
+      int failedRequests = 0;
+
+      final futures = categories.map((cat) async {
+        try {
+          final apiCategoryName = _toApiCategoryName(cat.id);
+          return await _lessonRepo.getCategoryProgress(apiCategoryName);
+        } catch (e) {
+          failedRequests++;
+          debugPrint('Failed to fetch category progress for ${cat.id}: $e');
+          return null;
+        }
+      }).toList();
+
+      final results = await Future.wait(futures);
+
+      // createBrandNewListToForceProviderToRebuildUi
+      List<AchievementCategory> updatedCategories = [];
+
+      for (int i = 0; i < categories.length; i++) {
+        final data = results[i];
+        if (data != null) {
+          updatedCategories.add(
+            AchievementCategory(
+              id: categories[i].id,
+              title: categories[i].title,
+              totalLessons: data.totalLessons > 0
+                  ? data.totalLessons
+                  : categories[i].totalLessons,
+              completedLessons: data.completedLessons,
+            ),
+          );
+        } else {
+          updatedCategories.add(categories[i]); // keepOldIfFailed
+        }
+      }
+
+      // assignNewListAndNotify
+      categories = updatedCategories;
+
+      if (failedRequests == categories.length) {
+        errorMessage = 'Unable to fetch achievements progress right now.';
+      }
+    } catch (e) {
+      errorMessage = 'network error fetching achievements';
+    } finally {
+      isLoading = false;
+      notifyListeners(); // 🎯 Force the UI to show the 5/9!
+    }
   }
 }
 
+// carouselViewModelRemainsUnchanged
 class CarouselViewModel extends ChangeNotifier {
   final List<CarouselItem> _items = [
     CarouselItem(
@@ -60,4 +130,18 @@ class CarouselViewModel extends ChangeNotifier {
   ];
 
   List<CarouselItem> get items => _items;
+}
+
+class CarouselItem {
+  final String title;
+  final String imagePath;
+  final double progress;
+  final int colorHex;
+
+  CarouselItem({
+    required this.title,
+    required this.imagePath,
+    required this.progress,
+    required this.colorHex,
+  });
 }

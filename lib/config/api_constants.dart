@@ -23,8 +23,6 @@ class ApiConstants {
   static const String updateName = "$baseUrl/user/update-name";
   static const String updateEmail = "$baseUrl/user/update-email";
   static const String updatePassword = "$baseUrl/user/update-password";
-  static const String uploadProfilePicture =
-      "$baseUrl/user/upload-profile-picture";
 
   // AI Gesture WebView
   static const String webBaseUrl = 'http://127.0.0.1:5173';

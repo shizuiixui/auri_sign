@@ -154,8 +154,6 @@ class Category extends StatelessWidget {
                         color: isLocked ? Colors.grey : Colors.black54,
                         fontFamily: 'Poppins',
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),

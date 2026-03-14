@@ -34,6 +34,7 @@ class DetailedCategoryProgress {
 class LessonProgressItem {
   final String lessonId;
   final String title;
+  final String description;
   final String status;
   final int score;
   final bool isUnlocked;
@@ -44,6 +45,8 @@ class LessonProgressItem {
     required this.status,
     required this.score,
     required this.isUnlocked,
+    required this.description,
+
   });
 
   factory LessonProgressItem.fromJson(Map<String, dynamic> json) {
@@ -53,6 +56,7 @@ class LessonProgressItem {
     return LessonProgressItem(
       lessonId: lessonData['id'] ?? '',
       title: lessonData['title'] ?? '',
+      description: lessonData['description'] ?? 'No description available.',
       status: progressData != null ? progressData['status'] : 'locked',
       score: progressData != null
           ? (progressData['scorePercentage'] as num?)?.toInt() ?? 0

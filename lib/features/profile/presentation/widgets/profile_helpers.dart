@@ -35,7 +35,6 @@ class _CompletedLessonsCarouselState extends State<CompletedLessonsCarousel> {
       });
     });
 
-    // 🎯 Trigger the fetch when the carousel loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<CategoryViewModel>().fetchAllCategoriesSummary();
     });
