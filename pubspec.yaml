@@ -44,6 +44,10 @@ dependencies:
   #HTTP Client
   dio: ^5.3.0
 
+  #File and Device Access
+  path_provider: ^2.1.0
+  open_filex: ^4.3.2
+
   #Comparing Dart Objects
   equatable: ^2.0.5
 

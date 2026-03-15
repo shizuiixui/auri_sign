@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:auri_sign/config/api_constants.dart';
 import 'package:auri_sign/features/lessons/data/repositories/lesson_repository.dart';
+import 'package:auri_sign/services/certificate_service.dart';
 import '../models/achievement_category.dart';
 
 class AchievementsViewModel extends ChangeNotifier {
   bool isLoading = false;
+  bool isDownloading = false;
   String? errorMessage;
+  String? downloadErrorMessage;
 
   final LessonRepository _lessonRepo = LessonRepository(
     baseUrl: ApiConstants.baseUrl,
   );
+
+  final CertificateService _certificateService = CertificateService();
 
   // defaultCategories
   List<AchievementCategory> categories = [
@@ -102,6 +107,46 @@ class AchievementsViewModel extends ChangeNotifier {
     } finally {
       isLoading = false;
       notifyListeners(); // 🎯 Force the UI to show the 5/9!
+    }
+  }
+
+  /// Downloads and opens a certificate PDF for the given category
+  Future<void> downloadCertificate(String categoryName) async {
+    isDownloading = true;
+    downloadErrorMessage = null;
+    notifyListeners();
+
+    try {
+      await _certificateService.downloadAndOpenCertificate(categoryName);
+    } catch (e) {
+      downloadErrorMessage = e.toString();
+      debugPrint('Certificate download error: $e');
+    } finally {
+      isDownloading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Verifies a certificate on the blockchain
+  Future<void> verifyCertificate(String categoryName) async {
+    isDownloading = true;
+    downloadErrorMessage = null;
+    notifyListeners();
+
+    try {
+      final result = await _certificateService.verifyCertificate(categoryName);
+
+      // Store verification result for display
+      debugPrint('Certificate verification successful: $result');
+
+      // You can add logic here to show verification details to user
+      notifyListeners();
+    } catch (e) {
+      downloadErrorMessage = e.toString();
+      debugPrint('Certificate verification error: $e');
+    } finally {
+      isDownloading = false;
+      notifyListeners();
     }
   }
 }

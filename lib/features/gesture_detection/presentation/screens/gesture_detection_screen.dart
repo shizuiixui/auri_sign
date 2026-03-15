@@ -6,7 +6,7 @@ import 'package:auri_sign/features/gesture_detection/camera_service.dart';
 import 'package:auri_sign/features/gesture_detection/fsl_mapper.dart';
 
 class GestureDetectionScreen extends StatefulWidget {
-  const GestureDetectionScreen({Key? key}) : super(key: key);
+  const GestureDetectionScreen({super.key});
 
   @override
   State<GestureDetectionScreen> createState() => _GestureDetectionScreenState();
@@ -20,7 +20,7 @@ class _GestureDetectionScreenState extends State<GestureDetectionScreen>
   String _detectedGesture = 'Initializing...';
   double _confidence = 0.0;
   String _confidenceLevel = '';
-  List<String> _gestureHistory = [];
+  final List<String> _gestureHistory = [];
   String _translatedText = '';
   bool _isProcessing = false;
 

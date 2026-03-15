@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart'; // Ensure plugin is available for the test
+// Ensure plugin is available for the test
 
 // Screens
 import 'package:auri_sign/features/profile/presentation/screens/achievements.dart';

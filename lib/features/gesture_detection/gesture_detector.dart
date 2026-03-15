@@ -9,7 +9,7 @@ class GestureDetector {
   bool _isInitialized = false;
   late List<int> _imageBuffer;
   int _frameCount = 0;
-  int _skipFrames = 3; // Process every 4th frame
+  final int _skipFrames = 3; // Process every 4th frame
   int _inputSize = 224; // model input size (assumed)
 
   // Tensor shapes (filled after loading model)
@@ -21,8 +21,8 @@ class GestureDetector {
   // simple stability filter
   String _lastPredicted = '';
   int _consecutiveCount = 0;
-  int _requiredConsecutive = 2;
-  double _minConfidence = 0.5;
+  final int _requiredConsecutive = 2;
+  final double _minConfidence = 0.5;
 
   Future<void> loadModel() async {
     try {
@@ -236,8 +236,12 @@ class GestureDetector {
         } else {
           // expectedLen > actualLen -> pad with zeros
           final Float32List padded = Float32List(expectedLen);
-          for (int i = 0; i < actualLen; i++) padded[i] = flatInput[i];
-          for (int i = actualLen; i < expectedLen; i++) padded[i] = 0.0;
+          for (int i = 0; i < actualLen; i++) {
+            padded[i] = flatInput[i];
+          }
+          for (int i = actualLen; i < expectedLen; i++) {
+            padded[i] = 0.0;
+          }
           nestedInput = [
             _inputIsUint8
                 ? List<int>.from(padded.map((v) => (v * 255).toInt()))

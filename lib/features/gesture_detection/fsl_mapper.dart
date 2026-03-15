@@ -53,12 +53,12 @@ class FSLMapper {
 
     // Check if it's a letter
     if (fslAlphabet.containsKey(gesture)) {
-      return gesture + ': ' + fslAlphabet[gesture]!;
+      return '$gesture: ${fslAlphabet[gesture]!}';
     }
 
     // Check if it's a word
     if (commonWords.containsKey(gesture)) {
-      return gesture + ' - ' + commonWords[gesture]!;
+      return '$gesture - ${commonWords[gesture]!}';
     }
 
     return gesture;

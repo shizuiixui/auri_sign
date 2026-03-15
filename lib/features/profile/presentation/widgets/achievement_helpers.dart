@@ -285,6 +285,8 @@ class CertificateCard extends StatelessWidget {
   final int completedLessons;
   final int totalLessons;
   final VoidCallback onDownload;
+  final VoidCallback? onVerify;
+  final bool isDownloading;
 
   const CertificateCard({
     super.key,
@@ -292,6 +294,8 @@ class CertificateCard extends StatelessWidget {
     required this.completedLessons,
     required this.totalLessons,
     required this.onDownload,
+    this.onVerify,
+    this.isDownloading = false,
   });
 
   @override
@@ -360,10 +364,11 @@ class CertificateCard extends StatelessWidget {
           Column(
             children: [
               _ActionButton(
-                text: "Download PDF",
+                text: isDownloading ? "Downloading..." : "Download PDF",
                 color: const Color(0xFFFFB800),
                 textColor: Colors.white,
-                onPressed: onDownload,
+                onPressed: isDownloading ? null : onDownload,
+                isLoading: isDownloading,
               ),
               const SizedBox(height: 8),
               _ActionButton(
@@ -371,9 +376,7 @@ class CertificateCard extends StatelessWidget {
                 color: Colors.white,
                 textColor: Colors.grey.shade700,
                 borderColor: Colors.grey.shade300,
-                onPressed: isCompleted ? () {
-                  // verifyActionLogicHere
-                } : null,
+                onPressed: (isCompleted && !isDownloading) ? onVerify : null,
               ),
             ],
           )
@@ -390,6 +393,7 @@ class _ActionButton extends StatelessWidget {
   final Color textColor;
   final Color? borderColor;
   final VoidCallback? onPressed;
+  final bool isLoading;
 
   const _ActionButton({
     required this.text,
@@ -397,6 +401,7 @@ class _ActionButton extends StatelessWidget {
     required this.textColor,
     this.borderColor,
     this.onPressed,
+    this.isLoading = false,
   });
 
   @override
@@ -414,10 +419,19 @@ class _ActionButton extends StatelessWidget {
           padding: EdgeInsets.zero,
         ),
         onPressed: onPressed,
-        child: Text(
-          text, 
-          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-        ),
+        child: isLoading
+            ? const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : Text(
+                text,
+                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+              ),
       ),
     );
   }

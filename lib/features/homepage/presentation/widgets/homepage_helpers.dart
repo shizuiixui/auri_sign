@@ -8,7 +8,6 @@ import '/core/widgets/continue_lesson_card.dart';
 import 'package:auri_sign/features/lessons/presentation/screens/category_details_page.dart';
 import '/../features/lessons/presentation/viewmodels/category_view_model.dart';
 import 'package:auri_sign/features/lessons/data/models/category_progress_model.dart';
-import 'package:auri_sign/features/homepage/presentation/widgets/daily_tracker.dart';
 
 class HomeHeader extends StatelessWidget {
   final String firstName;

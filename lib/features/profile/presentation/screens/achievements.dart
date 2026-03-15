@@ -124,18 +124,57 @@ class _AchievementsPageState extends State<AchievementsPage> {
                       categoryName: category.title,
                       completedLessons: category.completedLessons,
                       totalLessons: category.totalLessons,
+                      isDownloading: viewModel.isDownloading,
                       onDownload: () {
                         if (category.completedLessons < category.totalLessons ||
                             category.totalLessons == 0) {
                           _showLockDialog(context);
                         } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                "Downloading certificate for ${category.title}...",
-                              ),
-                            ),
-                          );
+                          // Download certificate
+                          viewModel.downloadCertificate(category.title).then((_) {
+                            if (viewModel.downloadErrorMessage != null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(viewModel.downloadErrorMessage!),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "Certificate for ${category.title} downloaded successfully!",
+                                  ),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            }
+                          });
+                        }
+                      },
+                      onVerify: () {
+                        if (category.completedLessons >= category.totalLessons &&
+                            category.totalLessons > 0) {
+                          // Verify certificate
+                          viewModel.verifyCertificate(category.title).then((_) {
+                            if (viewModel.downloadErrorMessage != null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(viewModel.downloadErrorMessage!),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    "Certificate verified successfully!",
+                                  ),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            }
+                          });
                         }
                       },
                     );
