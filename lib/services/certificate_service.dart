@@ -99,8 +99,10 @@ class CertificateService {
     String userID,
   ) async {
     try {
+      // 1) Read JWT token from local storage for authenticated certificate access.
       final token = await _getAuthToken();
 
+      // 2) Convert UI category label into encoded API-safe category path.
       final encodedCategory = _toEncodedCategory(categoryName);
 
       // Get temporary directory to save PDF
@@ -108,6 +110,7 @@ class CertificateService {
       final filePath =
           '${tempDir.path}/certificate_${encodedCategory.replaceAll('%2F', '_')}.pdf';
 
+      // 3) Download the generated PDF bytes from backend.
       // Backend resolves user context from Authorization token.
       final response = await _dio.download(
         '/certificates/$encodedCategory/pdf',
@@ -118,9 +121,8 @@ class CertificateService {
         ),
       );
 
-      // Check if download was successful
+      // 4) Open the downloaded PDF using a device app that supports PDF files.
       if (response.statusCode == 200) {
-        // Open the PDF file
         final result = await OpenFilex.open(filePath);
 
         if (result.type != ResultType.done) {
@@ -150,8 +152,10 @@ class CertificateService {
       } else {
         throw Exception('Failed to download certificate: ${e.message}');
       }
-    } catch (e) {
-      throw Exception('Error: ${e.toString()}');
+    } on Exception {
+      rethrow;
+    } catch (_) {
+      throw Exception('Unexpected error while downloading certificate.');
     }
   }
 
@@ -161,9 +165,13 @@ class CertificateService {
     String userID,
   ) async {
     try {
+      // 1) Read JWT token for authenticated verification request.
       final token = await _getAuthToken();
+
+      // 2) Normalize category to the exact backend enum/string format.
       final apiCategoryName = _toApiCategoryName(categoryName);
 
+      // 3) Call verify endpoint to validate off-chain data and on-chain proof.
       final response = await _dio.post(
         '/certificates/verify',
         data: {'userID': userID, 'category': apiCategoryName},
@@ -172,6 +180,7 @@ class CertificateService {
 
       if (response.statusCode == 200) {
         final body = response.data as Map<String, dynamic>;
+        // 4) Support nested and flat payload formats from backend.
         final verificationJson =
             (body['verification'] as Map<String, dynamic>?) ??
             (body['data'] as Map<String, dynamic>?) ??
@@ -191,8 +200,10 @@ class CertificateService {
         throw Exception('Server error while verifying certificate.');
       }
       throw Exception('Failed to verify: ${e.message}');
-    } catch (e) {
-      throw Exception('Error: ${e.toString()}');
+    } on Exception {
+      rethrow;
+    } catch (_) {
+      throw Exception('Unexpected error while verifying certificate.');
     }
   }
 }
