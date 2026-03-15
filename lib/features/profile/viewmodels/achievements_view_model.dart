@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:auri_sign/config/api_constants.dart';
 import 'package:auri_sign/features/lessons/data/repositories/lesson_repository.dart';
+import 'package:auri_sign/models/certificate_models.dart';
 import 'package:auri_sign/services/certificate_service.dart';
 import '../models/achievement_category.dart';
 
@@ -130,16 +131,29 @@ class AchievementsViewModel extends ChangeNotifier {
     }
   }
 
-  /// Verifies a certificate on the blockchain
-  Future<Map<String, dynamic>?> verifyCertificate(
-      String categoryName, String userID) async {
+  /// Fetches certificate details then verifies blockchain proof.
+  Future<CertificateVerificationDetails?> verifyCertificate(
+    String categoryName,
+    String userID,
+  ) async {
     isDownloading = true;
     downloadErrorMessage = null;
     notifyListeners();
 
     try {
-      final result =
-          await _certificateService.verifyCertificate(categoryName, userID);
+      final certificate = await _certificateService.getCertificateData(
+        categoryName,
+      );
+
+      final verification = await _certificateService.verifyCertificate(
+        certificate.category,
+        certificate.userID,
+      );
+
+      final result = CertificateVerificationDetails(
+        certificate: certificate,
+        verification: verification,
+      );
 
       // Store verification result for display
       debugPrint('Certificate verification successful: $result');
