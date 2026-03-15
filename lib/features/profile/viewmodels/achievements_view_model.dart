@@ -111,13 +111,16 @@ class AchievementsViewModel extends ChangeNotifier {
   }
 
   /// Downloads and opens a certificate PDF for the given category
-  Future<void> downloadCertificate(String categoryName) async {
+  Future<void> downloadCertificate(String categoryName, String userID) async {
     isDownloading = true;
     downloadErrorMessage = null;
     notifyListeners();
 
     try {
-      await _certificateService.downloadAndOpenCertificate(categoryName);
+      await _certificateService.downloadAndOpenCertificate(
+        categoryName,
+        userID,
+      );
     } catch (e) {
       downloadErrorMessage = e.toString();
       debugPrint('Certificate download error: $e');
@@ -128,22 +131,25 @@ class AchievementsViewModel extends ChangeNotifier {
   }
 
   /// Verifies a certificate on the blockchain
-  Future<void> verifyCertificate(String categoryName) async {
+  Future<Map<String, dynamic>?> verifyCertificate(
+      String categoryName, String userID) async {
     isDownloading = true;
     downloadErrorMessage = null;
     notifyListeners();
 
     try {
-      final result = await _certificateService.verifyCertificate(categoryName);
+      final result =
+          await _certificateService.verifyCertificate(categoryName, userID);
 
       // Store verification result for display
       debugPrint('Certificate verification successful: $result');
 
-      // You can add logic here to show verification details to user
       notifyListeners();
+      return result;
     } catch (e) {
       downloadErrorMessage = e.toString();
       debugPrint('Certificate verification error: $e');
+      return null;
     } finally {
       isDownloading = false;
       notifyListeners();

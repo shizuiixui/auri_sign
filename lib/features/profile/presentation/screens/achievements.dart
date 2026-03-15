@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:auri_sign/features/profile/presentation/widgets/achievement_helpers.dart';
 import 'package:auri_sign/features/profile/viewmodels/achievements_view_model.dart';
+import 'package:auri_sign/features/auth/viewmodels/user_view_model.dart';
 
 class AchievementsPage extends StatefulWidget {
   const AchievementsPage({super.key});
@@ -130,51 +131,94 @@ class _AchievementsPageState extends State<AchievementsPage> {
                             category.totalLessons == 0) {
                           _showLockDialog(context);
                         } else {
-                          // Download certificate
-                          viewModel.downloadCertificate(category.title).then((_) {
-                            if (viewModel.downloadErrorMessage != null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(viewModel.downloadErrorMessage!),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    "Certificate for ${category.title} downloaded successfully!",
+                          // Download certificate with userID so backend embeds TX Hash
+                          final userVM = context.read<UserViewModel>();
+                          final userId = userVM.user?.id;
+                          if (userId != null) {
+                            viewModel.downloadCertificate(category.title, userId).then((_) {
+                              if (viewModel.downloadErrorMessage != null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(viewModel.downloadErrorMessage!),
+                                    backgroundColor: Colors.red,
                                   ),
-                                  backgroundColor: Colors.green,
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      "Certificate for ${category.title} downloaded successfully!",
+                                    ),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                              }
+                            });
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  "User ID not available. Please login again.",
                                 ),
-                              );
-                            }
-                          });
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
                         }
                       },
                       onVerify: () {
                         if (category.completedLessons >= category.totalLessons &&
                             category.totalLessons > 0) {
                           // Verify certificate
-                          viewModel.verifyCertificate(category.title).then((_) {
-                            if (viewModel.downloadErrorMessage != null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(viewModel.downloadErrorMessage!),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    "Certificate verified successfully!",
+                          final userVM = context.read<UserViewModel>();
+                          final userId = userVM.user?.id;
+                          if (userId != null) {
+                            viewModel
+                                .verifyCertificate(category.title, userId)
+                                .then((result) {
+                              if (viewModel.downloadErrorMessage != null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content:
+                                        Text(viewModel.downloadErrorMessage!),
+                                    backgroundColor: Colors.red,
                                   ),
-                                  backgroundColor: Colors.green,
+                                );
+                              } else if (result != null) {
+                                // Debug: Print full result to see structure
+                                debugPrint('🔍 Full result object: $result');
+                                debugPrint('🔍 Result keys: ${result.keys.toList()}');
+
+                                // Extract and print TX hash to terminal
+                                final txHash = result['blockchainTxHash'] ??
+                                    result['txHash'] ??
+                                    result['tx_hash'] ??
+                                    result['hash'] ??
+                                    'N/A';
+                                debugPrint(
+                                    '✅ Certificate Verified! TX Hash: $txHash');
+                                debugPrint('Full verification result: $result');
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      "Certificate verified successfully!",
+                                    ),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                              }
+                            });
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  "User information not available. Please login again.",
                                 ),
-                              );
-                            }
-                          });
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
                         }
                       },
                     );
