@@ -360,7 +360,7 @@ class CertificateCard extends StatelessWidget {
             ),
           ),
           
-          // rightSideButtons
+          // Buttons
           Column(
             children: [
               _ActionButton(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:auri_sign/config/api_constants.dart';
+import 'package:auri_sign/core/routes/app_router.dart';
 
 // Widgets
 import 'package:auri_sign/core/widgets/bottom_nav_bar.dart';
@@ -32,7 +33,24 @@ class _NavFunctionState extends State<NavFunction> {
   @override
   void initState() {
     super.initState();
+    AppRouter.navTabIndex.addListener(_syncTabFromRouter);
     _initializeApp();
+  }
+
+  void _syncTabFromRouter() {
+    if (!mounted) return;
+    final nextIndex = AppRouter.navTabIndex.value;
+    if (nextIndex != _selectedIndex) {
+      setState(() {
+        _selectedIndex = nextIndex;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    AppRouter.navTabIndex.removeListener(_syncTabFromRouter);
+    super.dispose();
   }
 
   Future<void> _initializeApp() async {
@@ -98,6 +116,7 @@ class _NavFunctionState extends State<NavFunction> {
           setState(() {
             _selectedIndex = index;
           });
+          AppRouter.navTabIndex.value = index;
         },
       ),
     );

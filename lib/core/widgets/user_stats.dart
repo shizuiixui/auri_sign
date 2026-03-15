@@ -2,21 +2,39 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:auri_sign/features/profile/viewmodels/streak_view_model.dart';
 import 'package:auri_sign/features/profile/viewmodels/badges_view_model.dart';
+import 'package:auri_sign/features/auth/viewmodels/user_view_model.dart';
 import 'package:auri_sign/features/profile/presentation/screens/streak_page.dart';
 import 'package:auri_sign/features/profile/presentation/screens/badges_page.dart';
 
-class UserStatsRow extends StatelessWidget {
-  // 🎯 Removed the hardcoded trophyCount parameter!
+class UserStatsRow extends StatefulWidget {
   const UserStatsRow({super.key});
 
   @override
+  State<UserStatsRow> createState() => _UserStatsRowState();
+}
+
+class _UserStatsRowState extends State<UserStatsRow> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userVM = context.read<UserViewModel>();
+      final userId = userVM.user?.id;
+
+      if (userId != null) {
+        context.read<BadgesViewModel>().fetchUserProgress(userId);
+      }
+      context.read<StreakViewModel>().fetchStreakInfo();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Listen to both ViewModels for live data
     final streakVM = context.watch<StreakViewModel>();
     final badgesVM = context.watch<BadgesViewModel>();
 
     final currentStreak = streakVM.streakInfo?.currentStreak ?? 0;
-    final totalBadges = badgesVM.totalBadges; // 🎯 Real data!
+    final totalBadges = badgesVM.earnedBadges.length;
 
     return Row(
       children: [
@@ -33,14 +51,14 @@ class UserStatsRow extends StatelessWidget {
             child: _buildStat(
               icon: Icons.military_tech,
               value: totalBadges.toString(),
-              color: Colors.grey.shade700,
+              color: Color(0xFFE9B63B),
             ),
           ),
         ),
 
         const SizedBox(width: 15),
 
-        // Streak
+        // 2. Streak
         GestureDetector(
           onTap: () {
             Navigator.push(

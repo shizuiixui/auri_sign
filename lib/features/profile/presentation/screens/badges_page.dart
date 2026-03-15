@@ -12,52 +12,6 @@ class BadgesPage extends StatefulWidget {
 }
 
 class _BadgesPageState extends State<BadgesPage> {
-  // Badges List
-  final List<Map<String, dynamic>> upcomingBadges = [
-    {
-      "days": 3,
-      "name": "3-Day Streak",
-      "desc": "Complete lessons for 3 consecutive days",
-      "icon": Icons.local_fire_department,
-      "color": Colors.grey.shade600,
-    },
-    {
-      "days": 7,
-      "name": "Week Warrior",
-      "desc": "Complete lessons for 7 consecutive days",
-      "icon": Icons.emoji_events,
-      "color": Colors.green,
-    },
-    {
-      "days": 14,
-      "name": "Two Week Champion",
-      "desc": "Complete lessons for 14 consecutive days",
-      "icon": Icons.military_tech,
-      "color": Colors.lightBlue,
-    },
-    {
-      "days": 30,
-      "name": "Month Master",
-      "desc": "Complete lessons for 30 consecutive days",
-      "icon": Icons.workspace_premium,
-      "color": Colors.blue,
-    },
-    {
-      "days": 50,
-      "name": "50-Day Legend",
-      "desc": "Complete lessons for 50 consecutive days",
-      "icon": Icons.star,
-      "color": const Color(0xFFFFB800),
-    },
-    {
-      "days": 100,
-      "name": "Centurion",
-      "desc": "Complete lessons for 100 consecutive days",
-      "icon": Icons.diamond,
-      "color": Colors.red,
-    },
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -68,6 +22,31 @@ class _BadgesPageState extends State<BadgesPage> {
         context.read<BadgesViewModel>().fetchUserProgress(userId);
       }
     });
+  }
+
+  // translateReactFormatDate
+  String formatDate(String? dateString) {
+    if (dateString == null) return "N/A";
+    try {
+      final date = DateTime.parse(dateString);
+      final months = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+      return "${months[date.month - 1]} ${date.day}, ${date.year}";
+    } catch (e) {
+      return "N/A";
+    }
   }
 
   @override
@@ -101,13 +80,13 @@ class _BadgesPageState extends State<BadgesPage> {
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
               child: Column(
                 children: [
-                  // Top Stat Cards
+                  // topStatCards
                   Row(
                     children: [
                       Expanded(
                         child: _buildStatCard(
                           "Total Badges",
-                          "${vm.totalBadges}",
+                          "${vm.earnedBadges.length}",
                           Icons.military_tech,
                           const Color(0xFFFFB800),
                         ),
@@ -125,12 +104,12 @@ class _BadgesPageState extends State<BadgesPage> {
                   ),
                   SizedBox(height: 20.h),
 
-                  //  Earned Badges Section
+                  // earnedBadgesSectionRebuiltLikeWeb
                   _buildEarnedBadgesCard(vm.earnedBadges),
                   SizedBox(height: 20.h),
 
-                  //  Streak Badges to Earn List
-                  _buildUpcomingBadgesCard(),
+                  // streakBadgesToEarnList
+                  _buildUpcomingBadgesCard(vm.upcomingBadges),
                   SizedBox(height: 40.h),
                 ],
               ),
@@ -185,7 +164,7 @@ class _BadgesPageState extends State<BadgesPage> {
     );
   }
 
-  Widget _buildEarnedBadgesCard(List<dynamic> earnedBadges) {
+  Widget _buildEarnedBadgesCard(List<Map<String, dynamic>> earnedBadges) {
     return _buildCardWrapper(
       child: earnedBadges.isEmpty
           ? Column(
@@ -251,30 +230,106 @@ class _BadgesPageState extends State<BadgesPage> {
                   ),
                 ),
                 SizedBox(height: 15.h),
-                Wrap(
-                  spacing: 15.w,
-                  runSpacing: 15.h,
+
+                // 🎯 1:1 Web Layout Translation
+                Column(
                   children: earnedBadges.map((badge) {
-                    return Column(
-                      children: [
-                        CircleAvatar(
-                          radius: 25.r,
-                          backgroundColor: const Color(0xFFE0F7FA),
-                          child: Icon(
-                            Icons.military_tech,
-                            color: const Color(0xFF1E74FD),
-                            size: 30.sp,
+                    return Container(
+                      margin: EdgeInsets.only(bottom: 12.h),
+                      padding: EdgeInsets.all(16.w),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12.r),
+                        border: Border.all(color: Colors.grey.shade200),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.02),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
                           ),
-                        ),
-                        SizedBox(height: 5.h),
-                        Text(
-                          badge['name'] ?? "Badge",
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.bold,
+                        ],
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            radius: 25.r,
+                            backgroundColor: (badge['color'] as Color)
+                                .withOpacity(0.1),
+                            child: Icon(
+                              badge['icon'],
+                              color: badge['color'],
+                              size: 28.sp,
+                            ),
                           ),
-                        ),
-                      ],
+                          SizedBox(width: 15.w),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  badge['name'],
+                                  style: TextStyle(
+                                    fontSize: 15.sp,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 4.h),
+                                Text(
+                                  badge['desc'],
+                                  style: TextStyle(
+                                    fontSize: 12.sp,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                ),
+                                SizedBox(height: 12.h),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.military_tech,
+                                          size: 14.sp,
+                                          color: Colors.grey.shade500,
+                                        ),
+                                        SizedBox(width: 4.w),
+                                        Text(
+                                          "Unlocked: ${formatDate(badge['unlockedAt'])}",
+                                          style: TextStyle(
+                                            fontSize: 12.sp,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 8.w,
+                                        vertical: 4.h,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.green,
+                                        borderRadius: BorderRadius.circular(
+                                          12.r,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        "Earned",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 10.sp,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     );
                   }).toList(),
                 ),
@@ -283,7 +338,9 @@ class _BadgesPageState extends State<BadgesPage> {
     );
   }
 
-  Widget _buildUpcomingBadgesCard() {
+  Widget _buildUpcomingBadgesCard(List<Map<String, dynamic>> upcomingBadges) {
+    if (upcomingBadges.isEmpty) return const SizedBox.shrink();
+
     return _buildCardWrapper(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

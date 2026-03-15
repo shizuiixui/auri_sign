@@ -4,6 +4,7 @@ import 'package:auri_sign/features/profile/presentation/widgets/achievement_help
 import 'package:auri_sign/features/profile/presentation/widgets/certificate_verify_dialog.dart';
 import 'package:auri_sign/features/profile/viewmodels/achievements_view_model.dart';
 import 'package:auri_sign/features/auth/viewmodels/user_view_model.dart';
+import 'package:auri_sign/core/routes/app_router.dart';
 
 class AchievementsPage extends StatefulWidget {
   const AchievementsPage({super.key});
@@ -53,17 +54,19 @@ class _AchievementsPageState extends State<AchievementsPage> {
                   ),
                   elevation: 0,
                 ),
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  AppRouter.navTabIndex.value = 0;
+                  Navigator.of(context).pop();
+                  Navigator.of(this.context).pop();
+                  
+                },
                 child: const Text(
-                  "Go To Lessons",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  "Go To Lessons", 
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
+              ),
             ),
-          ),
         ],
       ),
     );

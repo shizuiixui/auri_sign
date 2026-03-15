@@ -18,6 +18,9 @@ import 'package:auri_sign/features/dictionary/presentation/viewmodels/dictionary
 import 'package:auri_sign/features/dictionary/presentation/screens/dictionary.dart';
 
 class AppRouter {
+  // Shared bottom-nav tab state for returning to an existing tab without pushing.
+  static final ValueNotifier<int> navTabIndex = ValueNotifier<int>(0);
+
   static Map<String, WidgetBuilder> getRoutes() {
     return {
       // Welcome and Auth

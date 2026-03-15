@@ -290,7 +290,7 @@ class ProfileSwitchTile extends StatelessWidget {
         trailing: Switch(
           value: value,
           onChanged: onChanged,
-          activeThumbColor: const Color(0xFFFFB800),
+          activeColor: const Color(0xFFFFB800),
         ),
       ),
     );
