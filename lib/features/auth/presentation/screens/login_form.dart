@@ -66,26 +66,50 @@ class _LoginFormState extends State<LoginForm> {
                   controller: passwordController,
                   validator: (value) => Validators.validatePassword(value),
                   obscureText: obscurePassword,
-                  decoration: textInputField(
-                    "Create a password",
-                    prefixIcon: Icons.lock_outlined,
-                  ).copyWith(
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                        color: Colors.grey,
-                        size: 24.sp,
+                  decoration:
+                      textInputField(
+                        "Create a password",
+                        prefixIcon: Icons.lock_outlined,
+                      ).copyWith(
+                        errorMaxLines: 3,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.grey,
+                            size: 24.sp,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              obscurePassword = !obscurePassword;
+                            });
+                          },
+                        ),
                       ),
-                      onPressed: () {
-                        setState(() {
-                          obscurePassword = !obscurePassword;
-                        });
-                      },
-                    ),
-                  ),
                 ),
+
+                // Error Message
+                ListenableBuilder(
+                  listenable: loginVM,
+                  builder: (context, child) {
+                    if (loginVM.errorMessage != null) {
+                      return Padding(
+                        padding: EdgeInsets.only(top: 8.h, left: 4.w),
+                        child: Text(
+                          loginVM.errorMessage!,
+                          style: TextStyle(
+                            color: Colors.red.shade700,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
+
                 SizedBox(height: 14.h),
                 Align(
                   alignment: Alignment.centerLeft,
@@ -126,17 +150,7 @@ class _LoginFormState extends State<LoginForm> {
                               email: emailController.text.trim(),
                               password: passwordController.text.trim(),
                             );
-
-                            if (loginVM.errorMessage != null) {
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(loginVM.errorMessage!),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
-                              }
-                            } else if (loginVM.token != null) {
+                            if (loginVM.token != null) {
                               if (context.mounted) {
                                 await context
                                     .read<UserViewModel>()
@@ -171,7 +185,7 @@ class _LoginFormState extends State<LoginForm> {
                     SizedBox(width: 6.w),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pushNamed(context, '/signup');
+                        Navigator.pushNamed(context, '/profiling');
                       },
                       child: Text(
                         "Sign Up",

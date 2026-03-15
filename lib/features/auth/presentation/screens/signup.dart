@@ -7,7 +7,6 @@ import '/core/utils/validators.dart';
 import '/features/auth/presentation/viewmodels/signup_view_models.dart';
 
 class SignupForm extends StatefulWidget {
-  // 🎯 NEW: We opened the door to accept the profiling data from the previous screens!
   final int? motivation;
   final int? communicationContext;
   final int? dailyTime;
@@ -142,6 +141,7 @@ class _SignupFormState extends State<SignupForm> {
                               "Create a password",
                               prefixIcon: Icons.lock_outlined,
                             ).copyWith(
+                              errorMaxLines: 3,
                               suffixIcon: IconButton(
                                 icon: Icon(
                                   inputPassword

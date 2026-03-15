@@ -20,7 +20,7 @@ class DictionaryViewModel extends ChangeNotifier {
   int selectedCategoryIndex = 0;
   bool showFilters = false;
 
-  final List<String> categories = ["All", "Alphabets", "Numbers", "Phrases"];
+  final List<String> categories = ["All", "Alphabets", "Numbers", "Phrases/Words"];
 
   // Filtering Logic
   List<DictionaryItem> get filteredList {
