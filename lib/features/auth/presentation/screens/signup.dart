@@ -1,10 +1,12 @@
-import 'package:auri_sign/features/auth/presentation/screens/email_verification.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '/core/widgets/button.dart';
 import '/core/widgets/text_input_field.dart';
 import '/core/utils/validators.dart';
+import '/core/utils/legal_texts.dart';
 import '/features/auth/presentation/viewmodels/signup_view_models.dart';
+import 'package:auri_sign/features/auth/presentation/screens/email_verification.dart';
 
 class SignupForm extends StatefulWidget {
   final int? motivation;
@@ -39,21 +41,168 @@ class _SignupFormState extends State<SignupForm> {
   bool confirmInputPassword = true;
   bool _legalDisclaimer = false;
 
+  late final TapGestureRecognizer _legalTapRecognizer;
+
+  @override
+  void initState() {
+    super.initState();
+    _legalTapRecognizer = TapGestureRecognizer()..onTap = _showLegalPopup;
+  }
+
+  // Dispose Controllers and Tap recognizer
   @override
   void dispose() {
-    // Dispose controllers
     firstNameController.dispose();
     lastNameController.dispose();
     emailController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
+    _legalTapRecognizer.dispose();
     super.dispose();
+  }
+
+  //  Popup Dialog
+  Future<void> _showLegalPopup() async {
+    bool hasScrolledToBottom = false;
+
+    final agreed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return AlertDialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.r),
+              ),
+              title: Text(
+                "Legal Agreements",
+                style: TextStyle(
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: Scrollbar(
+                  thumbVisibility: true,
+                  child: NotificationListener<ScrollNotification>(
+                    onNotification: (ScrollNotification scrollInfo) {
+                      if (!hasScrolledToBottom &&
+                          scrollInfo.metrics.pixels >=
+                              (scrollInfo.metrics.maxScrollExtent - 20)) {
+                        setStateDialog(() {
+                          hasScrolledToBottom = true;
+                        });
+                      }
+                      return false;
+                    },
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // TERMS OF SERVICE
+                          Text(
+                            "Terms & Conditions",
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFFE9B63B),
+                            ),
+                          ),
+                          SizedBox(height: 8.h),
+                          Text(
+                            LegalTexts.termsOfService,
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          Divider(
+                            height: 40.h,
+                            thickness: 1,
+                            color: Colors.grey.shade300,
+                          ),
+
+                          // PRIVACY POLICY
+                          Text(
+                            "Privacy Policy",
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFFE9B63B),
+                            ),
+                          ),
+                          SizedBox(height: 8.h),
+                          Text(
+                            LegalTexts.privacyPolicy,
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () =>
+                      Navigator.pop(context, false), // User declined
+                  child: Text(
+                    "Cancel",
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                      fontSize: 16.sp,
+                    ),
+                  ),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: hasScrolledToBottom
+                        ? const Color(0xFFE9B63B)
+                        : Colors.grey.shade300,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    elevation: hasScrolledToBottom ? 2 : 0,
+                  ),
+                  onPressed: hasScrolledToBottom
+                      ? () => Navigator.pop(context, true)
+                      : null,
+                  child: Text(
+                    "I Agree",
+                    style: TextStyle(
+                      color: hasScrolledToBottom
+                          ? Colors.white
+                          : Colors.grey.shade500,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.sp,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    if (agreed == true) {
+      setState(() {
+        _legalDisclaimer = true;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       backgroundColor: const Color(0XFFF8F8F8),
       body: SafeArea(
         top: false,
@@ -67,7 +216,6 @@ class _SignupFormState extends State<SignupForm> {
                 Center(
                   child: Column(
                     children: [
-                      // Sign Up Title
                       Text(
                         "Sign Up and Start Learning",
                         style: TextStyle(
@@ -77,8 +225,6 @@ class _SignupFormState extends State<SignupForm> {
                         ),
                       ),
                       SizedBox(height: 15.h),
-
-                      // Sign Up Subtitle
                       Text(
                         "Create an account to save your daily goal and start your first lesson.",
                         style: TextStyle(
@@ -88,9 +234,9 @@ class _SignupFormState extends State<SignupForm> {
                       ),
                       SizedBox(height: 20.h),
 
-                      // First Name Text Field
                       TextFormField(
                         controller: firstNameController,
+                        textInputAction: TextInputAction.next,
                         validator: (value) => Validators.validateName(
                           value,
                           fieldName: "First Name",
@@ -103,9 +249,9 @@ class _SignupFormState extends State<SignupForm> {
                       ),
                       SizedBox(height: 14.h),
 
-                      // Last Name Text Field
                       TextFormField(
                         controller: lastNameController,
+                        textInputAction: TextInputAction.next,
                         validator: (value) => Validators.validateName(
                           value,
                           fieldName: "Last Name",
@@ -118,9 +264,9 @@ class _SignupFormState extends State<SignupForm> {
                       ),
                       SizedBox(height: 14.h),
 
-                      // Email Text Field
                       TextFormField(
                         controller: emailController,
+                        textInputAction: TextInputAction.next,
                         validator: (value) => Validators.validateEmail(value),
                         keyboardType: TextInputType.emailAddress,
                         decoration: textInputField(
@@ -130,9 +276,9 @@ class _SignupFormState extends State<SignupForm> {
                       ),
                       SizedBox(height: 14.h),
 
-                      // Password Field
                       TextFormField(
                         controller: passwordController,
+                        textInputAction: TextInputAction.next,
                         validator: (value) =>
                             Validators.validatePassword(value),
                         obscureText: inputPassword,
@@ -150,19 +296,17 @@ class _SignupFormState extends State<SignupForm> {
                                   color: Colors.grey,
                                   size: 24.sp,
                                 ),
-                                onPressed: () {
-                                  setState(() {
-                                    inputPassword = !inputPassword;
-                                  });
-                                },
+                                onPressed: () => setState(
+                                  () => inputPassword = !inputPassword,
+                                ),
                               ),
                             ),
                       ),
                       SizedBox(height: 14.h),
 
-                      // Confirm Password Field
                       TextFormField(
                         controller: confirmPasswordController,
+                        textInputAction: TextInputAction.done,
                         validator: (value) =>
                             Validators.validateConfirmPassword(
                               value,
@@ -182,25 +326,26 @@ class _SignupFormState extends State<SignupForm> {
                                   color: Colors.grey,
                                   size: 24.sp,
                                 ),
-                                onPressed: () {
-                                  setState(() {
-                                    confirmInputPassword =
-                                        !confirmInputPassword;
-                                  });
-                                },
+                                onPressed: () => setState(
+                                  () => confirmInputPassword =
+                                      !confirmInputPassword,
+                                ),
                               ),
                             ),
                       ),
                       SizedBox(height: 8.h),
 
-                      // Legal Disclaimer Checkbox
+                      // Checkbox List Tile for Legal Disclaimer
                       CheckboxListTile(
                         value: _legalDisclaimer,
                         onChanged: (value) {
-                          if (value == null) return;
-                          setState(() {
-                            _legalDisclaimer = value;
-                          });
+                          if (value == true) {
+                            _showLegalPopup();
+                          } else {
+                            setState(() {
+                              _legalDisclaimer = false;
+                            });
+                          }
                         },
                         title: Text.rich(
                           TextSpan(
@@ -212,10 +357,12 @@ class _SignupFormState extends State<SignupForm> {
                             children: [
                               TextSpan(
                                 text: 'Terms of Service ',
+                                recognizer: _legalTapRecognizer,
                                 style: TextStyle(
                                   fontSize: 14.sp,
                                   fontFamily: 'Poppins',
                                   fontWeight: FontWeight.bold,
+                                  color: const Color(0xFFE9B63B),
                                 ),
                               ),
                               TextSpan(
@@ -227,10 +374,12 @@ class _SignupFormState extends State<SignupForm> {
                               ),
                               TextSpan(
                                 text: 'Privacy Policy',
+                                recognizer: _legalTapRecognizer,
                                 style: TextStyle(
                                   fontSize: 14.sp,
                                   fontFamily: 'Poppins',
                                   fontWeight: FontWeight.bold,
+                                  color: const Color(0xFFE9B63B),
                                 ),
                               ),
                             ],
@@ -243,7 +392,6 @@ class _SignupFormState extends State<SignupForm> {
                       ),
                       SizedBox(height: 15.h),
 
-                      // Sign Up Button
                       ListenableBuilder(
                         listenable: signupVM,
                         builder: (context, child) {
@@ -257,9 +405,8 @@ class _SignupFormState extends State<SignupForm> {
                               onPressed: () async {
                                 if (signupVM.isLoading) return;
 
-                                if (!_signupFormKey.currentState!.validate()) {
+                                if (!_signupFormKey.currentState!.validate())
                                   return;
-                                }
 
                                 if (!_legalDisclaimer) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -272,6 +419,7 @@ class _SignupFormState extends State<SignupForm> {
                                   );
                                   return;
                                 }
+
                                 await signupVM.signup(
                                   firstName: firstNameController.text.trim(),
                                   lastName: lastNameController.text.trim(),
@@ -314,7 +462,6 @@ class _SignupFormState extends State<SignupForm> {
                       ),
                       SizedBox(height: 20.h),
 
-                      // Already have an account
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

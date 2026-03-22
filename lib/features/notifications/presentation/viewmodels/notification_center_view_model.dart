@@ -68,7 +68,7 @@ class NotificationCenterViewModel extends ChangeNotifier {
     await prefs.setString('aurisign_inbox', encoded);
   }
 
-  // --- INBOX ACTIONS ---
+  //  Inbox
   void markAsRead(String id) {
     final index = _notifications.indexWhere((n) => n.id == id);
     if (index != -1 && !_notifications[index].isRead) {

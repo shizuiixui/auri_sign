@@ -82,6 +82,7 @@ class UserRepository {
     }
   }
 
+  // Get Current User Session
   Future<UserModel> getCurrentUser() async {
     final headers = await _getHeaders();
     final response = await http.get(

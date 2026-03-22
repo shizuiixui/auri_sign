@@ -51,7 +51,7 @@ class UserViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
-
+  // Session Management
   Future<void> initSession() async {
     _isLoading = true;
     notifyListeners();

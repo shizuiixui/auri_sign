@@ -43,6 +43,7 @@ class _StreakPageState extends State<StreakPage> {
             fontFamily: 'Inter',
           ),
         ),
+        centerTitle: true,
       ),
       body: vm.isLoading
           ? const Center(
@@ -52,66 +53,75 @@ class _StreakPageState extends State<StreakPage> {
           ? Center(child: Text(vm.errorMessage!))
           : streak == null
           ? const Center(child: Text("No streak data available."))
-          : SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Banner
-                  _buildBlueBanner(streak),
-                  SizedBox(height: 20.h),
-
-                  // Streak Status Card
-                  _buildStreakStatusCard(streak),
-                  SizedBox(height: 20.h),
-
-                  // Activity Card
-                  _buildActivityCard(streak),
-                  SizedBox(height: 20.h),
-
-                  // Recent Activity Card
-                  _buildRecentActivityCard(streak),
-                  SizedBox(height: 20.h),
-
-                  // Milestones Card
-                  if (streak.milestones.isNotEmpty)
-                    _buildMilestonesCard(streak),
-
-                  SizedBox(height: 20.h),
-
-                  // Tip Banner
-                  Container(
-                    padding: EdgeInsets.all(16.w),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE0F7FA),
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    child: Row(
+          : SafeArea(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 600),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(Icons.lightbulb, color: Color(0xFFE9B63B)),
-                        SizedBox(width: 10.w),
-                        Expanded(
-                          child: Text(
-                            "Tip: Complete a lesson today to maintain your streak!",
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              color: Colors.teal[800],
-                              fontFamily: 'Inter',
-                            ),
+                        // Banner
+                        _buildBlueBanner(streak),
+                        SizedBox(height: 20.h),
+
+                        // Streak Status Card
+                        _buildStreakStatusCard(streak),
+                        SizedBox(height: 20.h),
+
+                        // Activity Card
+                        _buildActivityCard(streak),
+                        SizedBox(height: 20.h),
+
+                        // Recent Activity Card
+                        _buildRecentActivityCard(streak),
+                        SizedBox(height: 20.h),
+
+                        // Milestones Card
+                        if (streak.milestones.isNotEmpty)
+                          _buildMilestonesCard(streak),
+
+                        SizedBox(height: 20.h),
+
+                        // Tip Banner
+                        Container(
+                          padding: EdgeInsets.all(16.w),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE0F7FA),
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.lightbulb,
+                                color: Color(0xFFE9B63B),
+                              ),
+                              SizedBox(width: 10.w),
+                              Expanded(
+                                child: Text(
+                                  "Tip: Complete a lesson today to maintain your streak!",
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    color: Colors.teal[800],
+                                    fontFamily: 'Inter',
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
+                        SizedBox(height: 40.h),
                       ],
                     ),
                   ),
-                  SizedBox(height: 40.h),
-                ],
+                ),
               ),
             ),
     );
   }
 
   Widget _buildBlueBanner(dynamic streak) {
-    // Generate the current week
     DateTime now = DateTime.now();
     int currentWeekday = now.weekday == 7 ? 0 : now.weekday; // Make Sunday 0
     DateTime startOfWeek = now.subtract(Duration(days: currentWeekday));
@@ -126,11 +136,11 @@ class _StreakPageState extends State<StreakPage> {
 
     return Container(
       width: double.infinity,
-      height: 140.h,
       decoration: BoxDecoration(
         color: const Color(0xFF1E74FD),
         borderRadius: BorderRadius.circular(16.r),
       ),
+      clipBehavior: Clip.hardEdge,
       child: Stack(
         children: [
           Positioned(
@@ -146,6 +156,7 @@ class _StreakPageState extends State<StreakPage> {
             padding: EdgeInsets.all(20.w),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   "${streak.currentStreak}",
@@ -164,7 +175,7 @@ class _StreakPageState extends State<StreakPage> {
                     fontFamily: 'Inter',
                   ),
                 ),
-                const Spacer(),
+                SizedBox(height: 25.h),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -183,7 +194,6 @@ class _StreakPageState extends State<StreakPage> {
                     return Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // The Day Letter
                         Text(
                           days[index],
                           style: TextStyle(
@@ -193,8 +203,6 @@ class _StreakPageState extends State<StreakPage> {
                           ),
                         ),
                         SizedBox(height: 6.h),
-
-                        // The Indicator Circle
                         Container(
                           height: 28.r,
                           width: 28.r,
@@ -251,47 +259,61 @@ class _StreakPageState extends State<StreakPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Current Streak",
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Colors.grey[600],
-                      fontFamily: 'Inter',
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Current Streak",
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: Colors.grey[600],
+                        fontFamily: 'Inter',
+                      ),
+                      maxLines: 1,
+                      overflow:
+                          TextOverflow.ellipsis, // Safely truncates if too long
                     ),
-                  ),
-                  Text(
-                    "${streak.currentStreak} days",
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF1E74FD),
+                    Text(
+                      "${streak.currentStreak} days",
+                      style: TextStyle(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF1E74FD),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    "Longest Streak",
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Colors.grey[600],
-                      fontFamily: 'Inter',
+              SizedBox(width: 10.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      "Longest Streak",
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: Colors.grey[600],
+                        fontFamily: 'Inter',
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  Text(
-                    "${streak.longestStreak} days",
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFFFFB800),
+                    Text(
+                      "${streak.longestStreak} days",
+                      style: TextStyle(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFFFFB800),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
