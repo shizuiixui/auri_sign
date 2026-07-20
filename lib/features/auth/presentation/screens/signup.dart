@@ -468,7 +468,7 @@ class _SignupFormState extends State<SignupForm> {
                           Text(
                             "Already have an account?",
                             style: TextStyle(
-                              fontSize: 18.sp,
+                              fontSize: 16.sp,
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w400,
                             ),
@@ -481,7 +481,7 @@ class _SignupFormState extends State<SignupForm> {
                             child: Text(
                               "Login",
                               style: TextStyle(
-                                fontSize: 18.sp,
+                                fontSize: 16.sp,
                                 fontFamily: 'Inter',
                                 fontWeight: FontWeight.w700,
                                 color: const Color(0xFFE9B63B),

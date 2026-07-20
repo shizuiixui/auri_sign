@@ -299,6 +299,7 @@ class ProfilePage extends StatelessWidget {
 
           SizedBox(height: 20.h),
 
+          /*
           const ProfileSectionHeader(title: "Achievements"),
 
           ProfileMenuTile(
@@ -317,23 +318,38 @@ class ProfilePage extends StatelessWidget {
           ),
 
           SizedBox(height: 40.h),
-
-          ElevatedButton(
-            onPressed: () => _showLogoutConfirmation(context, userVM),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.redAccent,
-              minimumSize: Size(double.infinity, 50.h),
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25.r),
-              ),
+          */
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x3F000000),
+                  blurRadius: 4,
+                  offset: Offset(0, 4),
+                  spreadRadius: 0,
+                ),
+              ],
             ),
-            child: Text(
-              "Log out",
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 16.sp,
+            child: ElevatedButton(
+              onPressed: () => _showLogoutConfirmation(context, userVM),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                minimumSize: Size(double.infinity, 50.h),
+                elevation: 0, // Removes the default material shadow
+                shadowColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+              child: Text(
+                "Log out",
+                style: TextStyle(
+                  fontSize: 16.5,
+                  fontFamily: 'Poppins-Regular',
+                  fontWeight: FontWeight.w400,
+                  color: Colors.white,
+                ),
               ),
             ),
           ),
@@ -342,7 +358,12 @@ class ProfilePage extends StatelessWidget {
             onPressed: () {},
             child: Text(
               "Delete Account",
-              style: TextStyle(color: Colors.redAccent, fontSize: 14.sp),
+              style: TextStyle(
+                color: Colors.redAccent,
+                fontSize: 14.sp,
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
           SizedBox(height: 20.h),

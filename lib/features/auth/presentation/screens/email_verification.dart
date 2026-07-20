@@ -95,14 +95,29 @@ class _VerifyEmailState extends State<VerifyEmail> {
                 ),
               ),
               SizedBox(height: 10.h),
-              Text(
-                "Enter the code sent to ${widget.email}",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontFamily: 'Poppins',
-                  fontSize: 14.sp,
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: "Enter the code sent to\n",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontFamily: 'Poppins-Regular',
+                        fontSize: 16.sp,
+                      ),
+                    ),
+                    TextSpan(
+                      text: widget.email,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16.sp,
+                      ),
+                    ),
+                  ],
                 ),
+                textAlign: TextAlign.center,
               ),
               SizedBox(height: 40.h),
               Row(
@@ -178,18 +193,18 @@ class _VerifyEmailState extends State<VerifyEmail> {
                         TextSpan(
                           text: "Didn't receive a code? ",
                           style: TextStyle(
-                            color: Colors.grey,
-                            fontFamily: 'Poppins',
-                            fontSize: 14.sp,
+                            fontSize: 16.sp,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w400,
                           ),
                         ),
                         TextSpan(
                           text: "Resend",
                           style: TextStyle(
-                            color: const Color(0xFFFFB800),
-                            fontFamily: 'Poppins',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14.sp,
+                            fontSize: 16.sp,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFFE9B63B),
                           ),
                         ),
                       ],

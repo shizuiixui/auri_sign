@@ -120,7 +120,7 @@ class _LoginFormState extends State<LoginForm> {
                     child: Text(
                       "Forgot Password?",
                       style: TextStyle(
-                        fontSize: 16.sp,
+                        fontSize: 15.sp,
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.w700,
                         color: const Color(0xFF000000),
@@ -177,7 +177,7 @@ class _LoginFormState extends State<LoginForm> {
                     Text(
                       "Don't have an account?",
                       style: TextStyle(
-                        fontSize: 18.sp,
+                        fontSize: 16.sp,
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w400,
                       ),
@@ -190,7 +190,7 @@ class _LoginFormState extends State<LoginForm> {
                       child: Text(
                         "Sign Up",
                         style: TextStyle(
-                          fontSize: 18.sp,
+                          fontSize: 16.sp,
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w700,
                           color: const Color(0xFFE9B63B),

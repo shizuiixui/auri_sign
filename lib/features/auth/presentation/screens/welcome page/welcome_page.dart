@@ -113,7 +113,7 @@ class WelcomePage extends StatelessWidget {
                 ),
               ),
               
-              SizedBox(height: 20.h),
+              SizedBox(height: 14.h),
               
               // Text Button
               GestureDetector(
@@ -124,7 +124,7 @@ class WelcomePage extends StatelessWidget {
                   "I already have an account",
                   style: TextStyle(
                     color: Colors.black,
-                    fontSize: 16.50.sp,
+                    fontSize: 15.50.sp,
                     fontFamily: 'Kantumruy Pro',
                     fontWeight: FontWeight.w400,
                     height: 2.91,

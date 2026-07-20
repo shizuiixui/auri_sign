@@ -83,15 +83,78 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           controller: _controller,
           physics: const NeverScrollableScrollPhysics(),
           children: [
-            Padding(
-              padding: EdgeInsets.all(16.w),
-              child: Form(
-                key: _formKey,
+            // Page 1: Email Form
+            SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.all(16.w),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Forgot Password",
+                        style: TextStyle(
+                          fontSize: 30.sp,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      SizedBox(height: 14.h),
+                      Text(
+                        "Please enter the email address associated with your account. We will send a link to reset your password.",
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontFamily: 'KantumruyPro-Regular',
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      SizedBox(height: 24.h),
+                      TextFormField(
+                        controller: emailController,
+                        validator: (value) => Validators.validateEmail(value),
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: textInputField(
+                          "Enter your email",
+                          prefixIcon: Icons.email_outlined,
+                        ),
+                      ),
+                      SizedBox(height: 60.h),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50.h,
+                        child: Button(
+                          text: _isLoading ? "Sending..." : "Send Reset Link",
+                          onPressed: () {
+                            if (_isLoading) return;
+                            _sendResetLink();
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 24.h),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // Page 2: Success Message
+            SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.all(16.w),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    SizedBox(height: 40.h),
+                    Icon(
+                      Icons.mark_email_read_outlined,
+                      size: 100.w,
+                      color: const Color(0xFFFFB800),
+                    ),
+                    SizedBox(height: 24.h),
                     Text(
-                      "Forgot Password",
+                      "Check Your Email",
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 30.sp,
                         fontFamily: 'Poppins',
@@ -100,79 +163,26 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                     SizedBox(height: 14.h),
                     Text(
-                      "Please enter the email address associated with your account. We will send a link to reset your password.",
+                      "We have sent a password reset link to your email. Please click the link in the email to change your password.",
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16.sp,
                         fontFamily: 'KantumruyPro-Regular',
                         fontWeight: FontWeight.w400,
                       ),
                     ),
-                    SizedBox(height: 24.h),
-                    TextFormField(
-                      controller: emailController,
-                      validator: (value) => Validators.validateEmail(value),
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: textInputField(
-                        "Enter your email",
-                        prefixIcon: Icons.email_outlined,
-                      ),
-                    ),
-                    const Spacer(),
+                    SizedBox(height: 40.h),
                     SizedBox(
                       width: double.infinity,
                       height: 50.h,
                       child: Button(
-                        text: _isLoading ? "Sending..." : "Send Reset Link",
-                        onPressed: () {
-                          if (_isLoading) return;
-                          _sendResetLink();
-                        },
+                        text: "Back to Login",
+                        onPressed: () => Navigator.pop(context),
                       ),
                     ),
+                    SizedBox(height: 24.h),
                   ],
                 ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(16.w),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.mark_email_read_outlined,
-                    size: 100.w,
-                    color: const Color(0xFFFFB800),
-                  ),
-                  SizedBox(height: 24.h),
-                  Text(
-                    "Check Your Email",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 30.sp,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  SizedBox(height: 14.h),
-                  Text(
-                    "We have sent a password reset link to your email. Please click the link in the email to change your password.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontFamily: 'KantumruyPro-Regular',
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  const Spacer(),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50.h,
-                    child: Button(
-                      text: "Back to Login",
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ),
-                ],
               ),
             ),
           ],
