@@ -17,26 +17,26 @@
 
 ---
 
-## Overview
+## 🚀 Overview
 
 **AuriSign** is an AI-assisted sign language learning platform that empowers inclusive communication. By combining traditional FSL education with modern AI, the platform allows for independent practice, instant feedback, and measurable skill development across both mobile and web platforms.
 
 ## ✨ Key Features
 
-* **Universal Authentication**
+* **🔐 Universal Authentication**
     * Secure Login & Sign Up with JWT implementation.
     * Email OTP verification for account security.
     * Session restoration via Shared Preferences for seamless mobile access.
 
-* **AI Gesture Recognition**
+* **🤖 AI Gesture Recognition**
     * Real-time webcam and mobile camera-based hand sign detection.
     * Powered by **TensorFlow.js** to validate hand movements and signs instantly.
 
-* **Structured Learning & Dictionary**
+* **📖 Structured Learning & Dictionary**
     * Category-based curriculum (Alphabets, Numbers, Common Words).
     * Digital dictionary with visual examples and high-quality video references.
 
-* **Progress Tracking**
+* **📊 Progress Tracking**
     * Personalized user profiles with learning analytics.
     * Daily activity tracker to maintain learning streaks and consistency.
 
@@ -73,11 +73,44 @@ npm install
 
 # Start the server (Development mode)
 npm run dev
-
-2. Mobile App Setup (Flutter)
-
+```
+### 2. Mobile App Setup (Flutter)
 Step 1: Clone the repository
 
 ```bash
 git clone [https://github.com/kyranjosafat/auri_sign.git](https://github.com/kyranjosafat/auri_sign.git)
-cd auri_sign
+```
+
+Step 2: Install Dependencies
+```bash
+flutter pub get
+```
+
+Step 3: Configure API Endpoint (Crucial)
+
+Open lib/core/di/injection_container.dart.
+
+Find the UserRepository registration.
+
+Update the baseUrl to match your computer's local IP address (ensure your phone/emulator is on the same Wi-Fi).
+
+Dart
+// Example:
+sl.registerLazySingleton<UserRepository>(
+  () => UserRepository(baseUrl: '[http://192.000.0.0:5000/api](http://192.168.1.5:5000/api)'), // <--- Update this IP
+);
+
+Step 4: Run the App
+```bash
+flutter run
+```
+```bash
+lib/
+├── core/               # Shared utilities, widgets, and dependency injection
+├── features/
+│   ├── auth/           # Login, Signup, Session logic & ViewModels
+│   ├── dictionary/     # FSL Dictionary and Video player
+│   ├── homepage/       # Dashboard and Daily Trackers
+│   ├── profile/        # Edit Profile, Settings, Image Upload
+│   └── lessons/        # Gamified learning modules
+└── main.dart           # Entry point & App Configuration
