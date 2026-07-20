@@ -15,7 +15,7 @@ class WelcomePage extends StatelessWidget {
           width: double.infinity,
           child: Column(
             children: [
-              // 1. LOGO SECTION
+              // 1. Logo Section
               Padding(
                 padding: EdgeInsets.only(top: 60.h), 
                 child: Container(
@@ -32,12 +32,12 @@ class WelcomePage extends StatelessWidget {
 
               SizedBox(height: 10.h), 
 
-              // 2. TEXT SECTION
+              // 2. Text Section
               SizedBox(
                 width: 328.w,
                 child: Text(
                   'Your Smart AI Sign Language Learning Companion',
-                  textAlign: TextAlign.center, 
+                  textAlign: TextAlign.start, 
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 18.sp,
@@ -53,7 +53,7 @@ class WelcomePage extends StatelessWidget {
                   width: 328.w,
                   child: Text(
                     'Empowering inclusive communication through AI-assisted learning.',
-                    textAlign: TextAlign.center, 
+                    textAlign: TextAlign.start, 
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 14.sp,
@@ -67,7 +67,7 @@ class WelcomePage extends StatelessWidget {
 
               SizedBox(height: 30.h),
 
-              // 3. IMAGE SECTION (Box & Shadow preserved)
+              // 3. Image Section
               Container(
                 width: 328.w,
                 height: 227.h,
@@ -102,7 +102,7 @@ class WelcomePage extends StatelessWidget {
 
               const Spacer(), 
 
-              // 4. BUTTONS SECTION
+              // 4. Buttons
               SizedBox(
                 width: 328.w,
                 child: Button(
@@ -115,6 +115,7 @@ class WelcomePage extends StatelessWidget {
               
               SizedBox(height: 20.h),
               
+              // Text Button
               GestureDetector(
                 onTap: () {
                   Navigator.pushNamed(context, '/login');

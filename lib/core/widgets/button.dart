@@ -33,8 +33,8 @@ class Button extends StatelessWidget {
           child: Text(
             text,
             style: const TextStyle(
-              fontSize: 14,
-              fontFamily: 'Poppins',
+              fontSize: 15,
+              fontFamily: 'Poppins-Regular',
               fontWeight: FontWeight.w400,
               color: Colors.white,
             ),

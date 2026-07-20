@@ -56,13 +56,28 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
 
     controller.runJavaScript("""
       (function() {
-        var style = document.getElementById('injected-mobile-css');
-        if (!style) {
-          style = document.createElement('style');
-          style.id = 'injected-mobile-css';
-          document.head.appendChild(style);
+        function injectMobileStyles() {
+          if (!document.getElementById('injected-mobile-css')) {
+            var style = document.createElement('style');
+            style.id = 'injected-mobile-css';
+            style.innerHTML = `$css`;
+            document.head.appendChild(style);
+          }
         }
-        style.innerHTML = `$css`;
+
+        // 1. Inject immediately on load
+        injectMobileStyles();
+
+        // 2. Watch for the web app wiping out the head or re-rendering
+        var observer = new MutationObserver(function(mutations) {
+          injectMobileStyles();
+        });
+        
+        // Target the whole document to catch any routing changes
+        observer.observe(document.documentElement, { 
+          childList: true, 
+          subtree: true 
+        });
       })();
     """);
   }
