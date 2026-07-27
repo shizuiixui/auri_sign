@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 // Ensure plugin is available for the test
 
 // Screens
-import 'package:auri_sign/features/profile/presentation/screens/achievements.dart';
 import 'package:auri_sign/features/profile/presentation/screens/change_password_page.dart';
 import 'package:auri_sign/features/profile/presentation/screens/edit_profile_page.dart';
 import 'package:auri_sign/features/profile/presentation/screens/privacy_policy.dart';
@@ -12,7 +11,6 @@ import 'package:auri_sign/features/profile/presentation/screens/terms_conditions
 import 'package:auri_sign/features/auth/presentation/screens/welcome page/welcome_page.dart';
 
 // ViewModels
-import 'package:auri_sign/features/profile/viewmodels/achievements_view_model.dart';
 import 'package:auri_sign/features/auth/viewmodels/user_view_model.dart';
 import '/features/auth/presentation/viewmodels/login_view_model.dart';
 import 'package:auri_sign/features/profile/viewmodels/notification_schedule_view_model.dart';
