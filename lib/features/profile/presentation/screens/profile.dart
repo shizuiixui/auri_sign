@@ -68,6 +68,7 @@ class ProfilePage extends StatelessWidget {
       context: parentContext,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20.r),
           ),
