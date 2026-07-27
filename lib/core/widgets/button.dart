@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
+import '/core/widgets/loading_indicator.dart';
 
 class Button extends StatelessWidget {
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final String text;
+  final bool isLoading;
 
-  const Button({super.key, required this.onPressed, required this.text});
+  const Button({
+    super.key,
+    required this.onPressed,
+    required this.text,
+    this.isLoading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onPressed,
+      onTap: isLoading ? null : onPressed,
       child: Container(
         width: double.infinity,
         height: 50,
@@ -30,15 +37,17 @@ class Button extends StatelessWidget {
 
         // Button Text
         child: Center(
-          child: Text(
-            text,
-            style: const TextStyle(
-              fontSize: 15.5,
-              fontFamily: 'Poppins-Regular',
-              fontWeight: FontWeight.w400,
-              color: Colors.white,
-            ),
-          ),
+          child: isLoading
+              ? const SizedBox(height: 24, width: 24, child: LoadingIndicator())
+              : Text(
+                  text,
+                  style: const TextStyle(
+                    fontSize: 15.5,
+                    fontFamily: 'Poppins-Regular',
+                    fontWeight: FontWeight.w400,
+                    color: Colors.white,
+                  ),
+                ),
         ),
       ),
     );

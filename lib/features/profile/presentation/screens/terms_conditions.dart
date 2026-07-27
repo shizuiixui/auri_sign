@@ -18,7 +18,8 @@ class TermsConditionsPage extends StatelessWidget {
           "Terms & Conditions",
           style: TextStyle(
             color: Colors.black,
-            fontSize: 16,
+            fontFamily: 'Poppins',
+            fontSize: 17,
             fontWeight: FontWeight.w600,
           ),
         ),

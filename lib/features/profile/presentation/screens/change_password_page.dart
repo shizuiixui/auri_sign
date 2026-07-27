@@ -1,7 +1,9 @@
+import 'package:auri_sign/core/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:auri_sign/features/auth/viewmodels/user_view_model.dart';
 import 'package:auri_sign/features/profile/presentation/widgets/change_password_helpers.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ChangePasswordPage extends StatefulWidget {
   const ChangePasswordPage({super.key});
@@ -46,7 +48,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           "Change Your Password",
           style: TextStyle(
             color: Colors.black,
-            fontSize: 16,
+            fontFamily: 'Poppins',
+            fontSize: 17,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -102,100 +105,65 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                       const Spacer(),
                       const SizedBox(height: 40),
 
-                      SizedBox(
-                        width: double.infinity,
-                        height: 55,
-                        child: ElevatedButton(
-                          onPressed: userVM.isLoading
-                              ? null
-                              : () async {
-                                  FocusScope.of(
-                                    context,
-                                  ).unfocus();
+                      Button(
+                        text: "Change Password",
+                        isLoading: userVM.isLoading,
+                        onPressed: () async {
+                          FocusScope.of(context).unfocus();
 
-                                  final currentPw =
-                                      _currentPasswordController.text;
-                                  final newPw = _newPasswordController.text;
-                                  final retypePw =
-                                      _retypePasswordController.text;
+                          final currentPw = _currentPasswordController.text;
+                          final newPw = _newPasswordController.text;
+                          final retypePw = _retypePasswordController.text;
 
-                                  if (currentPw.isEmpty ||
-                                      newPw.isEmpty ||
-                                      retypePw.isEmpty) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'All fields are required',
-                                        ),
-                                      ),
-                                    );
-                                    return;
-                                  }
-                                  if (newPw != retypePw) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'New passwords do not match!',
-                                        ),
-                                        backgroundColor: Colors.red,
-                                      ),
-                                    );
-                                    return;
-                                  }
-                                  try {
-                                    await userVM.changePassword(
-                                      currentPassword: currentPw,
-                                      newPassword: newPw,
-                                    );
+                          if (currentPw.isEmpty ||
+                              newPw.isEmpty ||
+                              retypePw.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('All fields are required'),
+                              ),
+                            );
+                            return;
+                          }
 
-                                    if (context.mounted) {
-                                      Navigator.pop(
-                                        context,
-                                      );
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                            'Password changed successfully!',
-                                          ),
-                                          backgroundColor: Colors.green,
-                                        ),
-                                      );
-                                    }
-                                  } catch (e) {
-                                    if (context.mounted) {
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        SnackBar(
-                                          content: Text(e.toString()),
-                                          backgroundColor: Colors.red,
-                                        ),
-                                      );
-                                    }
-                                  }
-                                },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFFB800),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            elevation: 2,
-                          ),
-                          child: userVM.isLoading
-                              ? const CircularProgressIndicator(
-                                  color: Colors.white,
-                                )
-                              : const Text(
-                                  "Change Password",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                          if (newPw != retypePw) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('New passwords do not match!'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                            return;
+                          }
+
+                          try {
+                            await userVM.changePassword(
+                              currentPassword: currentPw,
+                              newPassword: newPw,
+                            );
+
+                            if (context.mounted) {
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Password changed successfully!',
                                   ),
+                                  backgroundColor: Colors.green,
                                 ),
-                        ),
+                              );
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(e.toString()),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          }
+                        },
                       ),
                       const SizedBox(height: 40),
                     ],
