@@ -1,3 +1,4 @@
+import 'package:auri_sign/core/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:auri_sign/features/auth/viewmodels/user_view_model.dart';
@@ -52,12 +53,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               "Edit Your Profile",
               style: TextStyle(
                 color: Colors.black,
                 fontFamily: 'Poppins',
-                fontSize: 17,
+                fontSize: 17.sp,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -66,125 +67,92 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: EdgeInsets.symmetric(horizontal: 24.w),
           child: Column(
             children: [
-              const SizedBox(height: 30),
+              SizedBox(height: 30.h),
               CircleAvatar(
-                radius: 50,
+                radius: 50.r,
                 backgroundColor: Colors.grey.shade200,
                 backgroundImage: user?.profilePicture != null
                     ? NetworkImage(user!.profilePicture!)
                     : null,
                 child: user?.profilePicture == null
-                    ? const Icon(Icons.person, size: 50, color: Colors.grey)
+                    ? Icon(Icons.person, size: 50.r, color: Colors.grey)
                     : null,
               ),
-              const SizedBox(height: 40),
-
+              SizedBox(height: 40.h),
               EditProfileTextField(
                 controller: _firstNameController,
                 hint: 'First Name',
                 icon: Icons.person_outline,
               ),
-              const SizedBox(height: 16),
-
+              SizedBox(height: 16.h),
               EditProfileTextField(
                 controller: _lastNameController,
                 hint: 'Last Name',
                 icon: Icons.person_outline,
               ),
-              const SizedBox(height: 16),
-
+              SizedBox(height: 16.h),
               EditProfileTextField(
                 controller: _emailController,
                 hint: 'Email Address',
                 icon: Icons.mail_outline,
                 keyboardType: TextInputType.emailAddress,
               ),
-              const SizedBox(height: 50),
+              SizedBox(height: 50.h),
+              Button(
+                text: "Continue",
+                isLoading: userVM.isLoading,
+                onPressed: () async {
+                  FocusScope.of(context).unfocus();
 
-              // Continue Button
-              SizedBox(
-                width: double.infinity,
-                height: 55,
-                child: ElevatedButton(
-                  onPressed: userVM.isLoading
-                      ? null
-                      : () async {
-                          FocusScope.of(context).unfocus();
+                  final newFirstName = _firstNameController.text.trim();
+                  final newLastName = _lastNameController.text.trim();
+                  final newEmail = _emailController.text.trim();
 
-                          final newFirstName = _firstNameController.text.trim();
-                          final newLastName = _lastNameController.text.trim();
-                          final newEmail = _emailController.text.trim();
+                  if (newFirstName.isEmpty ||
+                      newLastName.isEmpty ||
+                      newEmail.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('All fields are required'),
+                      ),
+                    );
+                    return;
+                  }
 
-                          if (newFirstName.isEmpty ||
-                              newLastName.isEmpty ||
-                              newEmail.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('All fields are required'),
-                              ),
-                            );
-                            return;
-                          }
+                  try {
+                    await userVM.updateProfile(
+                      newFirstName: newFirstName,
+                      newLastName: newLastName,
+                      newEmail: newEmail,
+                    );
 
-                          try {
-                            await userVM.updateProfile(
-                              newFirstName: newFirstName,
-                              newLastName: newLastName,
-                              newEmail: newEmail,
-                            );
-
-                            if (context.mounted) {
-                              Navigator.pop(context);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Profile updated successfully!',
-                                  ),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
-                            }
-                          } catch (e) {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(e.toString()),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            }
-                          }
-                        },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFFB800),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    elevation: 2,
-                  ),
-                  child: userVM.isLoading
-                      ? const SizedBox(
-                          height: 24,
-                          width: 24,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Profile updated successfully!',
                           ),
-                        )
-                      : const Text(
-                          "Continue",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          backgroundColor: Colors.green,
                         ),
-                ),
+                      );
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(e.toString()),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  }
+                },
               ),
-              const SizedBox(height: 30),
+              SizedBox(height: 30.h),
             ],
           ),
         ),

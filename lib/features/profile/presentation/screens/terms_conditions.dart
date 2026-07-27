@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class TermsConditionsPage extends StatelessWidget {
   const TermsConditionsPage({super.key});
@@ -14,12 +15,12 @@ class TermsConditionsPage extends StatelessWidget {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           "Terms & Conditions",
           style: TextStyle(
             color: Colors.black,
             fontFamily: 'Poppins',
-            fontSize: 17,
+            fontSize: 17.sp,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -27,33 +28,33 @@ class TermsConditionsPage extends StatelessWidget {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 10.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 "Terms and Conditions for AuriSign",
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
                 ),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8.h),
               Text(
                 "Effective Date: January 19, 2026",
-                style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                style: TextStyle(fontSize: 14.sp, color: Colors.grey.shade600),
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: 24.h),
               Text(
                 _getTermsText(),
-                style: const TextStyle(
-                  fontSize: 14,
+                style: TextStyle(
+                  fontSize: 14.sp,
                   color: Colors.black87,
                   height: 1.5,
                 ),
               ),
-              const SizedBox(height: 40),
+              SizedBox(height: 40.h),
             ],
           ),
         ),

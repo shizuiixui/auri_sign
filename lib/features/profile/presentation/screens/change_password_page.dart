@@ -44,12 +44,12 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           "Change Your Password",
           style: TextStyle(
             color: Colors.black,
             fontFamily: 'Poppins',
-            fontSize: 17,
+            fontSize: 17.sp,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -59,14 +59,13 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: EdgeInsets.symmetric(horizontal: 24.w),
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: constraints.maxHeight),
                 child: IntrinsicHeight(
                   child: Column(
                     children: [
-                      const SizedBox(height: 40),
-
+                      SizedBox(height: 40.h),
                       CustomPasswordField(
                         controller: _currentPasswordController,
                         hint: "Enter your current password",
@@ -77,8 +76,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                           });
                         },
                       ),
-                      const SizedBox(height: 16),
-
+                      SizedBox(height: 16.h),
                       CustomPasswordField(
                         controller: _newPasswordController,
                         hint: "Enter your new password",
@@ -89,8 +87,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                           });
                         },
                       ),
-                      const SizedBox(height: 16),
-
+                      SizedBox(height: 16.h),
                       CustomPasswordField(
                         controller: _retypePasswordController,
                         hint: "Re-type your password",
@@ -101,10 +98,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                           });
                         },
                       ),
-
                       const Spacer(),
-                      const SizedBox(height: 40),
-
+                      SizedBox(height: 40.h),
                       Button(
                         text: "Change Password",
                         isLoading: userVM.isLoading,
@@ -165,7 +160,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                           }
                         },
                       ),
-                      const SizedBox(height: 40),
+                      SizedBox(height: 40.h),
                     ],
                   ),
                 ),
