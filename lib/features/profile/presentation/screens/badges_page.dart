@@ -297,9 +297,7 @@ class _BadgesPageState extends State<BadgesPage> {
                                         SizedBox(width: 4.w),
                                         Text(
                                           "Unlocked: ${formatDate(badge['unlockedAt'])}",
-                                          style: TextStyle(
-                                            fontSize: 12.sp,
-                                          ),
+                                          style: TextStyle(fontSize: 12.sp),
                                         ),
                                       ],
                                     ),
@@ -375,10 +373,16 @@ class _BadgesPageState extends State<BadgesPage> {
                       fontFamily: 'Inter',
                     ),
                   ),
-                  trailing: Icon(
-                    badge['icon'],
-                    color: badge['color'],
-                    size: 24.sp,
+                  trailing: Image.asset(
+                    badge['imagePath'] ?? 'assets/images/badges/3-DayStreak.png',
+                    width: 25.r,
+                    height: 25.r,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) => Icon(
+                      Icons.military_tech,
+                      size: 32.r,
+                      color: badge['color'],
+                    ),
                   ),
                 ),
                 if (badge != upcomingBadges.last)

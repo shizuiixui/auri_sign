@@ -13,6 +13,18 @@ class BadgesViewModel extends ChangeNotifier {
   List<Map<String, dynamic>> earnedBadges = [];
   List<Map<String, dynamic>> upcomingBadges = [];
 
+  BadgesViewModel() {
+    upcomingBadges = _allBadges
+        .map(
+          (b) => {
+            ...b,
+            "imagePath": getBadgeImagePath(b['id']),
+            "color": getBadgeColor(b['id']),
+          },
+        )
+        .toList();
+  }
+
   // Badges List
   final List<Map<String, dynamic>> _allBadges = [
     {
@@ -55,29 +67,31 @@ class BadgesViewModel extends ChangeNotifier {
 
   final Dio _dio = Dio(BaseOptions(baseUrl: ApiConstants.baseUrl));
 
-  // translateReactGetBadgeIcon
-  IconData getBadgeIcon(String? badgeId) {
-    if (badgeId == null) return Icons.military_tech;
-    if (badgeId.contains("streak_3")) return Icons.local_fire_department;
-    if (badgeId.contains("streak_7")) return Icons.emoji_events;
-    if (badgeId.contains("streak_14")) return Icons.military_tech;
+  String getBadgeImagePath(String? badgeId) {
+    if (badgeId == null) return 'assets/images/badges/3-DayStreak.png';
+    if (badgeId.contains("streak_3"))
+      return 'assets/images/badges/3-DayStreak.png';
+    if (badgeId.contains("streak_7"))
+      return 'assets/images/badges/WeekWarrior.png';
+    if (badgeId.contains("streak_14"))
+      return 'assets/images/badges/TwoWeekChampion.png';
     if (badgeId.contains("streak_30"))
-      return Icons.workspace_premium; // crownEquivalent
-    if (badgeId.contains("streak_50")) return Icons.star;
-    if (badgeId.contains("streak_100")) return Icons.workspace_premium;
-    return Icons.military_tech;
+      return 'assets/images/badges/MonthMaster.png';
+    if (badgeId.contains("streak_50"))
+      return 'assets/images/badges/50-DayLegend.png';
+    if (badgeId.contains("streak_100"))
+      return 'assets/images/badges/Centurion.png';
+    return 'assets/images/badges/3-DayStreak.png';
   }
 
-  // translateReactGetBadgeColor
   Color getBadgeColor(String? badgeId) {
     if (badgeId == null) return Colors.grey;
     if (badgeId.contains("streak_100")) return Colors.red;
-    if (badgeId.contains("streak_50"))
-      return const Color(0xFFFFB800); // warning
-    if (badgeId.contains("streak_30")) return Colors.blue; // primary
-    if (badgeId.contains("streak_14")) return Colors.lightBlue; // info
-    if (badgeId.contains("streak_7")) return Colors.green; // success
-    if (badgeId.contains("streak_3")) return Colors.grey.shade600; // secondary
+    if (badgeId.contains("streak_50")) return const Color(0xFFFFB800);
+    if (badgeId.contains("streak_30")) return Colors.blue;
+    if (badgeId.contains("streak_14")) return Colors.lightBlue;
+    if (badgeId.contains("streak_7")) return Colors.green;
+    if (badgeId.contains("streak_3")) return Colors.grey.shade600;
     return Colors.grey;
   }
 
@@ -104,7 +118,6 @@ class BadgesViewModel extends ChangeNotifier {
         List<String> earnedIds = [];
         earnedBadges = [];
 
-        // processEarnedBadgesUsingWebStructure
         for (var b in rawBadges) {
           if (b is Map) {
             String badgeId = b['badgeId'] ?? '';
@@ -114,13 +127,12 @@ class BadgesViewModel extends ChangeNotifier {
               "name": b['badgeName'] ?? 'Badge',
               "desc": b['description'] ?? '',
               "unlockedAt": b['unlockedAt'],
-              "icon": getBadgeIcon(badgeId),
+              "imagePath": getBadgeImagePath(badgeId),
               "color": getBadgeColor(badgeId),
             });
           }
         }
 
-        // dynamicallyFilterUpcomingBadges
         upcomingBadges = _allBadges
             .where((b) {
               return !earnedIds.any((earnedId) => earnedId.contains(b['id']));
@@ -128,7 +140,7 @@ class BadgesViewModel extends ChangeNotifier {
             .map(
               (b) => {
                 ...b,
-                "icon": getBadgeIcon(b['id']),
+                "imagePath": getBadgeImagePath(b['id']),
                 "color": getBadgeColor(b['id']),
               },
             )

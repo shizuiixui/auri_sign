@@ -148,6 +148,14 @@ flutter:
 
     - assets/images/heart.png
 
+    # Badges
+    - assets/images/badges/3-DayStreak.png
+    - assets/images/badges/50-DayLegend.png
+    - assets/images/badges/Centurion.png
+    - assets/images/badges/MonthMaster.png
+    - assets/images/badges/TwoWeekChampion.png
+    - assets/images/badges/WeekWarrior.png
+
   # Fonts
   fonts:
     - family: Poppins
