@@ -5,6 +5,7 @@ InputDecoration textInputField(
 
   IconData? prefixIcon,
   IconData? suffixIcon,
+  Widget? suffixIconWidget,
 }) {
   return InputDecoration(
     hintText: hintText,
@@ -14,9 +15,10 @@ InputDecoration textInputField(
         ? Icon(prefixIcon, color: const Color(0XFFB0B0B0))
         : null,
 
-    suffixIcon: suffixIcon != null
+    suffixIcon: suffixIconWidget ??
+      (suffixIcon != null
         ? Icon(suffixIcon, color: const Color(0XFFB0B0B0))
-        : null,
+        : null),
 
     // Border
     border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),

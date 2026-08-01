@@ -15,7 +15,7 @@ class WelcomePage extends StatelessWidget {
           width: double.infinity,
           child: Column(
             children: [
-              // 1. Logo Section
+              // Logo Section
               Padding(
                 padding: EdgeInsets.only(top: 60.h), 
                 child: Container(
@@ -32,7 +32,7 @@ class WelcomePage extends StatelessWidget {
 
               SizedBox(height: 10.h), 
 
-              // 2. Text Section
+              // Text Section
               SizedBox(
                 width: 328.w,
                 child: Text(
@@ -67,7 +67,7 @@ class WelcomePage extends StatelessWidget {
 
               SizedBox(height: 30.h),
 
-              // 3. Image Section
+              // Image Section
               Container(
                 width: 328.w,
                 height: 227.h,
@@ -102,7 +102,7 @@ class WelcomePage extends StatelessWidget {
 
               const Spacer(), 
 
-              // 4. Buttons
+              // Buttons
               SizedBox(
                 width: 328.w,
                 child: Button(
@@ -113,7 +113,7 @@ class WelcomePage extends StatelessWidget {
                 ),
               ),
               
-              SizedBox(height: 14.h),
+              SizedBox(height: 13.5.h),
               
               // Text Button
               GestureDetector(
@@ -124,7 +124,7 @@ class WelcomePage extends StatelessWidget {
                   "I already have an account",
                   style: TextStyle(
                     color: Colors.black,
-                    fontSize: 15.50.sp,
+                    fontSize: 14.sp,
                     fontFamily: 'Kantumruy Pro',
                     fontWeight: FontWeight.w400,
                     height: 2.91,

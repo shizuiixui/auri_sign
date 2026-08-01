@@ -235,7 +235,7 @@ class ProfileMenuTile extends StatelessWidget {
         contentPadding: EdgeInsets.symmetric(horizontal: 20.w),
         title: Text(
           title,
-          style: TextStyle(fontSize: 15.sp, fontFamily: 'Inter'),
+          style: TextStyle(fontSize: 14.sp, fontFamily: 'Inter'),
         ),
         trailing: Icon(
           Icons.arrow_forward_ios,
@@ -253,6 +253,17 @@ class ProfileSwitchTile extends StatelessWidget {
   final String? subtitle;
   final bool value;
   final ValueChanged<bool>? onChanged;
+  final TextStyle? titleStyle;
+  final TextStyle? subtitleStyle;
+  final Color? switchActiveColor;
+  final Color? switchActiveTrackColor;
+  final Color? switchInactiveThumbColor;
+  final Color? switchInactiveTrackColor;
+  final Color? backgroundColor;
+  final Color? borderColor;
+  final BorderRadiusGeometry? borderRadius;
+  final EdgeInsetsGeometry? margin;
+  final EdgeInsetsGeometry? contentPadding;
 
   const ProfileSwitchTile({
     super.key,
@@ -260,37 +271,55 @@ class ProfileSwitchTile extends StatelessWidget {
     required this.value,
     this.subtitle,
     this.onChanged,
+    this.titleStyle,
+    this.subtitleStyle,
+    this.switchActiveColor,
+    this.switchActiveTrackColor,
+    this.switchInactiveThumbColor,
+    this.switchInactiveTrackColor,
+    this.backgroundColor,
+    this.borderColor,
+    this.borderRadius,
+    this.margin,
+    this.contentPadding,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: margin ?? const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.grey.shade200),
-        borderRadius: BorderRadius.circular(30),
+        color: backgroundColor ?? Colors.white,
+        border: Border.all(color: borderColor ?? Colors.grey.shade200),
+        borderRadius: borderRadius ?? BorderRadius.circular(30),
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+        contentPadding:
+            contentPadding ?? const EdgeInsets.symmetric(horizontal: 20),
         title: Text(
           title,
-          style: const TextStyle(fontSize: 15, fontFamily: 'Inter'),
+          style:
+              titleStyle ?? const TextStyle(fontSize: 15, fontFamily: 'Inter'),
         ),
         subtitle: subtitle == null
             ? null
             : Text(
                 subtitle!,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                  fontFamily: 'Inter',
-                ),
+                style:
+                    subtitleStyle ??
+                    TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                      fontFamily: 'Inter',
+                    ),
               ),
         trailing: Switch(
           value: value,
           onChanged: onChanged,
-          activeColor: const Color(0xFFFFB800),
+          activeColor: switchActiveColor ?? const Color(0xFFFFB800),
+          activeTrackColor: switchActiveTrackColor,
+          inactiveThumbColor: switchInactiveThumbColor,
+          inactiveTrackColor: switchInactiveTrackColor,
         ),
       ),
     );

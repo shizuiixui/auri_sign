@@ -38,7 +38,7 @@ class _UserStatsRowState extends State<UserStatsRow> {
 
     return Row(
       children: [
-        // 1. Badge
+        // Badge
         GestureDetector(
           onTap: () {
             Navigator.push(
@@ -58,7 +58,7 @@ class _UserStatsRowState extends State<UserStatsRow> {
 
         const SizedBox(width: 15),
 
-        // 2. Streak
+        // Streak
         GestureDetector(
           onTap: () {
             Navigator.push(
@@ -86,7 +86,7 @@ class _UserStatsRowState extends State<UserStatsRow> {
   }) {
     return Row(
       children: [
-        Icon(icon, color: color, size: 28),
+        Icon(icon, color: color, size: 50),
         const SizedBox(width: 8),
         Text(
           value,

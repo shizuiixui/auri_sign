@@ -198,6 +198,7 @@ class ProfilePage extends StatelessWidget {
                 ),
               ],
             ),
+            // Circle Avatar
             child: CircleAvatar(
               radius: 50.r,
               backgroundColor: const Color(0xFFFFB800),
@@ -267,8 +268,18 @@ class ProfilePage extends StatelessWidget {
             value: notificationVM.schedule != null,
             onChanged: (value) =>
                 _onScheduleChanged(context, notificationVM, value),
+            titleStyle: TextStyle(
+              fontSize: 14.sp,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w400,
+            ),
+            subtitleStyle: TextStyle(
+              fontSize: 13.sp,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w400,
+              color: Colors.grey[600],
+            ),
           ),
-
           SizedBox(height: 20.h),
 
           const ProfileSectionHeader(title: "Legal & Privacy"),
