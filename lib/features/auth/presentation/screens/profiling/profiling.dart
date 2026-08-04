@@ -143,7 +143,7 @@ class _ProfilingScreenState extends State<ProfilingScreen> {
                         Navigator.pop(context);
                       }
                     },
-                    child: Icon(Icons.arrow_back, size: 24.sp),
+                    child: Icon(Icons.arrow_back, color: Colors.black),
                   ),
                   SizedBox(width: 10.w),
                   Expanded(
@@ -186,7 +186,7 @@ class _ProfilingScreenState extends State<ProfilingScreen> {
               padding: EdgeInsets.all(20.0.w),
               child: SizedBox(
                 width: double.infinity,
-                height: 50.h,
+                height: 40.h,
                 child: _isLoading
                     ? const LoadingIndicator()
                     : Opacity(

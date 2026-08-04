@@ -286,20 +286,32 @@ class ProfileSwitchTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isTablet = screenWidth >= 600;
+    final responsiveTitleSize = isTablet ? 15.sp : 14.sp;
+    final responsiveSubtitleSize = isTablet ? 13.sp : 12.sp;
+    final responsiveHorizontalPadding = isTablet ? 24.w : 20.w;
+    final responsiveVerticalPadding = isTablet ? 8.h : 0.h;
+
     return Container(
-      margin: margin ?? const EdgeInsets.only(bottom: 12),
+      margin: margin ?? EdgeInsets.only(bottom: isTablet ? 14.h : 12.h),
       decoration: BoxDecoration(
         color: backgroundColor ?? Colors.white,
         border: Border.all(color: borderColor ?? Colors.grey.shade200),
-        borderRadius: borderRadius ?? BorderRadius.circular(30),
+        borderRadius: borderRadius ?? BorderRadius.circular(30.r),
       ),
       child: ListTile(
         contentPadding:
-            contentPadding ?? const EdgeInsets.symmetric(horizontal: 20),
+            contentPadding ??
+            EdgeInsets.symmetric(
+              horizontal: responsiveHorizontalPadding,
+              vertical: responsiveVerticalPadding,
+            ),
         title: Text(
           title,
           style:
-              titleStyle ?? const TextStyle(fontSize: 15, fontFamily: 'Inter'),
+              titleStyle ??
+              TextStyle(fontSize: responsiveTitleSize, fontFamily: 'Inter'),
         ),
         subtitle: subtitle == null
             ? null
@@ -308,7 +320,7 @@ class ProfileSwitchTile extends StatelessWidget {
                 style:
                     subtitleStyle ??
                     TextStyle(
-                      fontSize: 12,
+                      fontSize: responsiveSubtitleSize,
                       color: Colors.grey[600],
                       fontFamily: 'Inter',
                     ),

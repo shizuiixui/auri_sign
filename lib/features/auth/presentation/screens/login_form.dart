@@ -21,6 +21,34 @@ class _LoginFormState extends State<LoginForm> {
   bool obscurePassword = true;
   final loginVM = LoginViewModel();
 
+  Widget _buildPasswordVisibilityIcon({
+    required bool isVisible,
+    required VoidCallback onPressed,
+  }) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final iconSize = screenWidth < 600 ? 20.sp : 18.sp;
+    final buttonSize = screenWidth < 600 ? 32.w : 28.w;
+
+    return Padding(
+      padding: EdgeInsets.only(right: 2.w),
+      child: IconButton(
+        padding: EdgeInsets.zero,
+        constraints: BoxConstraints(
+          minWidth: buttonSize,
+          minHeight: buttonSize,
+        ),
+        splashRadius: 18.r,
+        iconSize: iconSize,
+        icon: Icon(
+          isVisible ? Icons.visibility_off : Icons.visibility,
+          color: Colors.grey,
+          size: iconSize,
+        ),
+        onPressed: onPressed,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,14 +100,8 @@ class _LoginFormState extends State<LoginForm> {
                         prefixIcon: Icons.lock_outlined,
                       ).copyWith(
                         errorMaxLines: 3,
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            obscurePassword
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                            color: Colors.grey,
-                            size: 24.sp,
-                          ),
+                        suffixIcon: _buildPasswordVisibilityIcon(
+                          isVisible: obscurePassword,
                           onPressed: () {
                             setState(() {
                               obscurePassword = !obscurePassword;
@@ -141,7 +163,7 @@ class _LoginFormState extends State<LoginForm> {
                     }
                     return SizedBox(
                       width: double.infinity,
-                      height: 50.h,
+                      height: 40.h,
                       child: Button(
                         text: "Get Started",
                         onPressed: () async {

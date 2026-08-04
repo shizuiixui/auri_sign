@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '/core/widgets/loading_indicator.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Button extends StatelessWidget {
   final VoidCallback? onPressed;
@@ -15,15 +16,22 @@ class Button extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isTablet = screenWidth >= 600;
+    final buttonWidth = isTablet ? 280.w : 328.w;
+    final buttonHeight = isTablet ? 40.h : 50.h;
+    final borderRadius = isTablet ? 24.r : 30.r;
+    final fontSize = isTablet ? 15.sp : 16.5.sp;
+
     return GestureDetector(
       onTap: isLoading ? null : onPressed,
       child: Container(
-        width: double.infinity,
-        height: 50,
+        width: buttonWidth,
+        height: buttonHeight,
         decoration: ShapeDecoration(
           color: const Color(0xFFE9B63B),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(borderRadius),
           ),
           shadows: const [
             BoxShadow(
@@ -38,11 +46,11 @@ class Button extends StatelessWidget {
         // Button Text
         child: Center(
           child: isLoading
-              ? const SizedBox(height: 24, width: 24, child: LoadingIndicator())
+              ? SizedBox(height: 24.h, width: 24.w, child: LoadingIndicator())
               : Text(
                   text,
-                  style: const TextStyle(
-                    fontSize: 15.5,
+                  style: TextStyle(
+                    fontSize: fontSize,
                     fontFamily: 'Poppins-Regular',
                     fontWeight: FontWeight.w400,
                     color: Colors.white,

@@ -82,7 +82,7 @@ class ProfilePage extends StatelessWidget {
                   "Are you sure you want to log out of your account?",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 16.sp,
+                    fontSize: 15.sp,
                     fontFamily: "Poppins",
                     fontWeight: FontWeight.bold,
                   ),
@@ -116,7 +116,7 @@ class ProfilePage extends StatelessWidget {
                     "Log out",
                     style: TextStyle(
                       color: Colors.redAccent,
-                      fontSize: 16.sp,
+                      fontSize: 15.sp,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -139,7 +139,7 @@ class ProfilePage extends StatelessWidget {
                     "Cancel",
                     style: TextStyle(
                       color: Colors.black87,
-                      fontSize: 16.sp,
+                      fontSize: 15.sp,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -345,8 +345,8 @@ class ProfilePage extends StatelessWidget {
               onPressed: () => _showLogoutConfirmation(context, userVM),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.redAccent,
-                minimumSize: Size(double.infinity, 50.h),
-                elevation: 0, // Removes the default material shadow
+                minimumSize: Size(double.infinity, 40.h), //width & height
+                elevation: 0,
                 shadowColor: Colors.transparent,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
@@ -355,7 +355,7 @@ class ProfilePage extends StatelessWidget {
               child: Text(
                 "Log out",
                 style: TextStyle(
-                  fontSize: 16.5,
+                  fontSize: 16.sp,
                   fontFamily: 'Poppins-Regular',
                   fontWeight: FontWeight.w400,
                   color: Colors.white,
@@ -364,6 +364,8 @@ class ProfilePage extends StatelessWidget {
             ),
           ),
 
+          SizedBox(height: 10.h),
+          
           TextButton(
             onPressed: () {},
             child: Text(
@@ -371,8 +373,8 @@ class ProfilePage extends StatelessWidget {
               style: TextStyle(
                 color: Colors.redAccent,
                 fontSize: 14.sp,
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w700,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w500,
               ),
             ),
           ),
