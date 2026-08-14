@@ -9,12 +9,14 @@ import '/features/auth/presentation/viewmodels/signup_view_models.dart';
 import 'package:auri_sign/features/auth/presentation/screens/email_verification.dart';
 
 class SignupForm extends StatefulWidget {
+  final int? learnerType;
   final int? motivation;
   final int? communicationContext;
   final int? dailyTime;
 
   const SignupForm({
     super.key,
+    this.learnerType,
     this.motivation,
     this.communicationContext,
     this.dailyTime,
@@ -444,6 +446,7 @@ class _SignupFormState extends State<SignupForm> {
                                   confirmPassword: confirmPasswordController
                                       .text
                                       .trim(),
+                                  learnerType: widget.learnerType,
                                   motivation: widget.motivation,
                                   communicationContext:
                                       widget.communicationContext,

@@ -4,8 +4,7 @@ import 'package:auri_sign/config/api_constants.dart';
 class AuthService {
   final Dio _dio = Dio(
     BaseOptions(
-      baseUrl:
-          ApiConstants.baseUrl,
+      baseUrl: ApiConstants.baseUrl,
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
     ),
@@ -39,6 +38,7 @@ class AuthService {
     required String email,
     required String password,
     required String confirmPassword,
+    int? learnerType,
     int? motivation,
     int? communicationContext,
     int? dailyTime,
@@ -54,8 +54,11 @@ class AuthService {
       };
 
       // Profiling data
-      if (motivation != null && communicationContext != null && dailyTime != null) {
+      if (learnerType != null &&
+          motivation != null &&
+          communicationContext != null) {
         requestData['profiling'] = {
+          'learnerType': learnerType,
           'motivation': motivation,
           'communicationContext': communicationContext,
           'dailyTime': dailyTime,
@@ -63,10 +66,7 @@ class AuthService {
       }
 
       // Send via Dio
-      final response = await _dio.post(
-        '/auth/signup',
-        data: requestData,
-      );
+      final response = await _dio.post('/auth/signup', data: requestData);
       return response;
     } catch (e) {
       rethrow;

@@ -1,3 +1,5 @@
+import 'package:auri_sign/features/auth/presentation/screens/greetings/greetings-fingerspelling_page.dart';
+import 'package:auri_sign/features/auth/presentation/screens/greetings/greetings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:auri_sign/config/api_constants.dart';
 
@@ -29,6 +31,12 @@ class AppRouter {
       '/verifyEmail': (context) => const VerifyEmail(email: ''),
       '/profiling': (context) => const ProfilingScreen(),
       '/forgot_password': (context) => const ForgotPasswordScreen(),
+      '/greetings': (context) => const GreetingsPage(),
+      '/greetings-fingerspelling': (context) {
+        final token =
+            ModalRoute.of(context)?.settings.arguments as String? ?? '';
+        return GreetingFingerspellingPage(userToken: token);
+      },
 
       // Homepage & Profile
       '/home': (context) => const NavFunction(),

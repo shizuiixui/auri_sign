@@ -31,4 +31,7 @@ class ApiConstants {
   static String lessonWebviewUrl(String category, String lessonId) {
     return '$webBaseUrl/category/${category.toLowerCase()}/lesson/$lessonId';
   }
+
+  static const String greetingFingerspellingWebviewUrl =
+      '$webBaseUrl/greeting-fingerspelling';
 }

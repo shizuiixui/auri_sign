@@ -74,6 +74,7 @@ dependencies:
   flutter_native_splash: ^2.4.7
   webview_flutter_android: ^4.10.1
   intl: ^0.20.2
+  flutter_svg: ^2.3.0
 
 dev_dependencies:
   flutter_test:
@@ -156,6 +157,7 @@ flutter:
     - assets/images/badges/TwoWeekChampion.png
     - assets/images/badges/WeekWarrior.png
 
+    - assets/images/love.svg
   # Fonts
   fonts:
     - family: Poppins
