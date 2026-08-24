@@ -415,7 +415,7 @@ class _SignupFormState extends State<SignupForm> {
                         builder: (context, child) {
                           return SizedBox(
                             width: double.infinity,
-                            height: 40.h,
+                            height: 50.h,
                             child: Button(
                               text: signupVM.isLoading
                                   ? "Loading..."
