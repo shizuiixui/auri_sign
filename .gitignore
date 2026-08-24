@@ -37,3 +37,7 @@ DerivedData/
 .idea/
 *.iml
 .DS_Store
+
+# Secret
+Vibe Coding Rules (Mobile).md
+CHANGELOG.md

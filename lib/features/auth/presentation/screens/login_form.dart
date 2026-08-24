@@ -161,9 +161,10 @@ class _LoginFormState extends State<LoginForm> {
                         ),
                       );
                     }
+                    // Login Button
                     return SizedBox(
                       width: double.infinity,
-                      height: 40.h,
+                      height: 50.h,
                       child: Button(
                         text: "Get Started",
                         onPressed: () async {
