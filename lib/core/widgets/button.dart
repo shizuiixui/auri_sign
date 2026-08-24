@@ -52,7 +52,7 @@ class Button extends StatelessWidget {
                   style: TextStyle(
                     fontSize: fontSize,
                     fontFamily: 'Poppins-Regular',
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),
                 ),

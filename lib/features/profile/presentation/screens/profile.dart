@@ -345,7 +345,7 @@ class ProfilePage extends StatelessWidget {
               onPressed: () => _showLogoutConfirmation(context, userVM),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.redAccent,
-                minimumSize: Size(double.infinity, 40.h), //width & height
+                minimumSize: Size(double.infinity, 45.h), //width & height
                 elevation: 0,
                 shadowColor: Colors.transparent,
                 shape: RoundedRectangleBorder(
@@ -357,7 +357,7 @@ class ProfilePage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontFamily: 'Poppins-Regular',
-                  fontWeight: FontWeight.w400,
+                  fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),
               ),
