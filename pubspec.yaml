@@ -158,6 +158,7 @@ flutter:
     - assets/images/badges/WeekWarrior.png
 
     - assets/images/love.svg
+    - assets/images/welcome_girl.svg
   # Fonts
   fonts:
     - family: Poppins
