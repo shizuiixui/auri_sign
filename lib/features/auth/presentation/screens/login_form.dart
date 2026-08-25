@@ -173,17 +173,24 @@ class _LoginFormState extends State<LoginForm> {
                               email: emailController.text.trim(),
                               password: passwordController.text.trim(),
                             );
+
                             if (loginVM.token != null) {
                               if (context.mounted) {
-                                await context
-                                    .read<UserViewModel>()
-                                    .initSession();
+                                final userVM = context.read<UserViewModel>();
+                                await userVM.initSession();
 
                                 if (context.mounted) {
-                                  Navigator.pushReplacementNamed(
-                                    context,
-                                    '/greetings',
-                                  );
+                                  if (userVM.hasSeenFingerspelling) {
+                                    Navigator.pushReplacementNamed(
+                                      context,
+                                      '/home',
+                                    );
+                                  } else {
+                                    Navigator.pushReplacementNamed(
+                                      context,
+                                      '/greetings',
+                                    );
+                                  }
                                 }
                               }
                             }

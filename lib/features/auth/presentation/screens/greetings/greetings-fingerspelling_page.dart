@@ -1,8 +1,10 @@
+import 'package:auri_sign/features/auth/viewmodels/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:auri_sign/config/api_constants.dart';
+import 'package:provider/provider.dart';
 
 class GreetingFingerspellingPage extends StatefulWidget {
   final String userToken;
@@ -125,6 +127,8 @@ class _GreetingFingerspellingPageState
                 _isLoading = true;
               });
             }
+            // To mark the finger spelling as completed in SharedPref
+            context.read<UserViewModel>().completeFingerspelling();
 
             Future.delayed(const Duration(milliseconds: 600), () {
               if (mounted) {

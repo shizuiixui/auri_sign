@@ -1,9 +1,10 @@
-import 'package:auri_sign/core/widgets/loading_indicator.dart';
 import 'package:auri_sign/features/profile/presentation/screens/achievements.dart';
 import 'package:auri_sign/features/profile/viewmodels/achievements_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+// Ensure plugin is available for the test
 
 // Screens
 import 'package:auri_sign/features/profile/presentation/screens/change_password_page.dart';
@@ -63,27 +64,18 @@ class ProfilePage extends StatelessWidget {
     }
   }
 
-  // Logout Confirmation Dialog
-  void _showLogoutConfirmation(
-    BuildContext parentContext,
-    UserViewModel viewModel,
-  ) {
+  // New Logout Confirmation Dialog
+  void _showLogoutConfirmation(BuildContext context, UserViewModel userVM) {
     showDialog(
-      context: parentContext,
-      builder: (context) => LogoutDialog(
+      context: context,
+      builder: (BuildContext dialogContext) => LogoutDialog(
         onConfirm: () async {
-          showDialog(
-            context: parentContext,
-            barrierDismissible: false,
-            builder: (context) => const Center(child: LoadingIndicator()),
-          );
-          await Future.delayed(const Duration(milliseconds: 1800));
-          await viewModel.logout();
-          if (parentContext.mounted) {
-            Navigator.of(context).pop(); // Close dialog
-            parentContext.read<LoginViewModel>().clearSession();
+          Navigator.pop(dialogContext);
+          await userVM.logout();
+          if (context.mounted) {
+            context.read<LoginViewModel>().clearSession();
             Navigator.pushAndRemoveUntil(
-              parentContext,
+              context,
               MaterialPageRoute(builder: (context) => const WelcomePage()),
               (route) => false,
             );

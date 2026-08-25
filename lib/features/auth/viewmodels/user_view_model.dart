@@ -17,6 +17,8 @@ class UserViewModel extends ChangeNotifier {
   String _errorMessage = '';
 
   UserModel? get user => _user;
+  bool _hasSeenFingerspelling = false;
+  bool get hasSeenFingerspelling => _hasSeenFingerspelling;
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
 
@@ -28,9 +30,7 @@ class UserViewModel extends ChangeNotifier {
 
     try {
       final response = await http.get(
-        Uri.parse(
-          ApiConstants.userProfile,
-        ),
+        Uri.parse(ApiConstants.userProfile),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -51,6 +51,16 @@ class UserViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  // Fingerspelling Completion Tracking
+  Future<void> completeFingerspelling() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String userId = _user?.id ?? '';
+    await prefs.setBool('has_seen_fingerspelling_$userId', true);
+    _hasSeenFingerspelling = true;
+    notifyListeners();
+  }
+
   // Session Management
   Future<void> initSession() async {
     _isLoading = true;
@@ -66,8 +76,14 @@ class UserViewModel extends ChangeNotifier {
         notifyListeners();
         return;
       }
+      // Token exists, fetch user data
       _user = await _userRepository.getCurrentUser();
-
+      // Fetch hasSeenFingerspelling from SharedPreferences
+      final String userId = _user?.id ?? '';
+      _hasSeenFingerspelling = _hasSeenFingerspelling =
+          prefs.getBool('has_seen_fingerspelling_$userId') ?? false;
+      
+      // Logging for debugging purposes
       print("SESSION RESTORED: Welcome back, ${_user?.firstName}");
     } catch (e) {
       print("SESSION EXPIRED: $e");
@@ -90,9 +106,7 @@ class UserViewModel extends ChangeNotifier {
 
       if (_token != null) {
         await http.post(
-          Uri.parse(
-            ApiConstants.logout,
-          ), 
+          Uri.parse(ApiConstants.logout),
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer $_token',
