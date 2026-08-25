@@ -1,4 +1,5 @@
 import 'package:auri_sign/core/widgets/button.dart';
+import 'package:auri_sign/core/widgets/loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -44,10 +45,19 @@ class GreetingsPage extends StatelessWidget {
                 height: 50.h,
                 child: Button(
                   onPressed: () async {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (context) =>
+                          const Center(child: LoadingIndicator()),
+                    );
+                    await Future.delayed(const Duration(milliseconds: 1800));
                     final prefs = await SharedPreferences.getInstance();
                     final token = prefs.getString('auth_token') ?? '';
 
                     if (context.mounted) {
+                      Navigator.of(context).pop();
+
                       Navigator.pushReplacementNamed(
                         context,
                         '/greetings-fingerspelling',
