@@ -213,6 +213,7 @@ class _ProfilingScreenState extends State<ProfilingScreen> {
             ),
             Expanded(
               child: PageView.builder(
+                physics: const NeverScrollableScrollPhysics(),
                 controller: _controller,
                 itemCount: currentData.length,
                 onPageChanged: (index) {
@@ -317,18 +318,17 @@ class _ProfilingScreenState extends State<ProfilingScreen> {
                     if (optionData.containsKey('image'))
                       Image.asset(
                         optionData['image'],
-                        width: 24.w,
-                        height: 24.w,
+                        width: 30.w,
+                        height: 30.w,
+                        fit: BoxFit.contain,
                       )
                     else if (optionData.containsKey('icon'))
                       Icon(
                         optionData['icon'],
-                        size: 24.w,
+                        size: 30.w,
                         color: const Color(0xFFE9B63B),
                       ),
-
                     SizedBox(width: 15.w),
-
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
