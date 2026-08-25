@@ -70,9 +70,17 @@ class ProfilePage extends StatelessWidget {
       context: context,
       builder: (BuildContext dialogContext) => LogoutDialog(
         onConfirm: () async {
-          Navigator.pop(dialogContext);
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => const Center(
+              child: CircularProgressIndicator(color: Color(0xFFFFB800)),
+            ),
+          );
+          await Future.delayed(const Duration(milliseconds: 1800));
           await userVM.logout();
           if (context.mounted) {
+            Navigator.of(context).pop();
             context.read<LoginViewModel>().clearSession();
             Navigator.pushAndRemoveUntil(
               context,
