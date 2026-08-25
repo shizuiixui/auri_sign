@@ -14,10 +14,10 @@ InputDecoration textInputField(
     contentPadding: const EdgeInsets.symmetric(horizontal: 20),
     isDense: true,
     hintText: hintText,
-    hintStyle: TextStyle(fontSize: 13.sp, fontFamily: 'Inter',color: Color(0XFFB0B0B0)),
+    hintStyle: TextStyle(fontSize: 14.sp, fontFamily: 'Inter',color: Color(0XFFB0B0B0)),
 
     prefixIcon: prefixIcon != null
-        ? Icon(prefixIcon, size: 13.sp, color: const Color(0XFFB0B0B0))
+        ? Icon(prefixIcon, size: 14.sp, color: const Color(0XFFB0B0B0))
         : null,
     prefixIconConstraints: BoxConstraints(
       minWidth: 48,
