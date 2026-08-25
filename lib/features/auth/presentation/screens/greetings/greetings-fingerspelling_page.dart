@@ -114,28 +114,41 @@ class _GreetingFingerspellingPageState
       ..setUserAgent(
         "Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Mobile Safari/537.36",
       )
-      // 1. ADD THIS: The bridge between JavaScript and Flutter
+      // The bridge between JavaScript and Flutter
       ..addJavaScriptChannel(
         'MobileChannel',
         onMessageReceived: (JavaScriptMessage message) {
           if (message.message == 'navigateToHome') {
-            // This triggers when the web app tries to leave the fingerspelling page.
-            // Change '/home' to whatever your mobile dashboard route is named!
-            Navigator.pushReplacementNamed(context, '/home');
+            // Turn the loading overlay back on
+            if (mounted) {
+              setState(() {
+                _isLoading = true;
+              });
+            }
+
+            Future.delayed(const Duration(milliseconds: 600), () {
+              if (mounted) {
+                Navigator.pushReplacementNamed(context, '/home');
+              }
+            });
           }
         },
       )
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (String url) {
+            if (mounted) {
+              setState(() {
+                _isLoading = true;
+              });
+            }
             _injectCSS(webViewController);
           },
           onPageFinished: (String url) {
             _injectCSS(webViewController);
-
-            // 2. UPDATE THIS: Token Injection AND React Router Interception
+            // Handle Authentication and Routing Interception
             webViewController.runJavaScript("""
-              // Handle Authentication
+             // Handle Authentication
               localStorage.setItem('token', '${widget.userToken}');
               if (window.location.pathname === '/login' || window.location.pathname === '/') {
                  window.location.href = '/greeting-fingerspelling';
@@ -145,32 +158,31 @@ class _GreetingFingerspellingPageState
               const originalPush = window.history.pushState;
               const originalReplace = window.history.replaceState;
 
-              // Function to check where React is trying to go
               function notifyFlutter(url) {
-                // Adjust these paths depending on what your React web app calls its dashboard
                 if (url.includes('/home') || url.includes('/dashboard') || url.includes('/main') || url === '/') {
                   MobileChannel.postMessage('navigateToHome');
                 }
               }
 
-              // Intercept React's pushState
               window.history.pushState = function(state, unused, url) {
                 originalPush.apply(window.history, arguments);
                 notifyFlutter(url);
               };
 
-              // Intercept React's replaceState
               window.history.replaceState = function(state, unused, url) {
                 originalReplace.apply(window.history, arguments);
                 notifyFlutter(url);
               };
             """);
 
-            if (mounted) {
-              setState(() {
-                _isLoading = false;
-              });
-            }
+            // 2. Add an 800ms buffer to hide the web rendering process
+            Future.delayed(const Duration(milliseconds: 800), () {
+              if (mounted) {
+                setState(() {
+                  _isLoading = false;
+                });
+              }
+            });
           },
           onWebResourceError: (WebResourceError error) {
             debugPrint("WebView Error: ${error.description}");
