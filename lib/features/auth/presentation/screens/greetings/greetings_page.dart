@@ -1,5 +1,4 @@
 import 'package:auri_sign/core/widgets/button.dart';
-import 'package:auri_sign/core/widgets/loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
