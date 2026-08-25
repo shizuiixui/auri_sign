@@ -413,16 +413,20 @@ class _SignupFormState extends State<SignupForm> {
                       ListenableBuilder(
                         listenable: signupVM,
                         builder: (context, child) {
+                          if (signupVM.isLoading) {
+                            return const Center(
+                              child: CircularProgressIndicator(
+                                color: Color(0xFFE9B63B),
+                              ),
+                            );
+                          }
+                          // Start Learning Button
                           return SizedBox(
                             width: double.infinity,
                             height: 50.h,
                             child: Button(
-                              text: signupVM.isLoading
-                                  ? "Loading..."
-                                  : "Start Learning",
+                              text: "Start Learning",
                               onPressed: () async {
-                                if (signupVM.isLoading) return;
-
                                 if (!_signupFormKey.currentState!.validate())
                                   return;
 
