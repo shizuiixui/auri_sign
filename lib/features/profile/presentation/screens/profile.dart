@@ -1,3 +1,5 @@
+import 'package:auri_sign/features/profile/presentation/screens/achievements.dart';
+import 'package:auri_sign/features/profile/viewmodels/achievements_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -309,7 +311,6 @@ class ProfilePage extends StatelessWidget {
 
           SizedBox(height: 20.h),
 
-          /*
           const ProfileSectionHeader(title: "Achievements"),
 
           ProfileMenuTile(
@@ -328,7 +329,6 @@ class ProfilePage extends StatelessWidget {
           ),
 
           SizedBox(height: 40.h),
-          */
           Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(30),
@@ -365,7 +365,7 @@ class ProfilePage extends StatelessWidget {
           ),
 
           SizedBox(height: 10.h),
-          
+
           TextButton(
             onPressed: () {},
             child: Text(
