@@ -1,3 +1,4 @@
+import 'package:auri_sign/core/widgets/loading_indicator.dart';
 import 'package:auri_sign/features/profile/presentation/screens/achievements.dart';
 import 'package:auri_sign/features/profile/viewmodels/achievements_view_model.dart';
 import 'package:flutter/material.dart';
@@ -71,8 +72,15 @@ class ProfilePage extends StatelessWidget {
       context: parentContext,
       builder: (context) => LogoutDialog(
         onConfirm: () async {
+          showDialog(
+            context: parentContext,
+            barrierDismissible: false,
+            builder: (context) => const Center(child: LoadingIndicator()),
+          );
+          await Future.delayed(const Duration(milliseconds: 1800));
           await viewModel.logout();
           if (parentContext.mounted) {
+            Navigator.of(context).pop(); // Close dialog
             parentContext.read<LoginViewModel>().clearSession();
             Navigator.pushAndRemoveUntil(
               parentContext,
