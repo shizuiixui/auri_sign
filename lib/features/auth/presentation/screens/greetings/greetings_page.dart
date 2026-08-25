@@ -29,6 +29,7 @@ class GreetingsPage extends StatelessWidget {
               Text(
                 "Hi, $firstName! Your Sign Language Journey Starts Here ",
                 style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500),
+                textAlign: TextAlign.center,
               ),
               SizedBox(height: 10.h),
               Text(
