@@ -48,8 +48,11 @@ class GreetingsPage extends StatelessWidget {
                     showDialog(
                       context: context,
                       barrierDismissible: false,
-                      builder: (context) =>
-                          const Center(child: LoadingIndicator()),
+                      builder: (context) => const Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFFFFB800),
+                        ),
+                      ),
                     );
                     await Future.delayed(const Duration(milliseconds: 1800));
                     final prefs = await SharedPreferences.getInstance();
