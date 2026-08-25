@@ -3,7 +3,6 @@ import 'package:auri_sign/features/profile/viewmodels/achievements_view_model.da
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-// Ensure plugin is available for the test
 
 // Screens
 import 'package:auri_sign/features/profile/presentation/screens/change_password_page.dart';
@@ -20,6 +19,7 @@ import 'package:auri_sign/features/profile/viewmodels/notification_schedule_view
 // Widgets
 import '/core/widgets/user_stats.dart';
 import 'package:auri_sign/features/profile/presentation/widgets/profile_helpers.dart';
+import 'package:auri_sign/features/profile/presentation/widgets/logout_dialog.dart';
 
 // Use Cases
 import 'package:auri_sign/features/profile/domain/usecases/set_schedule_enabled_usecase.dart';
@@ -62,95 +62,26 @@ class ProfilePage extends StatelessWidget {
     }
   }
 
+  // Logout Confirmation Dialog
   void _showLogoutConfirmation(
     BuildContext parentContext,
     UserViewModel viewModel,
   ) {
     showDialog(
       context: parentContext,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.r),
-          ),
-          contentPadding: EdgeInsets.zero,
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: EdgeInsets.all(24.0.w),
-                child: Text(
-                  "Are you sure you want to log out of your account?",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 15.sp,
-                    fontFamily: "Poppins",
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Divider(height: 1.h, thickness: 1.h, color: Colors.grey.shade300),
-              SizedBox(
-                width: double.infinity,
-                child: TextButton(
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 16.h),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.zero,
-                    ),
-                  ),
-                  onPressed: () async {
-                    Navigator.pop(dialogContext);
-                    await viewModel.logout();
-                    if (parentContext.mounted) {
-                      parentContext.read<LoginViewModel>().clearSession();
-                      Navigator.pushAndRemoveUntil(
-                        parentContext,
-                        MaterialPageRoute(
-                          builder: (context) => const WelcomePage(),
-                        ),
-                        (route) => false,
-                      );
-                    }
-                  },
-                  child: Text(
-                    "Log out",
-                    style: TextStyle(
-                      color: Colors.redAccent,
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-              Divider(height: 1.h, thickness: 1.h, color: Colors.grey.shade300),
-              SizedBox(
-                width: double.infinity,
-                child: TextButton(
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 16.h),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(
-                        bottom: Radius.circular(20.r),
-                      ),
-                    ),
-                  ),
-                  onPressed: () => Navigator.pop(dialogContext),
-                  child: Text(
-                    "Cancel",
-                    style: TextStyle(
-                      color: Colors.black87,
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+      builder: (context) => LogoutDialog(
+        onConfirm: () async {
+          await viewModel.logout();
+          if (parentContext.mounted) {
+            parentContext.read<LoginViewModel>().clearSession();
+            Navigator.pushAndRemoveUntil(
+              parentContext,
+              MaterialPageRoute(builder: (context) => const WelcomePage()),
+              (route) => false,
+            );
+          }
+        },
+      ),
     );
   }
 
