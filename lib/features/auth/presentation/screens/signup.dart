@@ -420,7 +420,6 @@ class _SignupFormState extends State<SignupForm> {
                               ),
                             );
                           }
-                          // Start Learning Button
                           return SizedBox(
                             width: double.infinity,
                             height: 50.h,
@@ -441,7 +440,6 @@ class _SignupFormState extends State<SignupForm> {
                                   );
                                   return;
                                 }
-
                                 await signupVM.signup(
                                   firstName: firstNameController.text.trim(),
                                   lastName: lastNameController.text.trim(),
@@ -458,25 +456,92 @@ class _SignupFormState extends State<SignupForm> {
                                 );
 
                                 if (signupVM.errorMessage != null) {
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(signupVM.errorMessage!),
-                                        backgroundColor: Colors.red,
-                                      ),
-                                    );
-                                  }
+                                  if (!context.mounted) return;
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(signupVM.errorMessage!),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
                                 } else {
-                                  if (context.mounted) {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => VerifyEmail(
-                                          email: emailController.text.trim(),
+                                  // Success Account Creation Dialog
+                                  if (!context.mounted) return;
+                                  showDialog(
+                                    context: context,
+                                    barrierDismissible: false,
+                                    builder: (BuildContext dialogContext) {
+                                      return AlertDialog(
+                                        backgroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            20.r,
+                                          ),
                                         ),
-                                      ),
-                                    );
-                                  }
+                                        title: Text(
+                                          "Account Created!",
+                                          style: TextStyle(
+                                            fontSize: 22.sp,
+                                            fontFamily: 'Poppins',
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                        content: Text(
+                                          "Before you can log in and start learning, you must first verify your account. Continue to the next screen for instructions.",
+                                          style: TextStyle(
+                                            fontSize: 15.sp,
+                                            fontFamily: 'Inter',
+                                            color: Colors.grey.shade700,
+                                            height: 1.5,
+                                          ),
+                                        ),
+                                        actions: [
+                                          SizedBox(
+                                            width: double.infinity,
+                                            child: TextButton(
+                                              style: TextButton.styleFrom(
+                                                backgroundColor: const Color(
+                                                  0xFFE9B63B,
+                                                ),
+                                                padding: EdgeInsets.symmetric(
+                                                  vertical: 12.h,
+                                                ),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        12.r,
+                                                      ),
+                                                ),
+                                              ),
+                                              onPressed: () {
+                                                Navigator.pop(dialogContext);
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        VerifyEmail(
+                                                          email: emailController
+                                                              .text
+                                                              .trim(),
+                                                        ),
+                                                  ),
+                                                );
+                                              },
+                                              child: Text(
+                                                "Continue",
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 16.sp,
+                                                  fontFamily: 'Poppins',
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
                                 }
                               },
                             ),
