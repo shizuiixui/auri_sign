@@ -440,6 +440,7 @@ class _SignupFormState extends State<SignupForm> {
                                   );
                                   return;
                                 }
+
                                 await signupVM.signup(
                                   firstName: firstNameController.text.trim(),
                                   lastName: lastNameController.text.trim(),
@@ -464,81 +465,112 @@ class _SignupFormState extends State<SignupForm> {
                                     ),
                                   );
                                 } else {
-                                  // Success Account Creation Dialog
                                   if (!context.mounted) return;
                                   showDialog(
                                     context: context,
                                     barrierDismissible: false,
                                     builder: (BuildContext dialogContext) {
-                                      return AlertDialog(
-                                        backgroundColor: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            20.r,
-                                          ),
-                                        ),
-                                        title: Text(
-                                          "Account Created!",
-                                          style: TextStyle(
-                                            fontSize: 22.sp,
-                                            fontFamily: 'Poppins',
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black87,
-                                          ),
-                                        ),
-                                        content: Text(
-                                          "Before you can log in and start learning, you must first verify your account. Continue to the next screen for instructions.",
-                                          style: TextStyle(
-                                            fontSize: 15.sp,
-                                            fontFamily: 'Inter',
-                                            color: Colors.grey.shade700,
-                                            height: 1.5,
-                                          ),
-                                        ),
-                                        actions: [
-                                          SizedBox(
-                                            width: double.infinity,
-                                            child: TextButton(
-                                              style: TextButton.styleFrom(
-                                                backgroundColor: const Color(
-                                                  0xFFE9B63B,
-                                                ),
-                                                padding: EdgeInsets.symmetric(
-                                                  vertical: 12.h,
-                                                ),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                        12.r,
-                                                      ),
-                                                ),
-                                              ),
-                                              onPressed: () {
-                                                Navigator.pop(dialogContext);
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        VerifyEmail(
-                                                          email: emailController
-                                                              .text
-                                                              .trim(),
-                                                        ),
-                                                  ),
-                                                );
-                                              },
-                                              child: Text(
-                                                "Continue",
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 16.sp,
-                                                  fontFamily: 'Poppins',
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
+                                      bool isNavigating = false;
+                                      return StatefulBuilder(
+                                        builder: (context, setStateDialog) {
+                                          return AlertDialog(
+                                            backgroundColor: Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(20.r),
                                             ),
-                                          ),
-                                        ],
+                                            title: Text(
+                                              "Account Created!",
+                                              style: TextStyle(
+                                                fontSize: 22.sp,
+                                                fontFamily: 'Poppins',
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black87,
+                                              ), textAlign: TextAlign.center,
+                                            ),
+                                            content: Text(
+                                              "Before you can log in and start learning, you must first verify your account. Continue to the next screen for instructions.",
+                                              style: TextStyle(
+                                                fontSize: 15.sp,
+                                                fontFamily: 'Inter',
+                                                color: Colors.grey.shade700,
+                                                height: 1.5,
+                                              ), textAlign: TextAlign.center,
+                                            ),
+                                            actions: [
+                                              SizedBox(
+                                                width: double.infinity,
+                                                child: TextButton(
+                                                  style: TextButton.styleFrom(
+                                                    backgroundColor:
+                                                        const Color(0xFFE9B63B),
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                          vertical: 12.h,
+                                                        ),
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            12.r,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                  onPressed: isNavigating
+                                                      ? null
+                                                      : () async {
+                                                          setStateDialog(() {
+                                                            isNavigating = true;
+                                                          });
+                                                          await Future.delayed(
+                                                            const Duration(
+                                                              milliseconds: 600,
+                                                            ),
+                                                          );
+                                                          if (!context.mounted)
+                                                            return;
+                                                          Navigator.pop(
+                                                            dialogContext,
+                                                          );
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  VerifyEmail(
+                                                                    email: emailController
+                                                                        .text
+                                                                        .trim(),
+                                                                  ),
+                                                            ),
+                                                          );
+                                                        },
+                                                  child: isNavigating
+                                                      ? SizedBox(
+                                                          height: 20.h,
+                                                          width: 20.h,
+                                                          child:
+                                                              const CircularProgressIndicator(
+                                                                color: Colors
+                                                                    .white,
+                                                                strokeWidth:
+                                                                    2.5,
+                                                              ),
+                                                        )
+                                                      : Text(
+                                                          "Continue",
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 16.sp,
+                                                            fontFamily:
+                                                                'Poppins',
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                        ),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        },
                                       );
                                     },
                                   );
