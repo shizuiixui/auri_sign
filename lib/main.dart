@@ -21,11 +21,7 @@ import 'package:auri_sign/features/profile/viewmodels/badges_view_model.dart';
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 @pragma('vm:entry-point')
-void notificationTapBackground(NotificationResponse notificationResponse) {
-  debugPrint(
-    "Notification tapped in background: ${notificationResponse.payload}",
-  );
-}
+void notificationTapBackground(NotificationResponse notificationResponse) {}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,10 +37,7 @@ void main() async {
   [];
   await flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
-    onDidReceiveNotificationResponse: (details) {
-      // Handle foreground taps
-      debugPrint("Notification tapped in foreground: ${details.payload}");
-    },
+    onDidReceiveNotificationResponse: (details) {},
     onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
   );
 
