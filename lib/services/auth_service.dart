@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:auri_sign/config/api_constants.dart';
 
+// AuthService API class handle
 class AuthService {
   final Dio _dio = Dio(
     BaseOptions(
@@ -20,6 +21,7 @@ class AuthService {
     }
   }
 
+  // Verify OTP API call
   Future<Response> verifyOTP({
     required String email,
     required String otp,
@@ -34,6 +36,7 @@ class AuthService {
     }
   }
 
+  // Signup API call
   Future<Response> signup({
     required String firstName,
     required String lastName,
@@ -72,6 +75,7 @@ class AuthService {
     }
   }
 
+  // Login API call
   Future<Response> login({
     required String email,
     required String password,
