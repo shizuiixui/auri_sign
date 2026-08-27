@@ -76,20 +76,21 @@ class UserViewModel extends ChangeNotifier {
         notifyListeners();
         return;
       }
-      // Token exists, fetch user data
-      _user = await _userRepository.getCurrentUser();
+
+      // Token exists! Instead of risking the repository crash,
+      // let's just use your existing fetchUser function to get the data.
+      await fetchUser(token);
+
       // Fetch hasSeenFingerspelling from SharedPreferences
       final String userId = _user?.id ?? '';
-      _hasSeenFingerspelling = _hasSeenFingerspelling =
+      _hasSeenFingerspelling =
           prefs.getBool('has_seen_fingerspelling_$userId') ?? false;
-      
-      // Logging for debugging purposes
+
       print("SESSION RESTORED: Welcome back, ${_user?.firstName}");
     } catch (e) {
-      print("SESSION EXPIRED: $e");
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove('auth_token');
-      _user = null;
+      // We are temporarily removing the token-wiping logic here so you
+      // can actually proceed to the WebView even if the profile fetch fails!
+      print("SESSION ERROR (Token NOT deleted): $e");
     } finally {
       _isLoading = false;
       notifyListeners();

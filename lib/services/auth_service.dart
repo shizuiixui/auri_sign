@@ -5,14 +5,16 @@ class AuthService {
   final Dio _dio = Dio(
     BaseOptions(
       baseUrl: ApiConstants.baseUrl,
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 10),
+      connectTimeout: const Duration(seconds: 60),
+      receiveTimeout: const Duration(seconds: 60),
+      sendTimeout: const Duration(seconds: 60),
+      headers: {'Content-Type': 'application/json'},
     ),
   );
 
   Future<Response> sendOTP({required String email}) async {
     try {
-      return await _dio.post('/otp/sendOTP', data: {'email': email});
+      return await _dio.post('/api/otp/sendOTP', data: {'email': email});
     } catch (e) {
       rethrow;
     }
@@ -24,7 +26,7 @@ class AuthService {
   }) async {
     try {
       return await _dio.post(
-        '/otp/verifyOTP',
+        '/api/otp/verifyOTP',
         data: {'email': email, 'otp': otp},
       );
     } catch (e) {
@@ -44,7 +46,6 @@ class AuthService {
     int? dailyTime,
   }) async {
     try {
-      // Base user data
       final Map<String, dynamic> requestData = {
         'firstName': firstName,
         'lastName': lastName,
@@ -53,7 +54,6 @@ class AuthService {
         'confirmPassword': confirmPassword,
       };
 
-      // Profiling data
       if (learnerType != null &&
           motivation != null &&
           communicationContext != null) {
@@ -65,8 +65,7 @@ class AuthService {
         };
       }
 
-      // Send via Dio
-      final response = await _dio.post('/auth/signup', data: requestData);
+      final response = await _dio.post('/api/auth/signup', data: requestData);
       return response;
     } catch (e) {
       rethrow;
@@ -79,7 +78,7 @@ class AuthService {
   }) async {
     try {
       final response = await _dio.post(
-        '/auth/login',
+        '/api/auth/login',
         data: {'email': email, 'password': password},
       );
       return response;

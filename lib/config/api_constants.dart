@@ -1,33 +1,29 @@
 class ApiConstants {
-  static const String ipAddress =
-      "192.168.100.10"; // change with your laptop IP address
-  static const String port = "5000";
-
   // Base URL
-  static const String baseUrl = 'http://localhost:5000/api';
-
+  static const String baseUrl = 'https://aurisign-backend.onrender.com';
   // Authentication
-  static const String login = "$baseUrl/auth/login";
-  static const String register = "$baseUrl/auth/register";
-  static const String logout = "$baseUrl/user/logout";
+  static const String login = "$baseUrl/api/auth/login";
+  static const String register = "$baseUrl/api/auth/register";
+  static const String logout = "$baseUrl/api/auth/logout";
 
   // Dictionary
-  static const String dictionary = "$baseUrl/dictionary";
+  static const String dictionary = "$baseUrl/api/dictionary";
 
   // Lessons
-  static const String lessons = "$baseUrl/lessons";
+  static const String lessons = "$baseUrl/api/lessons";
 
   // Profile
-  static const String userProfile = "$baseUrl/user/me";
-  static const String profile = "$baseUrl/user/profile";
-  static const String updateName = "$baseUrl/user/update-name";
-  static const String updateEmail = "$baseUrl/user/update-email";
-  static const String updatePassword = "$baseUrl/user/update-password";
+  static const String userProfile = "$baseUrl/api/user/me";
+  static const String profile = "$baseUrl/api/user/profile";
+  static const String updateName = "$baseUrl/api/user/update-name";
+  static const String updateEmail = "$baseUrl/api/user/update-email";
+  static const String updatePassword = "$baseUrl/api/user/update-password";
 
   // AI Gesture WebView
-  static const String webBaseUrl = 'http://127.0.0.1:5173';
+  static const String webBaseUrl = 'https://auri-sign-web.vercel.app';
 
   static const String gestureWebviewUrl = '$webBaseUrl/ai_gesture/mobile';
+
   static String lessonWebviewUrl(String category, String lessonId) {
     return '$webBaseUrl/category/${category.toLowerCase()}/lesson/$lessonId';
   }

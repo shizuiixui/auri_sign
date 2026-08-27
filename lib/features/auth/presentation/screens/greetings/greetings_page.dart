@@ -53,13 +53,21 @@ class GreetingsPage extends StatelessWidget {
                         ),
                       ),
                     );
+
                     await Future.delayed(const Duration(milliseconds: 1800));
+
+                    // THE FIX: Grab it from the disk where LoginViewModel saved it!
                     final prefs = await SharedPreferences.getInstance();
-                    final token = prefs.getString('auth_token') ?? '';
+                    final String token = prefs.getString('auth_token') ?? '';
+
+                    print(
+                      "CHECKING DISK FOR TOKEN: $token",
+                    ); // Let's verify it!
 
                     if (context.mounted) {
-                      Navigator.of(context).pop();
+                      Navigator.of(context).pop(); // Close dialog
 
+                      // Pass the token to your router
                       Navigator.pushReplacementNamed(
                         context,
                         '/greetings-fingerspelling',

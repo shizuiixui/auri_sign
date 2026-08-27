@@ -5,6 +5,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:auri_sign/config/api_constants.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class GreetingFingerspellingPage extends StatefulWidget {
   final String userToken;
@@ -34,10 +35,8 @@ class _GreetingFingerspellingPageState
     super.dispose();
   }
 
-  // CSS Injection to hide web layout elements and make it feel native
   void _injectCSS(WebViewController controller) {
     const String css = """
-      /* Hide standard web layout and UI components immediately */
       nav, header, footer, .navbar, .bottom-nav, .sidebar, 
       .badge, .streak-container, [class*='badge'], [class*='streak'] { 
         display: none !important; 
@@ -46,50 +45,35 @@ class _GreetingFingerspellingPageState
         pointer-events: none !important;
         opacity: 0 !important;
       }
-      
-      .container-fluid, .container {
-        padding: 0 !important;
-        margin: 0 !important;
-      }
-      
-      body {
-        background-color: #fff !important; 
-        overflow-x: hidden;
-      }
+      .container-fluid, .container { padding: 0 !important; margin: 0 !important; }
+      body { background-color: #fff !important; overflow-x: hidden; }
     """;
 
-    controller.runJavaScript("""
+    controller
+        .runJavaScript("""
       (function() {
-        function injectMobileStyles() {
-          if (!document.getElementById('injected-mobile-css')) {
-            var style = document.createElement('style');
-            style.id = 'injected-mobile-css';
-            style.innerHTML = `$css`;
-            document.head.appendChild(style);
-          }
-        }
-
-        // 1. Inject immediately on load
-        injectMobileStyles();
-
-        // 2. Watch for the web app wiping out the head or re-rendering
-        var observer = new MutationObserver(function(mutations) {
-          injectMobileStyles();
-        });
-        
-        // Target the whole document to catch any routing changes
-        observer.observe(document.documentElement, { 
-          childList: true, 
-          subtree: true 
-        });
+        var style = document.createElement('style');
+        style.innerHTML = `$css`;
+        document.head.appendChild(style);
       })();
-    """);
+    """)
+        .catchError((_) {});
   }
 
   Future<void> _initWebView() async {
     await [Permission.camera, Permission.microphone].request();
+    if (!mounted) return;
 
-    const String targetUrl = ApiConstants.greetingFingerspellingWebviewUrl;
+    final prefs = await SharedPreferences.getInstance();
+    final String effectiveToken = widget.userToken.isNotEmpty
+        ? widget.userToken
+        : (prefs.getString('auth_token') ?? '');
+
+    // THE MAGIC BULLET: Just pass the token exactly how your leader set it up!
+    final String targetUrl =
+        "${ApiConstants.greetingFingerspellingWebviewUrl}?token=$effectiveToken";
+
+    print("TESTING URL: $targetUrl");
 
     late final PlatformWebViewControllerCreationParams params;
     if (WebViewPlatform.instance is AndroidWebViewPlatform) {
@@ -105,101 +89,79 @@ class _GreetingFingerspellingPageState
       final androidController =
           webViewController.platform as AndroidWebViewController;
       androidController.setMediaPlaybackRequiresUserGesture(false);
-      androidController.setOnPlatformPermissionRequest((request) {
-        request.grant();
+      androidController.setOnPlatformPermissionRequest(
+        (request) => request.grant(),
+      );
+    }
+
+    void handleExit() {
+      if (mounted) setState(() => _isLoading = true);
+      context.read<UserViewModel>().completeFingerspelling();
+      Future.delayed(const Duration(milliseconds: 600), () {
+        if (mounted) Navigator.pushReplacementNamed(context, '/home');
       });
     }
 
     webViewController
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0x00000000))
+      ..setBackgroundColor(Colors.white)
       ..setUserAgent(
-        "Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Mobile Safari/537.36",
+        "Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 AuriSignMobile",
       )
-      // The bridge between JavaScript and Flutter
       ..addJavaScriptChannel(
         'MobileChannel',
-        onMessageReceived: (JavaScriptMessage message) {
-          if (message.message == 'navigateToHome') {
-            // Turn the loading overlay back on
-            if (mounted) {
-              setState(() {
-                _isLoading = true;
-              });
-            }
-            // To mark the finger spelling as completed in SharedPref
-            context.read<UserViewModel>().completeFingerspelling();
-
-            Future.delayed(const Duration(milliseconds: 600), () {
-              if (mounted) {
-                Navigator.pushReplacementNamed(context, '/home');
-              }
-            });
-          }
-        },
+        onMessageReceived: (m) => handleExit(),
+      )
+      ..addJavaScriptChannel(
+        'FlutterChannel',
+        onMessageReceived: (m) => handleExit(),
       )
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (String url) {
-            if (mounted) {
-              setState(() {
-                _isLoading = true;
-              });
-            }
-            _injectCSS(webViewController);
+            if (mounted) setState(() => _isLoading = true);
           },
           onPageFinished: (String url) {
             _injectCSS(webViewController);
-            // Handle Authentication and Routing Interception
-            webViewController.runJavaScript("""
-             // Handle Authentication
-              localStorage.setItem('token', '${widget.userToken}');
-              if (window.location.pathname === '/login' || window.location.pathname === '/') {
-                 window.location.href = '/greeting-fingerspelling';
-              }
 
-              // Handle Routing Interception
-              const originalPush = window.history.pushState;
-              const originalReplace = window.history.replaceState;
-
-              function notifyFlutter(url) {
-                if (url.includes('/home') || url.includes('/dashboard') || url.includes('/main') || url === '/') {
-                  MobileChannel.postMessage('navigateToHome');
+            // Just the history patcher to know when the user exits back to Flutter
+            webViewController
+                .runJavaScript("""
+              (function() {
+                if (!window.__historyPatched) {
+                  const originalPush = window.history.pushState;
+                  const originalReplace = window.history.replaceState;
+                  function notifyFlutter(navUrl) {
+                    if (navUrl && (navUrl.includes('/home') || navUrl === '/')) {
+                      if (window.MobileChannel) MobileChannel.postMessage('navigateToHome');
+                      if (window.FlutterChannel) FlutterChannel.postMessage('navigateToHome');
+                    }
+                  }
+                  window.history.pushState = function() {
+                    originalPush.apply(window.history, arguments);
+                    notifyFlutter(arguments[2]);
+                  };
+                  window.history.replaceState = function() {
+                    originalReplace.apply(window.history, arguments);
+                    notifyFlutter(arguments[2]);
+                  };
+                  window.__historyPatched = true;
                 }
-              }
+              })();
+            """)
+                .catchError((_) {});
 
-              window.history.pushState = function(state, unused, url) {
-                originalPush.apply(window.history, arguments);
-                notifyFlutter(url);
-              };
-
-              window.history.replaceState = function(state, unused, url) {
-                originalReplace.apply(window.history, arguments);
-                notifyFlutter(url);
-              };
-            """);
-
-            // 2. Add an 800ms buffer to hide the web rendering process
-            Future.delayed(const Duration(milliseconds: 800), () {
-              if (mounted) {
-                setState(() {
-                  _isLoading = false;
-                });
-              }
+            Future.delayed(const Duration(milliseconds: 600), () {
+              if (mounted) setState(() => _isLoading = false);
             });
           },
-          onWebResourceError: (WebResourceError error) {
-            debugPrint("WebView Error: ${error.description}");
-          },
+          onWebResourceError: (error) =>
+              debugPrint("WebView Error: ${error.description}"),
         ),
       )
       ..loadRequest(Uri.parse(targetUrl));
 
-    if (mounted) {
-      setState(() {
-        controller = webViewController;
-      });
-    }
+    if (mounted) setState(() => controller = webViewController);
   }
 
   @override
@@ -220,21 +182,10 @@ class _GreetingFingerspellingPageState
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.black),
-            onPressed: () {
-              setState(() => _isLoading = true);
-              controller?.reload();
-            },
-          ),
-        ],
       ),
       body: Stack(
         children: [
           if (controller != null) WebViewWidget(controller: controller!),
-
-          // Loading Overlay
           if (controller == null || _isLoading)
             Container(
               color: Colors.white,
