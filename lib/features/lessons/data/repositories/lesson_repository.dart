@@ -25,7 +25,7 @@ class LessonRepository {
     }
 
     final encodedCategory = Uri.encodeComponent(categoryName);
-    final url = Uri.parse('$baseUrl/lessons/user/categories/$encodedCategory/progress');
+    final url = Uri.parse('$baseUrl/api/lessons/user/categories/$encodedCategory/progress');
 
     final response = await http.get(url, headers: headers);
 
@@ -39,7 +39,7 @@ class LessonRepository {
 
   Future<List<CategorySummary>> getAllCategoriesProgress() async {
     final headers = await _getHeaders();
-    final url = Uri.parse('$baseUrl/lessons/user/categories/progress');
+    final url = Uri.parse('$baseUrl/api/lessons/user/categories/progress');
 
     debugPrint("🚀 FETCHING CAROUSEL SUMMARY: $url");
 
