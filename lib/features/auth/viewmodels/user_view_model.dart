@@ -200,9 +200,34 @@ class UserViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _userRepository.updatePassword(currentPassword, newPassword);
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token') ?? '';
+
+      final response = await http.put(
+        Uri.parse(
+          ApiConstants.updatePassword,
+        ),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'currentPassword': currentPassword,
+          'newPassword': newPassword,
+        }),
+      );
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        final body = jsonDecode(response.body);
+        throw Exception(
+          body['message'] ?? 'Failed to update password on server.',
+        );
+      }
+
+      debugPrint("SUCCESS: Password updated securely.");
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
+      debugPrint("Change Password Error: $_errorMessage");
       throw Exception(_errorMessage);
     } finally {
       _isLoading = false;
