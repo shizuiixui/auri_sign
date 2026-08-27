@@ -110,7 +110,7 @@ class HomeHeader extends StatelessWidget {
                     icon: Stack(
                       clipBehavior: Clip.none,
                       children: [
-                        Icon(Icons.notifications_outlined, size: 24.sp),
+                        Icon(Icons.notifications, size: 24.sp),
                         if (unreadCount > 0)
                           Positioned(
                             right: -2,
