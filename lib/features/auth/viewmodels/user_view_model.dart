@@ -128,23 +128,62 @@ class UserViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token') ?? '';
+
+      // Update Name via direct HTTP request
       if (_user != null &&
           (newFirstName != _user!.firstName ||
               newLastName != _user!.lastName)) {
-        await _userRepository.updateName(newFirstName, newLastName);
+        final response = await http.put(
+          Uri.parse(ApiConstants.updateName),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          body: jsonEncode({
+            'firstName': newFirstName,
+            'lastName': newLastName,
+          }),
+        );
+
+        if (response.statusCode != 200 && response.statusCode != 201) {
+          final body = jsonDecode(response.body);
+          throw Exception(
+            body['message'] ?? 'Failed to update name on server.',
+          );
+        }
       }
+
+      // Update Email via HTTP request
       if (_user != null && newEmail.isNotEmpty && newEmail != _user!.email) {
-        await _userRepository.updateEmail(newEmail);
+        final emailResponse = await http.put(
+          Uri.parse(ApiConstants.updateEmail),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          body: jsonEncode({'email': newEmail}),
+        );
+
+        if (emailResponse.statusCode != 200) {
+          final body = jsonDecode(emailResponse.body);
+          throw Exception(body['message'] ?? 'Failed to update email.');
+        }
       }
+
       if (_user != null) {
         _user = _user!.copyWith(
           firstName: newFirstName,
           lastName: newLastName,
-          email: newEmail,
+          email: newEmail.isNotEmpty ? newEmail : _user!.email,
         );
       }
+
+      debugPrint("SUCCESS: Profile updated locally and on server.");
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
+      debugPrint("Update Profile Error: $_errorMessage");
       throw Exception(_errorMessage);
     } finally {
       _isLoading = false;

@@ -104,7 +104,7 @@ class BadgesViewModel extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('auth_token') ?? '';
       final response = await _dio.get(
-        '/progress/$userId',
+        '/api/progress/$userId',
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 
@@ -147,6 +147,9 @@ class BadgesViewModel extends ChangeNotifier {
             .toList();
       }
     } catch (e) {
+      if (e is DioException) {
+        debugPrint('🚨 EXACT FAILED BADGES URL: ${e.requestOptions.uri}');
+      }
       debugPrint("Badges Fetch Error: $e");
     } finally {
       isLoading = false;

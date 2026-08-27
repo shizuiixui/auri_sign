@@ -21,7 +21,7 @@ class StreakViewModel extends ChangeNotifier {
       final token = prefs.getString('auth_token') ?? '';
 
       final response = await _dio.get(
-        '/progress/streak/info',
+        '/api/progress/streak/info',
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
       if (response.statusCode == 200 &&
@@ -35,6 +35,7 @@ class StreakViewModel extends ChangeNotifier {
       }
     } catch (e) {
       if (e is DioException) {
+        debugPrint('🚨 EXACT FAILED URL: ${e.requestOptions.uri}');
         if (e.response?.data is Map<String, dynamic>) {
           errorMessage =
               e.response?.data['message'] ?? 'Network error fetching streak.';
