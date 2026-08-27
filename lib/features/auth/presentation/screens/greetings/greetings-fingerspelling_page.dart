@@ -35,6 +35,7 @@ class _GreetingFingerspellingPageState
     super.dispose();
   }
 
+  // CSS Injection
   void _injectCSS(WebViewController controller) {
     const String css = """
       nav, header, footer, .navbar, .bottom-nav, .sidebar, 
@@ -49,6 +50,7 @@ class _GreetingFingerspellingPageState
       body { background-color: #fff !important; overflow-x: hidden; }
     """;
 
+    // JavaScript Injection
     controller
         .runJavaScript("""
       (function() {
@@ -60,6 +62,7 @@ class _GreetingFingerspellingPageState
         .catchError((_) {});
   }
 
+  // Init WebView and handle permissions, token, and navigation
   Future<void> _initWebView() async {
     await [Permission.camera, Permission.microphone].request();
     if (!mounted) return;
@@ -68,12 +71,8 @@ class _GreetingFingerspellingPageState
     final String effectiveToken = widget.userToken.isNotEmpty
         ? widget.userToken
         : (prefs.getString('auth_token') ?? '');
-
-    // THE MAGIC BULLET: Just pass the token exactly how your leader set it up!
     final String targetUrl =
         "${ApiConstants.greetingFingerspellingWebviewUrl}?token=$effectiveToken";
-
-    print("TESTING URL: $targetUrl");
 
     late final PlatformWebViewControllerCreationParams params;
     if (WebViewPlatform.instance is AndroidWebViewPlatform) {
@@ -124,7 +123,7 @@ class _GreetingFingerspellingPageState
           onPageFinished: (String url) {
             _injectCSS(webViewController);
 
-            // Just the history patcher to know when the user exits back to Flutter
+            // Patch history methods to detect navigation to home
             webViewController
                 .runJavaScript("""
               (function() {
