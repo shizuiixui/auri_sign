@@ -20,7 +20,7 @@ class CustomPasswordField extends StatelessWidget {
       controller: controller,
       obscureText: isObscured,
       decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.lock_outline, color: Colors.black87),
+        prefixIcon: const Icon(Icons.lock, color: Colors.black87),
         suffixIcon: IconButton(
           icon: Icon(
             isObscured ? Icons.visibility_off : Icons.visibility,
