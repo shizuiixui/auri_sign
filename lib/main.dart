@@ -1,3 +1,4 @@
+import 'package:auri_sign/features/auth/presentation/viewmodels/forgot_password_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -55,6 +56,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => di.sl<CategoryViewModel>()),
         ChangeNotifierProvider(create: (_) => StreakViewModel()),
         ChangeNotifierProvider(create: (_) => BadgesViewModel()),
+        ChangeNotifierProvider(create: (_) => ForgotPasswordViewModel()),
       ],
       child: const MyApp(),
     ),

@@ -1,10 +1,10 @@
+import 'package:auri_sign/features/auth/presentation/viewmodels/forgot_password_view_model.dart';
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:auri_sign/config/api_constants.dart';
 import '/core/widgets/text_input_field.dart';
 import '/core/utils/validators.dart';
 import '/core/widgets/button.dart';
+import 'package:provider/provider.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -29,34 +29,21 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   Future<void> _sendResetLink() async {
     if (!_formKey.currentState!.validate()) return;
+    final viewModel = context.read<ForgotPasswordViewModel>();
+    final success = await viewModel.requestReset(emailController.text.trim());
 
-    setState(() => _isLoading = true);
-
-    try {
-      final dio = Dio();
-      await dio.post(
-        '${ApiConstants.baseUrl}/password-reset/request',
-        data: {'email': emailController.text.trim()},
+    if (success && mounted) {
+      _controller.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
       );
-
-      if (mounted) {
-        _controller.nextPage(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-        );
-      }
-    } on DioException catch (e) {
-      String errorMsg =
-          e.response?.data['message'] ?? "Failed to send reset link.";
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMsg), backgroundColor: Colors.red),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+    } else if (!success && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(viewModel.errorMessage ?? "Failed to send reset link."),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -102,7 +89,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       ),
                       SizedBox(height: 14.h),
                       Text(
-                        "Please enter the email address associated with your account. We will send a link to reset your password.",
+                        "Enter your email address and we'll send you a link to reset your password.",
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontFamily: 'KantumruyPro-Regular',

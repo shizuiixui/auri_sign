@@ -19,13 +19,14 @@ class ForgotPasswordViewModel extends ChangeNotifier {
     _setLoading(true);
     try {
       final response = await _dio.post(
-        '${ApiConstants.baseUrl}/password-reset/request',
+        '${ApiConstants.baseUrl}/api/password-reset/request',
         data: {'email': email},
       );
       _successMessage = response.data['message'];
       return true;
     } on DioException catch (e) {
-      _errorMessage = e.response?.data['message'] ?? "Too many attempts. Try again later.";
+      _errorMessage =
+          e.response?.data['message'] ?? "Too many attempts. Try again later.";
       return false;
     } finally {
       _setLoading(false);
@@ -37,7 +38,7 @@ class ForgotPasswordViewModel extends ChangeNotifier {
     _setLoading(true);
     try {
       await _dio.get(
-        '${ApiConstants.baseUrl}/password-reset/verify-token',
+        '${ApiConstants.baseUrl}/api/password-reset/verify-token',
         queryParameters: {'token': otp},
       );
       _resetToken = otp;
@@ -56,15 +57,13 @@ class ForgotPasswordViewModel extends ChangeNotifier {
     _setLoading(true);
     try {
       await _dio.post(
-        '${ApiConstants.baseUrl}/password-reset/reset',
-        data: {
-          'token': _resetToken,
-          'newPassword': newPassword,
-        },
+        '${ApiConstants.baseUrl}/api/password-reset/reset',
+        data: {'token': _resetToken, 'newPassword': newPassword},
       );
       return true;
     } on DioException catch (e) {
-      _errorMessage = e.response?.data['message'] ?? "Failed to reset password.";
+      _errorMessage =
+          e.response?.data['message'] ?? "Failed to reset password.";
       return false;
     } finally {
       _setLoading(false);
