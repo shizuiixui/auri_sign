@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:auri_sign/config/api_constants.dart';
 import 'package:auri_sign/features/lessons/data/repositories/lesson_repository.dart';
-import 'package:auri_sign/models/certificate_models.dart';
 import 'package:auri_sign/services/certificate_service.dart';
 import '../models/achievement_category.dart';
 
@@ -126,46 +125,6 @@ class AchievementsViewModel extends ChangeNotifier {
     } catch (e) {
       downloadErrorMessage = e.toString();
       debugPrint('Certificate download error: $e');
-    } finally {
-      isDownloading = false;
-      notifyListeners();
-    }
-  }
-
-  /// Fetches certificate details then verifies blockchain proof.
-  Future<CertificateVerificationDetails?> verifyCertificate(
-    String categoryId,
-    String userID,
-  ) async {
-    isDownloading = true;
-    downloadErrorMessage = null;
-    notifyListeners();
-
-    try {
-      final apiCategoryName = _toApiCategoryName(categoryId);
-
-      final certificate = await _certificateService.getCertificateData(
-        apiCategoryName,
-      );
-
-      final verification = await _certificateService.verifyCertificate(
-        certificate.category,
-        certificate.userID,
-      );
-
-      final result = CertificateVerificationDetails(
-        certificate: certificate,
-        verification: verification,
-      );
-
-      debugPrint('Certificate verification successful: $result');
-
-      notifyListeners();
-      return result;
-    } catch (e) {
-      downloadErrorMessage = e.toString();
-      debugPrint('Certificate verification error: $e');
-      return null;
     } finally {
       isDownloading = false;
       notifyListeners();

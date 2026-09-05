@@ -54,44 +54,6 @@ class CertificateService {
     return Uri.encodeComponent(apiCategoryName);
   }
 
-  Future<CertificateData> getCertificateData(String categoryName) async {
-    try {
-      final token = await _getAuthToken();
-      final encodedCategory = _toEncodedCategory(categoryName);
-
-      final response = await _dio.get(
-        '/certificates/$encodedCategory',
-        options: _authOptions(token),
-      );
-
-      if (response.statusCode == 200) {
-        final body = response.data as Map<String, dynamic>;
-        final certificateJson =
-            (body['certificate'] as Map<String, dynamic>?) ??
-            (body['data'] as Map<String, dynamic>?);
-        if (certificateJson == null) {
-          throw Exception('Invalid certificate response from server.');
-        }
-        return CertificateData.fromJson(certificateJson);
-      }
-
-      throw Exception('Failed to get certificate details. Please try again.');
-    } on DioException catch (e) {
-      if (e.response?.statusCode == 400) {
-        throw Exception('Invalid category requested.');
-      } else if (e.response?.statusCode == 404) {
-        throw Exception(
-          'Certificate not found. Please complete this category first.',
-        );
-      } else if (e.response?.statusCode == 401) {
-        throw Exception('Session expired. Please login again.');
-      } else if (e.response?.statusCode == 500) {
-        throw Exception('Server error while getting certificate details.');
-      }
-      throw Exception('Failed to fetch certificate details: ${e.message}');
-    }
-  }
-
   /// Generates the certificate on the backend, then downloads and opens the PDF
   /// Downloads and opens a certificate PDF for the given category
   Future<void> downloadAndOpenCertificate(
@@ -153,54 +115,6 @@ class CertificateService {
     } catch (e) {
       debugPrint('🚨 GENERAL ERROR: $e');
       throw Exception('Unexpected error while downloading certificate.');
-    }
-  }
-
-  /// Verifies a certificate on the blockchain and returns typed verification data.
-  Future<CertificateVerification> verifyCertificate(
-    String categoryName,
-    String userID,
-  ) async {
-    try {
-      // 1) Read JWT token for authenticated verification request.
-      final token = await _getAuthToken();
-
-      // 2) Normalize category to the exact backend enum/string format.
-      final apiCategoryName = _toApiCategoryName(categoryName);
-
-      // 3) Call verify endpoint to validate off-chain data and on-chain proof.
-      final response = await _dio.post(
-        '/certificates/verify',
-        data: {'userID': userID, 'category': apiCategoryName},
-        options: _authOptions(token),
-      );
-
-      if (response.statusCode == 200) {
-        final body = response.data as Map<String, dynamic>;
-        // 4) Support nested and flat payload formats from backend.
-        final verificationJson =
-            (body['verification'] as Map<String, dynamic>?) ??
-            (body['data'] as Map<String, dynamic>?) ??
-            body;
-        return CertificateVerification.fromJson(verificationJson);
-      }
-
-      throw Exception('Failed to verify certificate. Please try again.');
-    } on DioException catch (e) {
-      if (e.response?.statusCode == 404) {
-        throw Exception('Category not completed yet. Certificate not found.');
-      } else if (e.response?.statusCode == 400) {
-        throw Exception('Invalid category requested.');
-      } else if (e.response?.statusCode == 401) {
-        throw Exception('Session expired. Please login again.');
-      } else if (e.response?.statusCode == 500) {
-        throw Exception('Server error while verifying certificate.');
-      }
-      throw Exception('Failed to verify: ${e.message}');
-    } on Exception {
-      rethrow;
-    } catch (_) {
-      throw Exception('Unexpected error while verifying certificate.');
     }
   }
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:auri_sign/features/profile/presentation/widgets/achievement_helpers.dart';
-import 'package:auri_sign/features/profile/presentation/widgets/certificate_verify_dialog.dart';
 import 'package:auri_sign/features/profile/viewmodels/achievements_view_model.dart';
 import 'package:auri_sign/features/auth/viewmodels/user_view_model.dart';
 import 'package:auri_sign/core/routes/app_router.dart';
@@ -133,7 +132,6 @@ class _AchievementsPageState extends State<AchievementsPage> {
                       totalLessons: category.totalLessons,
                       isDownloading: viewModel.isDownloading,
 
-                      // 1. Make onDownload async
                       onDownload: () async {
                         if (category.completedLessons < category.totalLessons ||
                             category.totalLessons == 0) {
@@ -143,13 +141,11 @@ class _AchievementsPageState extends State<AchievementsPage> {
                           final userId = userVM.user?.id;
 
                           if (userId != null) {
-                            // 2. Pass category.id and await the result
                             await viewModel.downloadCertificate(
                               category.id,
                               userId,
                             );
 
-                            // 3. Ensure the context is safe to use
                             if (!context.mounted) return;
 
                             if (viewModel.downloadErrorMessage != null) {
@@ -176,63 +172,6 @@ class _AchievementsPageState extends State<AchievementsPage> {
                               const SnackBar(
                                 content: Text(
                                   "User ID not available. Please login again.",
-                                ),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          }
-                        }
-                      },
-
-                      // Make onVerify async as well
-                      onVerify: () async {
-                        if (category.completedLessons >=
-                                category.totalLessons &&
-                            category.totalLessons > 0) {
-                          final userVM = context.read<UserViewModel>();
-                          final userId = userVM.user?.id;
-
-                          if (userId != null) {
-                            // Pass category.id and await
-                            final result = await viewModel.verifyCertificate(
-                              category.id,
-                              userId,
-                            );
-
-                            if (!context.mounted) return;
-
-                            if (viewModel.downloadErrorMessage != null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    viewModel.downloadErrorMessage!,
-                                  ),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            } else if (result != null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    "Certificate verified successfully!",
-                                  ),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
-
-                              showDialog(
-                                context: context,
-                                builder: (context) => CertificateVerifyDialog(
-                                  selectedCategory: category.title,
-                                  details: result,
-                                ),
-                              );
-                            }
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  "User information not available. Please login again.",
                                 ),
                                 backgroundColor: Colors.red,
                               ),

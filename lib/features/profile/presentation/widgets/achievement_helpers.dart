@@ -98,7 +98,7 @@ class ExpandedLessonsList extends StatelessWidget {
         lessons.add(
           ActiveLessonStep(
             title: "Lesson $i Completed",
-            subtitle: "Completed", 
+            subtitle: "Completed",
             progress: 1.0,
             number: i,
           ),
@@ -108,7 +108,7 @@ class ExpandedLessonsList extends StatelessWidget {
       }
     }
     lessons.add(const SizedBox(height: 16));
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(children: lessons),
@@ -233,11 +233,7 @@ class LessonCoin extends StatelessWidget {
   final bool isActive;
   final int number;
 
-  const LessonCoin({
-    super.key,
-    required this.isActive,
-    required this.number,
-  });
+  const LessonCoin({super.key, required this.isActive, required this.number});
 
   @override
   Widget build(BuildContext context) {
@@ -285,7 +281,6 @@ class CertificateCard extends StatelessWidget {
   final int completedLessons;
   final int totalLessons;
   final VoidCallback onDownload;
-  final VoidCallback? onVerify;
   final bool isDownloading;
 
   const CertificateCard({
@@ -294,7 +289,6 @@ class CertificateCard extends StatelessWidget {
     required this.completedLessons,
     required this.totalLessons,
     required this.onDownload,
-    this.onVerify,
     this.isDownloading = false,
   });
 
@@ -327,17 +321,22 @@ class CertificateCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.orange.shade50,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: const Color(0xFFFFB800).withOpacity(0.5)),
+                    border: Border.all(
+                      color: const Color(0xFFFFB800).withOpacity(0.5),
+                    ),
                   ),
                   child: Text(
                     categoryName,
                     style: const TextStyle(
-                      fontSize: 12, 
-                      fontWeight: FontWeight.bold, 
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
                       color: Color(0xFFB8860B),
                     ),
                   ),
@@ -345,13 +344,17 @@ class CertificateCard extends StatelessWidget {
                 const SizedBox(height: 12),
                 Text(
                   "$completedLessons/$totalLessons lessons completed",
-                  style: TextStyle(fontSize: 13, color: Colors.grey[700], fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey[700],
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   isCompleted ? "Completed" : "Not yet completed",
                   style: TextStyle(
-                    fontSize: 12, 
+                    fontSize: 12,
                     color: isCompleted ? Colors.green : Colors.grey,
                     fontWeight: FontWeight.bold,
                   ),
@@ -359,7 +362,7 @@ class CertificateCard extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Buttons
           Column(
             children: [
@@ -370,16 +373,8 @@ class CertificateCard extends StatelessWidget {
                 onPressed: isDownloading ? null : onDownload,
                 isLoading: isDownloading,
               ),
-              const SizedBox(height: 8),
-              _ActionButton(
-                text: "Verify",
-                color: Colors.white,
-                textColor: Colors.grey.shade700,
-                borderColor: Colors.grey.shade300,
-                onPressed: (isCompleted && !isDownloading) ? onVerify : null,
-              ),
             ],
-          )
+          ),
         ],
       ),
     );
@@ -430,7 +425,10 @@ class _ActionButton extends StatelessWidget {
               )
             : Text(
                 text,
-                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
       ),
     );
