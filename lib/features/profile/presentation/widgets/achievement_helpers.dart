@@ -276,6 +276,7 @@ class LessonCoin extends StatelessWidget {
 }
 
 // Certificate Card Widget
+// Certificate Card Widget
 class CertificateCard extends StatelessWidget {
   final String categoryName;
   final int completedLessons;
@@ -313,7 +314,8 @@ class CertificateCard extends StatelessWidget {
         ],
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        // 👉 CHANGED THIS to center so the button perfectly aligns with the middle of the text!
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // leftSideInfo
           Expanded(
@@ -363,18 +365,14 @@ class CertificateCard extends StatelessWidget {
             ),
           ),
 
-          // Buttons
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _ActionButton(
-                text: isDownloading ? "Downloading..." : "Download",
-                color: const Color(0xFFFFB800),
-                textColor: Colors.white,
-                onPressed: isDownloading ? null : onDownload,
-                isLoading: isDownloading,
-              ),
-            ],
+          // Button
+          _ActionButton(
+            text: isDownloading ? "Downloading..." : "Download",
+            icon: Icons.download_rounded,
+            color: const Color(0xFFFFB800),
+            textColor: Colors.white,
+            onPressed: isDownloading ? null : onDownload,
+            isLoading: isDownloading,
           ),
         ],
       ),
@@ -383,8 +381,10 @@ class CertificateCard extends StatelessWidget {
 }
 
 // actionButtonHelperForCertificates
+// actionButtonHelperForCertificates
 class _ActionButton extends StatelessWidget {
   final String text;
+  final IconData icon;
   final Color color;
   final Color textColor;
   final Color? borderColor;
@@ -392,7 +392,9 @@ class _ActionButton extends StatelessWidget {
   final bool isLoading;
 
   const _ActionButton({
+    super.key,
     required this.text,
+    required this.icon,
     required this.color,
     required this.textColor,
     this.borderColor,
@@ -403,16 +405,17 @@ class _ActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 110,
-      height: 32,
+      height: 38,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
           foregroundColor: textColor,
           elevation: 0,
           side: borderColor != null ? BorderSide(color: borderColor!) : null,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-          padding: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 14,
+          ),
         ),
         onPressed: onPressed,
         child: isLoading
@@ -420,16 +423,27 @@ class _ActionButton extends StatelessWidget {
                 width: 16,
                 height: 16,
                 child: CircularProgressIndicator(
-                  strokeWidth: 2,
+                  strokeWidth: 2.5,
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               )
-            : Text(
-                text,
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                ),
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    icon,
+                    size: 18,
+                    color: textColor,
+                  ), // Your white download icon
+                  const SizedBox(width: 6),
+                  Text(
+                    text,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
       ),
     );
