@@ -18,6 +18,7 @@ class ApiConstants {
   static const String updateName = "$baseUrl/api/user/update-name";
   static const String updateEmail = "$baseUrl/api/user/update-email";
   static const String updatePassword = "$baseUrl/api/user/update-password";
+  static const String deleteAccount = "$baseUrl/api/user/delete-account";
 
   // AI Gesture WebView
   static const String webBaseUrl = 'https://auri-sign-web.vercel.app';

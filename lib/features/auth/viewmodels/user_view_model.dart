@@ -118,6 +118,51 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
+  // Add the password parameter here
+  Future<void> deleteAccount(String password) async {
+    _isLoading = true;
+    _errorMessage = '';
+    notifyListeners();
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token') ?? '';
+
+      debugPrint(
+        '🚨 DELETE REQUEST TO: ${ApiConstants.baseUrl}/api/user/delete-account',
+      );
+
+      final response = await http.delete(
+        Uri.parse('${ApiConstants.baseUrl}/api/user/delete-account'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        // ADD THE BODY HERE!
+        body: jsonEncode({'password': password}),
+      );
+
+      debugPrint('🚨 STATUS CODE: ${response.statusCode}');
+      debugPrint('🚨 RAW RESPONSE: ${response.body}');
+
+      if (response.statusCode != 200) {
+        final body = jsonDecode(response.body);
+        throw Exception(body['message'] ?? 'Failed to delete account.');
+      }
+
+      await prefs.remove('auth_token');
+
+      debugPrint("SUCCESS: Account deleted successfully.");
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      debugPrint('Delete Account Error: $_errorMessage');
+      throw Exception(_errorMessage);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> updateProfile({
     required String newFirstName,
     required String newLastName,
@@ -204,9 +249,7 @@ class UserViewModel extends ChangeNotifier {
       final token = prefs.getString('auth_token') ?? '';
 
       final response = await http.put(
-        Uri.parse(
-          ApiConstants.updatePassword,
-        ),
+        Uri.parse(ApiConstants.updatePassword),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',

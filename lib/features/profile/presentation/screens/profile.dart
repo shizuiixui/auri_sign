@@ -1,4 +1,5 @@
 import 'package:auri_sign/features/profile/presentation/screens/achievements.dart';
+import 'package:auri_sign/features/profile/presentation/widgets/delete_account_dialog.dart';
 import 'package:auri_sign/features/profile/viewmodels/achievements_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -64,7 +65,7 @@ class ProfilePage extends StatelessWidget {
     }
   }
 
-  // New Logout Confirmation Dialog
+  // Logout Confirmation Dialog
   void _showLogoutConfirmation(BuildContext context, UserViewModel userVM) {
     showDialog(
       context: context,
@@ -87,6 +88,55 @@ class ProfilePage extends StatelessWidget {
               MaterialPageRoute(builder: (context) => const WelcomePage()),
               (route) => false,
             );
+          }
+        },
+      ),
+    );
+  }
+
+  // Delete Account Confirmation Dialog
+  void _showDeleteConfirmation(BuildContext context, UserViewModel userVM) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) => DeleteAccountDialog(
+        onConfirm: (password) async {
+          Navigator.of(dialogContext).pop();
+
+          // 2. Show the loading overlay
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => const Center(
+              child: CircularProgressIndicator(color: Color(0xFFFFB800)),
+            ),
+          );
+
+          try {
+            await Future.delayed(const Duration(milliseconds: 1800));
+
+            // 3. Trigger the backend call using the captured password
+            await userVM.deleteAccount(password);
+
+            if (context.mounted) {
+              Navigator.of(context).pop(); // Pop the loading circle
+
+              context.read<LoginViewModel>().clearSession();
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const WelcomePage()),
+                (route) => false,
+              );
+            }
+          } catch (e) {
+            if (context.mounted) {
+              Navigator.of(context).pop(); // Pop the loading circle
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(e.toString()),
+                  backgroundColor: Colors.redAccent,
+                ),
+              );
+            }
           }
         },
       ),
@@ -305,8 +355,12 @@ class ProfilePage extends StatelessWidget {
 
           SizedBox(height: 10.h),
 
+          // Delete Account
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              final userVM = context.read<UserViewModel>();
+              _showDeleteConfirmation(context, userVM);
+            },
             child: Text(
               "Delete Account",
               style: TextStyle(
