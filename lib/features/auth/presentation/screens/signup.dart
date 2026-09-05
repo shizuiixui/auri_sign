@@ -265,6 +265,7 @@ class _SignupFormState extends State<SignupForm> {
                       SizedBox(height: 20.h),
 
                       TextFormField(
+                        style: TextStyle(fontSize: 14.sp, fontFamily: 'Inter'),
                         controller: firstNameController,
                         textInputAction: TextInputAction.next,
                         validator: (value) => Validators.validateName(
@@ -280,6 +281,7 @@ class _SignupFormState extends State<SignupForm> {
                       SizedBox(height: 14.h),
 
                       TextFormField(
+                        style: TextStyle(fontSize: 14.sp, fontFamily: 'Inter'),
                         controller: lastNameController,
                         textInputAction: TextInputAction.next,
                         validator: (value) => Validators.validateName(
@@ -295,6 +297,7 @@ class _SignupFormState extends State<SignupForm> {
                       SizedBox(height: 14.h),
 
                       TextFormField(
+                        style: TextStyle(fontSize: 14.sp, fontFamily: 'Inter'),
                         controller: emailController,
                         textInputAction: TextInputAction.next,
                         validator: (value) => Validators.validateEmail(value),
@@ -307,6 +310,7 @@ class _SignupFormState extends State<SignupForm> {
                       SizedBox(height: 14.h),
 
                       TextFormField(
+                        style: TextStyle(fontSize: 14.sp, fontFamily: 'Inter'),
                         controller: passwordController,
                         textInputAction: TextInputAction.next,
                         validator: (value) =>
@@ -329,6 +333,7 @@ class _SignupFormState extends State<SignupForm> {
                       SizedBox(height: 14.h),
 
                       TextFormField(
+                        style: TextStyle(fontSize: 14.sp, fontFamily: 'Inter'),
                         controller: confirmPasswordController,
                         textInputAction: TextInputAction.done,
                         validator: (value) =>
