@@ -81,6 +81,7 @@ class _LoginFormState extends State<LoginForm> {
                 ),
                 SizedBox(height: 20.h),
                 TextFormField(
+                  style: TextStyle(fontSize: 14.sp, fontFamily: 'Inter'),
                   controller: emailController,
                   validator: (value) => Validators.validateEmail(value),
                   keyboardType: TextInputType.emailAddress,
@@ -91,6 +92,7 @@ class _LoginFormState extends State<LoginForm> {
                 ),
                 SizedBox(height: 14.h),
                 TextFormField(
+                  style: TextStyle(fontSize: 14.sp, fontFamily: 'Inter'),
                   controller: passwordController,
                   validator: (value) => Validators.validatePassword(value),
                   obscureText: obscurePassword,
