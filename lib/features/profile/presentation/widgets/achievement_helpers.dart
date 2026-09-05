@@ -275,7 +275,7 @@ class LessonCoin extends StatelessWidget {
   }
 }
 
-// certificateCardUi
+// Certificate Card Widget
 class CertificateCard extends StatelessWidget {
   final String categoryName;
   final int completedLessons;
@@ -365,9 +365,10 @@ class CertificateCard extends StatelessWidget {
 
           // Buttons
           Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               _ActionButton(
-                text: isDownloading ? "Downloading..." : "Download PDF",
+                text: isDownloading ? "Downloading..." : "Download",
                 color: const Color(0xFFFFB800),
                 textColor: Colors.white,
                 onPressed: isDownloading ? null : onDownload,
