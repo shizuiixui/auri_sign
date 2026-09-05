@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -91,29 +92,26 @@ class CertificateService {
     }
   }
 
+  /// Generates the certificate on the backend, then downloads and opens the PDF
   /// Downloads and opens a certificate PDF for the given category
-  /// The userID is needed so backend can embed the correct TX Hash in the PDF
-  /// Throws [Exception] if download fails or category is not completed
   Future<void> downloadAndOpenCertificate(
     String categoryName,
     String userID,
   ) async {
     try {
-      // 1) Read JWT token from local storage for authenticated certificate access.
       final token = await _getAuthToken();
-
-      // 2) Convert UI category label into encoded API-safe category path.
       final encodedCategory = _toEncodedCategory(categoryName);
 
-      // Get temporary directory to save PDF
+      debugPrint(
+        '🚨 STEP 1: Sending DOWNLOAD request to /api/certificates/$encodedCategory/pdf',
+      );
+
       final tempDir = await getTemporaryDirectory();
       final filePath =
           '${tempDir.path}/certificate_${encodedCategory.replaceAll('%2F', '_')}.pdf';
 
-      // 3) Download the generated PDF bytes from backend.
-      // Backend resolves user context from Authorization token.
       final response = await _dio.download(
-        '/certificates/$encodedCategory/pdf',
+        '/api/certificates/$encodedCategory/pdf',
         filePath,
         options: Options(
           headers: {'Authorization': 'Bearer $token'},
@@ -121,7 +119,8 @@ class CertificateService {
         ),
       );
 
-      // 4) Open the downloaded PDF using a device app that supports PDF files.
+      debugPrint('🚨 STEP 2 SUCCESS. File downloaded to: $filePath');
+
       if (response.statusCode == 200) {
         final result = await OpenFilex.open(filePath);
 
@@ -134,27 +133,25 @@ class CertificateService {
         throw Exception('Failed to download certificate. Please try again.');
       }
     } on DioException catch (e) {
+      debugPrint('🚨 DIO ERROR TRIGGERED!');
+      debugPrint('🚨 ERROR PATH: ${e.requestOptions.path}');
+      debugPrint('🚨 ERROR STATUS: ${e.response?.statusCode}');
+
       if (e.response?.statusCode == 400) {
         throw Exception('Invalid category requested.');
       } else if (e.response?.statusCode == 404) {
         throw Exception(
-          'Certificate not found. Please complete all lessons in this category first.',
+          'Not found. Please complete all lessons in this category first.',
         );
       } else if (e.response?.statusCode == 401) {
         throw Exception('Session expired. Please login again.');
       } else if (e.response?.statusCode == 500) {
         throw Exception('Server error while generating certificate PDF.');
-      } else if (e.type == DioExceptionType.connectionTimeout ||
-          e.type == DioExceptionType.receiveTimeout) {
-        throw Exception(
-          'Connection timeout. Please check your internet connection.',
-        );
       } else {
         throw Exception('Failed to download certificate: ${e.message}');
       }
-    } on Exception {
-      rethrow;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('🚨 GENERAL ERROR: $e');
       throw Exception('Unexpected error while downloading certificate.');
     }
   }

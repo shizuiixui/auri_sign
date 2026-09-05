@@ -107,19 +107,20 @@ class AchievementsViewModel extends ChangeNotifier {
       errorMessage = 'network error fetching achievements';
     } finally {
       isLoading = false;
-      notifyListeners(); // 🎯 Force the UI to show the 5/9!
+      notifyListeners();
     }
   }
 
-  /// Downloads and opens a certificate PDF for the given category
-  Future<void> downloadCertificate(String categoryName, String userID) async {
+  Future<void> downloadCertificate(String categoryId, String userID) async {
     isDownloading = true;
     downloadErrorMessage = null;
     notifyListeners();
 
     try {
+      final apiCategoryName = _toApiCategoryName(categoryId);
+
       await _certificateService.downloadAndOpenCertificate(
-        categoryName,
+        apiCategoryName,
         userID,
       );
     } catch (e) {
@@ -133,7 +134,7 @@ class AchievementsViewModel extends ChangeNotifier {
 
   /// Fetches certificate details then verifies blockchain proof.
   Future<CertificateVerificationDetails?> verifyCertificate(
-    String categoryName,
+    String categoryId,
     String userID,
   ) async {
     isDownloading = true;
@@ -141,8 +142,10 @@ class AchievementsViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
+      final apiCategoryName = _toApiCategoryName(categoryId);
+
       final certificate = await _certificateService.getCertificateData(
-        categoryName,
+        apiCategoryName,
       );
 
       final verification = await _certificateService.verifyCertificate(
@@ -155,7 +158,6 @@ class AchievementsViewModel extends ChangeNotifier {
         verification: verification,
       );
 
-      // Store verification result for display
       debugPrint('Certificate verification successful: $result');
 
       notifyListeners();

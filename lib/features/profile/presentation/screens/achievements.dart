@@ -58,15 +58,17 @@ class _AchievementsPageState extends State<AchievementsPage> {
                   AppRouter.navTabIndex.value = 0;
                   Navigator.of(context).pop();
                   Navigator.of(this.context).pop();
-                  
                 },
                 child: const Text(
-                  "Go To Lessons", 
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  "Go To Lessons",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-              ),
             ),
+          ),
         ],
       ),
     );
@@ -130,38 +132,45 @@ class _AchievementsPageState extends State<AchievementsPage> {
                       completedLessons: category.completedLessons,
                       totalLessons: category.totalLessons,
                       isDownloading: viewModel.isDownloading,
-                      onDownload: () {
+
+                      // 1. Make onDownload async
+                      onDownload: () async {
                         if (category.completedLessons < category.totalLessons ||
                             category.totalLessons == 0) {
                           _showLockDialog(context);
                         } else {
-                          // Download certificate with userID so backend embeds TX Hash
                           final userVM = context.read<UserViewModel>();
                           final userId = userVM.user?.id;
+
                           if (userId != null) {
-                            viewModel
-                                .downloadCertificate(category.title, userId)
-                                .then((_) {
-                                  if (viewModel.downloadErrorMessage != null) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          viewModel.downloadErrorMessage!,
-                                        ),
-                                        backgroundColor: Colors.red,
-                                      ),
-                                    );
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          "Certificate for ${category.title} downloaded successfully!",
-                                        ),
-                                        backgroundColor: Colors.green,
-                                      ),
-                                    );
-                                  }
-                                });
+                            // 2. Pass category.id and await the result
+                            await viewModel.downloadCertificate(
+                              category.id,
+                              userId,
+                            );
+
+                            // 3. Ensure the context is safe to use
+                            if (!context.mounted) return;
+
+                            if (viewModel.downloadErrorMessage != null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    viewModel.downloadErrorMessage!,
+                                  ),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "Certificate for ${category.title} downloaded successfully!",
+                                  ),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            }
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -174,46 +183,51 @@ class _AchievementsPageState extends State<AchievementsPage> {
                           }
                         }
                       },
-                      onVerify: () {
+
+                      // Make onVerify async as well
+                      onVerify: () async {
                         if (category.completedLessons >=
                                 category.totalLessons &&
                             category.totalLessons > 0) {
-                          // Verify certificate
                           final userVM = context.read<UserViewModel>();
                           final userId = userVM.user?.id;
-                          if (userId != null) {
-                            viewModel
-                                .verifyCertificate(category.title, userId)
-                                .then((result) {
-                                  if (viewModel.downloadErrorMessage != null) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          viewModel.downloadErrorMessage!,
-                                        ),
-                                        backgroundColor: Colors.red,
-                                      ),
-                                    );
-                                  } else if (result != null) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          "Certificate verified successfully!",
-                                        ),
-                                        backgroundColor: Colors.green,
-                                      ),
-                                    );
 
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) =>
-                                          CertificateVerifyDialog(
-                                            selectedCategory: category.title,
-                                            details: result,
-                                          ),
-                                    );
-                                  }
-                                });
+                          if (userId != null) {
+                            // Pass category.id and await
+                            final result = await viewModel.verifyCertificate(
+                              category.id,
+                              userId,
+                            );
+
+                            if (!context.mounted) return;
+
+                            if (viewModel.downloadErrorMessage != null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    viewModel.downloadErrorMessage!,
+                                  ),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            } else if (result != null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    "Certificate verified successfully!",
+                                  ),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+
+                              showDialog(
+                                context: context,
+                                builder: (context) => CertificateVerifyDialog(
+                                  selectedCategory: category.title,
+                                  details: result,
+                                ),
+                              );
+                            }
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
