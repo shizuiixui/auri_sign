@@ -111,6 +111,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       ),
                       SizedBox(height: 24.h),
                       TextFormField(
+                        style: TextStyle(fontSize: 14.sp, fontFamily: 'Inter'),
                         controller: emailController,
                         validator: (value) => Validators.validateEmail(value),
                         keyboardType: TextInputType.emailAddress,
