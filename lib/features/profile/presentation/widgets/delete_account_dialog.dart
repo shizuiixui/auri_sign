@@ -25,13 +25,11 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
       backgroundColor: Colors.white,
-      insetPadding: EdgeInsets.symmetric(horizontal: 20.w), // Outer padding
-      // We use a Column directly instead of a single Padding widget so
-      // the horizontal Divider can bleed completely edge-to-edge
+      insetPadding: EdgeInsets.symmetric(horizontal: 20.w),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // --- TOP SECTION (Text & Input) ---
+          // Top Section
           Padding(
             padding: EdgeInsets.only(
               left: 24.w,
@@ -60,7 +58,7 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
                     fontFamily: 'Poppins',
                     fontSize: 14.sp,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0XFFE83E48), // Matching your logout red
+                    color: const Color(0XFFE83E48),
                   ),
                 ),
                 SizedBox(height: 8.h),
@@ -103,18 +101,19 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.r),
-                      borderSide: const BorderSide(color: Color(0xFFE9B63B), width: 2),
+                      borderSide: const BorderSide(
+                        color: Color(0xFFE9B63B),
+                        width: 2,
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
           ),
-
-          // --- EDGE-TO-EDGE DIVIDER ---
           const Divider(color: Color(0XFFEEEEEE), thickness: 1, height: 1),
 
-          // --- BOTTOM SECTION (Buttons) ---
+          // Bottom Section
           Padding(
             padding: EdgeInsets.only(
               left: 24.w,
@@ -142,7 +141,7 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
                       backgroundColor: const Color(0XFFE83E48),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.r), // Pill shape
+                        borderRadius: BorderRadius.circular(30.r),
                       ),
                       padding: EdgeInsets.symmetric(vertical: 14.h),
                     ),

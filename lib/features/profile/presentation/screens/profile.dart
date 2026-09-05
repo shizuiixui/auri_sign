@@ -101,8 +101,6 @@ class ProfilePage extends StatelessWidget {
       builder: (BuildContext dialogContext) => DeleteAccountDialog(
         onConfirm: (password) async {
           Navigator.of(dialogContext).pop();
-
-          // 2. Show the loading overlay
           showDialog(
             context: context,
             barrierDismissible: false,
@@ -114,11 +112,11 @@ class ProfilePage extends StatelessWidget {
           try {
             await Future.delayed(const Duration(milliseconds: 1800));
 
-            // 3. Trigger the backend call using the captured password
+            // Trigger backend call using captured password
             await userVM.deleteAccount(password);
 
             if (context.mounted) {
-              Navigator.of(context).pop(); // Pop the loading circle
+              Navigator.of(context).pop();
 
               context.read<LoginViewModel>().clearSession();
               Navigator.pushAndRemoveUntil(
@@ -129,7 +127,7 @@ class ProfilePage extends StatelessWidget {
             }
           } catch (e) {
             if (context.mounted) {
-              Navigator.of(context).pop(); // Pop the loading circle
+              Navigator.of(context).pop();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(e.toString()),
