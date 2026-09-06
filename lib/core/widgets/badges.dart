@@ -3,15 +3,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 // Certified Alphabet Signer Badge
 class AlphabetBadge extends StatelessWidget {
-  final double width;
-  final double height;
-
-  const AlphabetBadge({super.key, this.width = 100, this.height = 115});
+  const AlphabetBadge({super.key});
 
   @override
   Widget build(BuildContext context) {
     const String svgString = '''
-    <svg width="200" height="230" viewBox="0 0 400 460" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="80 50 240 270" xmlns="http://www.w3.org/2000/svg">
       <g transform="translate(200,190)">
         <g fill="#93C5FD">
           <circle cx="0" cy="-108" r="20"/><circle cx="42" cy="-96" r="20"/><circle cx="76" cy="-68" r="20"/>
@@ -34,21 +31,18 @@ class AlphabetBadge extends StatelessWidget {
     </svg>
     ''';
 
-    return SvgPicture.string(svgString, width: width, height: height);
+    return SvgPicture.string(svgString, fit: BoxFit.contain);
   }
 }
 
 // Certified Numeric Signer Badge
 class NumberBadge extends StatelessWidget {
-  final double width;
-  final double height;
-
-  const NumberBadge({super.key, this.width = 100, this.height = 115});
+  const NumberBadge({super.key});
 
   @override
   Widget build(BuildContext context) {
     const String svgString = '''
-    `<svg width="200" height="230" viewBox="0 0 400 460" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="80 50 240 270" xmlns="http://www.w3.org/2000/svg">
       <g transform="translate(200,190)">
         <g fill="#A7F3D0">
           <circle cx="0" cy="-108" r="20"/><circle cx="42" cy="-96" r="20"/><circle cx="76" cy="-68" r="20"/>
@@ -68,24 +62,21 @@ class NumberBadge extends StatelessWidget {
         <circle r="28" fill="#FFFFFF" stroke="#047857" stroke-width="4"/>
         <text x="0" y="10" text-anchor="middle" font-size="22" font-weight="700" fill="#047857" font-family="Arial, sans-serif">123</text>
       </g>
-    </svg>`;
+    </svg>
     ''';
 
-    return SvgPicture.string(svgString, width: width, height: height);
+    return SvgPicture.string(svgString, fit: BoxFit.contain);
   }
 }
 
 // Certified Phrase Communicator Badge
 class PhraseBadge extends StatelessWidget {
-  final double width;
-  final double height;
-
-  const PhraseBadge({super.key, this.width = 100, this.height = 115});
+  const PhraseBadge({super.key});
 
   @override
   Widget build(BuildContext context) {
     const String svgString = '''
-     `<svg width="200" height="230" viewBox="0 0 400 460" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="80 50 240 270" xmlns="http://www.w3.org/2000/svg">
       <g transform="translate(200,190)">
         <g fill="#FBCFE8">
           <circle cx="0" cy="-108" r="20"/><circle cx="42" cy="-96" r="20"/><circle cx="76" cy="-68" r="20"/>
@@ -104,8 +95,8 @@ class PhraseBadge extends StatelessWidget {
         <circle r="28" fill="#FFFFFF" stroke="#BE185D" stroke-width="4"/>
         <text x="0" y="12" text-anchor="middle" font-size="26" fill="#BE185D">♥</text>
       </g>
-    </svg>`;
+    </svg>
     ''';
-    return SvgPicture.string(svgString, width: width, height: height);
+    return SvgPicture.string(svgString, fit: BoxFit.contain);
   }
 }

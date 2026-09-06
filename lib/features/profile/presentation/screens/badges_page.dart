@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:auri_sign/features/profile/viewmodels/badges_view_model.dart';
 import 'package:auri_sign/features/auth/viewmodels/user_view_model.dart';
+import 'package:auri_sign/features/profile/presentation/widgets/badge_display_helper.dart';
 
 class BadgesPage extends StatefulWidget {
   const BadgesPage({super.key});
@@ -231,9 +232,9 @@ class _BadgesPageState extends State<BadgesPage> {
                 ),
                 SizedBox(height: 15.h),
 
-                // 🎯 1:1 Web Layout Translation
                 Column(
                   children: earnedBadges.map((badge) {
+                    final badgeId = badge['badgeId'] ?? badge['id'] ?? '';
                     return Container(
                       margin: EdgeInsets.only(bottom: 12.h),
                       padding: EdgeInsets.all(16.w),
@@ -252,15 +253,10 @@ class _BadgesPageState extends State<BadgesPage> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          CircleAvatar(
-                            radius: 25.r,
-                            backgroundColor: (badge['color'] as Color)
-                                .withOpacity(0.1),
-                            child: Icon(
-                              badge['icon'],
-                              color: badge['color'],
-                              size: 28.sp,
-                            ),
+                          SizedBox(
+                            width: 50.r,
+                            height: 50.r,
+                            child: BadgeDisplayHelper.getBadgeWidget(badgeId),
                           ),
                           SizedBox(width: 15.w),
                           Expanded(
@@ -355,34 +351,46 @@ class _BadgesPageState extends State<BadgesPage> {
           ...upcomingBadges.map((badge) {
             return Column(
               children: [
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(
-                    badge['name'],
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Inter',
-                    ),
-                  ),
-                  subtitle: Text(
-                    badge['desc'],
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Colors.grey.shade600,
-                      fontFamily: 'Inter',
-                    ),
-                  ),
-                  trailing: Image.asset(
-                    badge['imagePath'] ?? 'assets/images/badges/3-DayStreak.png',
-                    width: 25.r,
-                    height: 25.r,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) => Icon(
-                      Icons.military_tech,
-                      size: 32.r,
-                      color: badge['color'],
-                    ),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.h),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Text on the left
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              badge['name'],
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Inter',
+                              ),
+                            ),
+                            SizedBox(height: 4.h),
+                            Text(
+                              badge['desc'],
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: Colors.grey.shade600,
+                                fontFamily: 'Inter',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      SizedBox(width: 15.w),
+                      SizedBox(
+                        width: 32.r,
+                        height: 32.r,
+                        child: BadgeDisplayHelper.getBadgeWidget(
+                          badge['id'] ?? '',
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 if (badge != upcomingBadges.last)

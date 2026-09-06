@@ -14,18 +14,10 @@ class BadgesViewModel extends ChangeNotifier {
   List<Map<String, dynamic>> upcomingBadges = [];
 
   BadgesViewModel() {
-    upcomingBadges = _allBadges
-        .map(
-          (b) => {
-            ...b,
-            "imagePath": getBadgeImagePath(b['id']),
-            "color": getBadgeColor(b['id']),
-          },
-        )
-        .toList();
+    _updateUpcomingBadges([]);
   }
 
-  // Badges List
+  // Fetch user progress from API
   final List<Map<String, dynamic>> _allBadges = [
     {
       "id": "streak_3",
@@ -63,37 +55,24 @@ class BadgesViewModel extends ChangeNotifier {
       "name": "Centurion",
       "desc": "Complete lessons for 100 consecutive days",
     },
+    {
+      "id": "alphabet",
+      "name": "Certified Alphabet Signer",
+      "desc": "Complete all Alphabet lessons",
+    },
+    {
+      "id": "number",
+      "name": "Certified Numeric Signer",
+      "desc": "Complete all Numeric lessons",
+    },
+    {
+      "id": "phrase",
+      "name": "Certified Phrase Communicator",
+      "desc": "Complete all Phrase lessons",
+    },
   ];
 
   final Dio _dio = Dio(BaseOptions(baseUrl: ApiConstants.baseUrl));
-
-  String getBadgeImagePath(String? badgeId) {
-    if (badgeId == null) return 'assets/images/badges/3-DayStreak.png';
-    if (badgeId.contains("streak_3"))
-      return 'assets/images/badges/3-DayStreak.png';
-    if (badgeId.contains("streak_7"))
-      return 'assets/images/badges/WeekWarrior.png';
-    if (badgeId.contains("streak_14"))
-      return 'assets/images/badges/TwoWeekChampion.png';
-    if (badgeId.contains("streak_30"))
-      return 'assets/images/badges/MonthMaster.png';
-    if (badgeId.contains("streak_50"))
-      return 'assets/images/badges/50-DayLegend.png';
-    if (badgeId.contains("streak_100"))
-      return 'assets/images/badges/Centurion.png';
-    return 'assets/images/badges/3-DayStreak.png';
-  }
-
-  Color getBadgeColor(String? badgeId) {
-    if (badgeId == null) return Colors.grey;
-    if (badgeId.contains("streak_100")) return Colors.red;
-    if (badgeId.contains("streak_50")) return const Color(0xFFFFB800);
-    if (badgeId.contains("streak_30")) return Colors.blue;
-    if (badgeId.contains("streak_14")) return Colors.lightBlue;
-    if (badgeId.contains("streak_7")) return Colors.green;
-    if (badgeId.contains("streak_3")) return Colors.grey.shade600;
-    return Colors.grey;
-  }
 
   Future<void> fetchUserProgress(String userId) async {
     isLoading = true;
@@ -114,46 +93,44 @@ class BadgesViewModel extends ChangeNotifier {
         totalBadges = (data['totalBadges'] as num?)?.toInt() ?? 0;
         totalPoints = (data['totalPoints'] as num?)?.toDouble() ?? 0.0;
 
-        final rawBadges = data['badges'] as List? ?? [];
+        final rawBadgesFromApi = data['badges'] as List? ?? [];
         List<String> earnedIds = [];
         earnedBadges = [];
 
-        for (var b in rawBadges) {
+        for (var b in rawBadgesFromApi) {
           if (b is Map) {
             String badgeId = b['badgeId'] ?? '';
             earnedIds.add(badgeId);
+
+            // Store the data
             earnedBadges.add({
               "badgeId": badgeId,
               "name": b['badgeName'] ?? 'Badge',
               "desc": b['description'] ?? '',
               "unlockedAt": b['unlockedAt'],
-              "imagePath": getBadgeImagePath(badgeId),
-              "color": getBadgeColor(badgeId),
             });
           }
         }
 
-        upcomingBadges = _allBadges
-            .where((b) {
-              return !earnedIds.any((earnedId) => earnedId.contains(b['id']));
-            })
-            .map(
-              (b) => {
-                ...b,
-                "imagePath": getBadgeImagePath(b['id']),
-                "color": getBadgeColor(b['id']),
-              },
-            )
-            .toList();
+        _updateUpcomingBadges(earnedIds);
       }
     } catch (e) {
+      errorMessage = "Failed to load badges.";
       if (e is DioException) {
         debugPrint('🚨 EXACT FAILED BADGES URL: ${e.requestOptions.uri}');
+        debugPrint('Response: ${e.response?.data}');
       }
       debugPrint("Badges Fetch Error: $e");
     } finally {
       isLoading = false;
       notifyListeners();
     }
+  }
+
+  // Private helper to update upcoming badges based on ID's
+  void _updateUpcomingBadges(List<String> earnedIds) {
+    upcomingBadges = _allBadges.where((hardcodedBadge) {
+      return !earnedIds.contains(hardcodedBadge['id']);
+    }).toList();
   }
 }
