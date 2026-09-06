@@ -21,6 +21,7 @@ import 'package:auri_sign/features/profile/viewmodels/notification_schedule_view
 
 // Widgets
 import '/core/widgets/user_stats.dart';
+import '/core/widgets/role_badge.dart';
 import 'package:auri_sign/features/profile/presentation/widgets/profile_helpers.dart';
 import 'package:auri_sign/features/profile/presentation/widgets/logout_dialog.dart';
 
@@ -163,10 +164,14 @@ class ProfilePage extends StatelessWidget {
     UserViewModel userVM,
     NotificationScheduleViewModel notificationVM,
   ) {
-    // Logic to get the first letter
+    // Logic to get user initials
     String initial = "U";
-    if (user?.firstName != null && user!.firstName!.isNotEmpty) {
-      initial = user.firstName![0].toUpperCase();
+    if (user?.firstName != null && user!.firstName.isNotEmpty) {
+      final firstLetter = user.firstName[0].toUpperCase();
+      final lastLetter = (user.lastName != null && user.lastName.isNotEmpty)
+          ? user.lastName[0].toUpperCase()
+          : '';
+      initial = "$firstLetter$lastLetter";
     }
 
     return SingleChildScrollView(
@@ -194,7 +199,7 @@ class ProfilePage extends StatelessWidget {
               child: Text(
                 initial,
                 style: TextStyle(
-                  fontSize: 45.sp,
+                  fontSize: initial.length > 1 ? 38.sp : 45.sp,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                   fontFamily: 'Poppins',
@@ -203,15 +208,23 @@ class ProfilePage extends StatelessWidget {
             ),
           ),
 
+          // User Name and Email
           SizedBox(height: 12.h),
           Text(
-            user?.firstName ?? "User",
+            user != null && user.lastName != null && user.lastName.isNotEmpty
+                ? "${user.firstName} ${user.lastName}"
+                : (user?.firstName ?? "User"),
             style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold),
           ),
           Text(
             user?.email ?? "",
             style: TextStyle(color: Colors.grey[600], fontSize: 14.sp),
           ),
+
+          SizedBox(height: 10.h),
+
+          // Role Badge
+          const RoleBadge(),
 
           SizedBox(height: 16.h),
 
