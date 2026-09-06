@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 // achievementProgressCard
 class AchievementProgressCard extends StatelessWidget {
@@ -22,49 +23,56 @@ class AchievementProgressCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.only(bottom: isExpanded ? 0 : 16),
-        padding: const EdgeInsets.all(20),
+        margin: EdgeInsets.only(bottom: isExpanded ? 0 : 16.h),
+        padding: EdgeInsets.all(20.w),
         decoration: BoxDecoration(
           color: Colors.white,
-          border: Border.all(color: const Color(0xFFFFB800), width: 1.5),
-          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: const Color(0xFFFFB800), width: 1.5.w),
+          borderRadius: BorderRadius.circular(20.r),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    Text(
-                      subtitle,
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
-                    ),
-                  ],
+                      SizedBox(height: 2.h),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                const Spacer(),
+                SizedBox(width: 8.w),
                 Icon(
                   isExpanded
                       ? Icons.keyboard_arrow_up
                       : Icons.keyboard_arrow_down,
                   color: Colors.black,
+                  size: 24.sp,
                 ),
               ],
             ),
-            const SizedBox(height: 15),
+            SizedBox(height: 15.h),
             ClipRRect(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(10.r),
               child: LinearProgressIndicator(
                 value: progress,
-                minHeight: 8,
+                minHeight: 8.h,
                 backgroundColor: Colors.grey[200],
                 valueColor: const AlwaysStoppedAnimation<Color>(
                   Color(0xFFFFB800),
@@ -107,10 +115,10 @@ class ExpandedLessonsList extends StatelessWidget {
         lessons.add(InactiveLessonStep(title: "Lesson $i Locked", number: i));
       }
     }
-    lessons.add(const SizedBox(height: 16));
+    lessons.add(SizedBox(height: 16.h));
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Column(children: lessons),
     );
   }
@@ -122,7 +130,11 @@ class VerticalStepLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(height: 20, width: 1.5, color: Colors.grey.shade400);
+    return Container(
+      height: 20.h,
+      width: 1.5.w,
+      color: Colors.grey.shade400,
+    );
   }
 }
 
@@ -144,37 +156,41 @@ class ActiveLessonStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: const Color(0xFFFFB800), width: 1.5),
-        borderRadius: BorderRadius.circular(25),
+        border: Border.all(color: const Color(0xFFFFB800), width: 1.5.w),
+        borderRadius: BorderRadius.circular(25.r),
       ),
       child: Row(
         children: [
           LessonCoin(isActive: true, number: number),
-          const SizedBox(width: 12),
+          SizedBox(width: 12.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    fontSize: 14,
+                  style: TextStyle(
+                    fontSize: 14.sp,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                SizedBox(height: 2.h),
                 Text(
                   subtitle,
-                  style: const TextStyle(fontSize: 10, color: Colors.grey),
+                  style: TextStyle(
+                    fontSize: 10.sp,
+                    color: Colors.grey.shade600,
+                  ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4.h),
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(10.r),
                   child: LinearProgressIndicator(
                     value: progress,
-                    minHeight: 4,
+                    minHeight: 4.h,
                     backgroundColor: Colors.grey[200],
                     valueColor: const AlwaysStoppedAnimation<Color>(
                       Color(0xFFFFB800),
@@ -204,22 +220,24 @@ class InactiveLessonStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: Colors.grey.shade300, width: 1.5),
-        borderRadius: BorderRadius.circular(25),
+        border: Border.all(color: Colors.grey.shade300, width: 1.5.w),
+        borderRadius: BorderRadius.circular(25.r),
       ),
       child: Row(
         children: [
           LessonCoin(isActive: false, number: number),
-          const SizedBox(width: 12),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey,
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey,
+              ),
             ),
           ),
         ],
@@ -238,15 +256,15 @@ class LessonCoin extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 30,
-      height: 30,
+      width: 30.r,
+      height: 30.r,
       child: Stack(
         alignment: Alignment.center,
         children: [
           Image.asset(
             'assets/images/your_coin_image.png',
-            width: 30,
-            height: 30,
+            width: 30.r,
+            height: 30.r,
             fit: BoxFit.contain,
             color: isActive ? null : Colors.grey,
             colorBlendMode: isActive ? null : BlendMode.saturation,
@@ -266,7 +284,7 @@ class LessonCoin extends StatelessWidget {
             style: TextStyle(
               color: isActive ? Colors.white : Colors.grey.shade600,
               fontWeight: FontWeight.bold,
-              fontSize: 13,
+              fontSize: 13.sp,
             ),
           ),
         ],
@@ -275,7 +293,6 @@ class LessonCoin extends StatelessWidget {
   }
 }
 
-// Certificate Card Widget
 // Certificate Card Widget
 class CertificateCard extends StatelessWidget {
   final String categoryName;
@@ -299,11 +316,11 @@ class CertificateCard extends StatelessWidget {
     bool isCompleted = completedLessons >= totalLessons && totalLessons > 0;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.only(bottom: 12.h),
+      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
         border: Border.all(color: Colors.grey.shade200),
         boxShadow: [
           BoxShadow(
@@ -314,7 +331,6 @@ class CertificateCard extends StatelessWidget {
         ],
       ),
       child: Row(
-        // 👉 CHANGED THIS to center so the button perfectly aligns with the middle of the text!
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // leftSideInfo
@@ -323,40 +339,40 @@ class CertificateCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 10.w,
+                    vertical: 4.h,
                   ),
                   decoration: BoxDecoration(
                     color: Colors.orange.shade50,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(20.r),
                     border: Border.all(
                       color: const Color(0xFFFFB800).withOpacity(0.5),
                     ),
                   ),
                   child: Text(
                     categoryName,
-                    style: const TextStyle(
-                      fontSize: 12,
+                    style: TextStyle(
+                      fontSize: 12.sp,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFFB8860B),
+                      color: const Color(0xFFB8860B),
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 10.h),
                 Text(
                   "$completedLessons/$totalLessons lessons completed",
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 13.sp,
                     color: Colors.grey[700],
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4.h),
                 Text(
                   isCompleted ? "Completed" : "Not yet completed",
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 12.sp,
                     color: isCompleted ? Colors.green : Colors.grey,
                     fontWeight: FontWeight.bold,
                   ),
@@ -364,6 +380,8 @@ class CertificateCard extends StatelessWidget {
               ],
             ),
           ),
+
+          SizedBox(width: 10.w),
 
           // Button
           _ActionButton(
@@ -381,23 +399,19 @@ class CertificateCard extends StatelessWidget {
 }
 
 // actionButtonHelperForCertificates
-// actionButtonHelperForCertificates
 class _ActionButton extends StatelessWidget {
   final String text;
   final IconData icon;
   final Color color;
   final Color textColor;
-  final Color? borderColor;
   final VoidCallback? onPressed;
   final bool isLoading;
 
   const _ActionButton({
-    super.key,
     required this.text,
     required this.icon,
     required this.color,
     required this.textColor,
-    this.borderColor,
     this.onPressed,
     this.isLoading = false,
   });
@@ -405,25 +419,26 @@ class _ActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 38,
+      height: 38.h,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
           foregroundColor: textColor,
           elevation: 0,
-          side: borderColor != null ? BorderSide(color: borderColor!) : null,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          padding: const EdgeInsets.symmetric(
-            horizontal: 14,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.r),
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: 12.w,
           ),
         ),
         onPressed: onPressed,
         child: isLoading
-            ? const SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.5,
+            ? SizedBox(
+                width: 16.r,
+                height: 16.r,
+                child: const CircularProgressIndicator(
+                  strokeWidth: 2.0,
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               )
@@ -432,14 +447,14 @@ class _ActionButton extends StatelessWidget {
                 children: [
                   Icon(
                     icon,
-                    size: 18,
+                    size: 18.sp,
                     color: textColor,
-                  ), // Your white download icon
-                  const SizedBox(width: 6),
+                  ),
+                  SizedBox(width: 6.w),
                   Text(
                     text,
-                    style: const TextStyle(
-                      fontSize: 12,
+                    style: TextStyle(
+                      fontSize: 12.sp,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
