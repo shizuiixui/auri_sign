@@ -239,8 +239,10 @@ class ProfilePage extends StatelessWidget {
           const CompletedLessonsCarousel(),
           SizedBox(height: 8.h),
 
+          // Account Section
           const ProfileSectionHeader(title: "Account"),
 
+          // Edit Profile
           ProfileMenuTile(
             title: "Edit Profile",
             onTap: () {
@@ -252,6 +254,8 @@ class ProfilePage extends StatelessWidget {
               );
             },
           ),
+
+          // Change Password
           ProfileMenuTile(
             title: "Change Your Password",
             onTap: () {
@@ -285,8 +289,10 @@ class ProfilePage extends StatelessWidget {
           ),
           SizedBox(height: 20.h),
 
+          // Legal & Privacy Section
           const ProfileSectionHeader(title: "Legal & Privacy"),
 
+          // Terms & Conditions
           ProfileMenuTile(
             title: "Terms & Conditions",
             onTap: () {
@@ -298,6 +304,8 @@ class ProfilePage extends StatelessWidget {
               );
             },
           ),
+
+          // Privacy Policy
           ProfileMenuTile(
             title: "Privacy Policy",
             onTap: () {
@@ -312,8 +320,10 @@ class ProfilePage extends StatelessWidget {
 
           SizedBox(height: 20.h),
 
+          // Achievements Section
           const ProfileSectionHeader(title: "Achievements"),
 
+          // Download Certificates
           ProfileMenuTile(
             title: "Download Certificates",
             onTap: () {
@@ -329,6 +339,7 @@ class ProfilePage extends StatelessWidget {
             },
           ),
 
+          // Bagdes Showcase
           ProfileMenuTile(
             title: "Badges Showcase",
             onTap: () {
