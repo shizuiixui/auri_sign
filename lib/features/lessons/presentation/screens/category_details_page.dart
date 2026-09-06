@@ -79,12 +79,12 @@ class _CategoryDetailsPageState extends State<CategoryDetailsPage> {
       appBar: AppBar(
         title: Text(
           widget.title,
-          style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.bold),
         ),
         backgroundColor: const Color(0XFFF8F8F8),
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black, size: 24.w),
+          icon: Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
       ),
