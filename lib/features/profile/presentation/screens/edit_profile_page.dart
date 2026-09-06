@@ -85,19 +85,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
               EditProfileTextField(
                 controller: _firstNameController,
                 hint: 'First Name',
-                icon: Icons.person_outline,
+                icon: Icons.person,
               ),
               SizedBox(height: 16.h),
               EditProfileTextField(
                 controller: _lastNameController,
                 hint: 'Last Name',
-                icon: Icons.person_outline,
+                icon: Icons.person,
               ),
               SizedBox(height: 16.h),
               EditProfileTextField(
                 controller: _emailController,
                 hint: 'Email Address',
-                icon: Icons.mail_outline,
+                icon: Icons.mail,
                 keyboardType: TextInputType.emailAddress,
               ),
               SizedBox(height: 50.h),
