@@ -256,7 +256,10 @@ class _BadgesPageState extends State<BadgesPage> {
                           SizedBox(
                             width: 50.r,
                             height: 50.r,
-                            child: BadgeDisplayHelper.getBadgeWidget(badgeId),
+                            child: BadgeDisplayHelper.getBadgeWidget(
+                              badgeId,
+                              badgeName: badge['name'],
+                            ),
                           ),
                           SizedBox(width: 15.w),
                           Expanded(
@@ -388,6 +391,7 @@ class _BadgesPageState extends State<BadgesPage> {
                         height: 32.r,
                         child: BadgeDisplayHelper.getBadgeWidget(
                           badge['id'] ?? '',
+                          badgeName: badge['name'],
                         ),
                       ),
                     ],

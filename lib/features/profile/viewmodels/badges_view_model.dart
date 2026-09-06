@@ -94,25 +94,29 @@ class BadgesViewModel extends ChangeNotifier {
         totalPoints = (data['totalPoints'] as num?)?.toDouble() ?? 0.0;
 
         final rawBadgesFromApi = data['badges'] as List? ?? [];
-        List<String> earnedIds = [];
+        List<String> earnedIdentifiers = [];
         earnedBadges = [];
 
         for (var b in rawBadgesFromApi) {
           if (b is Map) {
-            String badgeId = b['badgeId'] ?? '';
-            earnedIds.add(badgeId);
+            String badgeId = (b['badgeId'] ?? b['id'] ?? b['_id'] ?? '').toString();
+            String badgeName = (b['badgeName'] ?? b['name'] ?? 'Badge').toString();
+            String desc = (b['description'] ?? b['desc'] ?? '').toString();
+
+            if (badgeId.isNotEmpty) earnedIdentifiers.add(badgeId);
+            if (badgeName.isNotEmpty) earnedIdentifiers.add(badgeName);
 
             // Store the data
             earnedBadges.add({
               "badgeId": badgeId,
-              "name": b['badgeName'] ?? 'Badge',
-              "desc": b['description'] ?? '',
+              "name": badgeName,
+              "desc": desc,
               "unlockedAt": b['unlockedAt'],
             });
           }
         }
 
-        _updateUpcomingBadges(earnedIds);
+        _updateUpcomingBadges(earnedIdentifiers);
       }
     } catch (e) {
       errorMessage = "Failed to load badges.";
@@ -127,10 +131,24 @@ class BadgesViewModel extends ChangeNotifier {
     }
   }
 
-  // Private helper to update upcoming badges based on ID's
-  void _updateUpcomingBadges(List<String> earnedIds) {
+  // Private helper to update upcoming badges based on earned identifiers (IDs and Names)
+  void _updateUpcomingBadges(List<String> earnedIdentifiers) {
+    final lowerEarned = earnedIdentifiers
+        .map((e) => e.toLowerCase().trim())
+        .where((e) => e.isNotEmpty)
+        .toSet();
+
     upcomingBadges = _allBadges.where((hardcodedBadge) {
-      return !earnedIds.contains(hardcodedBadge['id']);
+      final id = (hardcodedBadge['id'] as String? ?? '').toLowerCase().trim();
+      final name = (hardcodedBadge['name'] as String? ?? '').toLowerCase().trim();
+
+      final isEarned = lowerEarned.contains(id) ||
+          lowerEarned.contains(name) ||
+          lowerEarned.any((earned) =>
+              (id.isNotEmpty && (earned.contains(id) || id.contains(earned))) ||
+              (name.isNotEmpty && (earned.contains(name) || name.contains(earned))));
+
+      return !isEarned;
     }).toList();
   }
 }
