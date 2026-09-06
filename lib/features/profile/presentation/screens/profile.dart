@@ -1,4 +1,5 @@
 import 'package:auri_sign/features/profile/presentation/screens/achievements.dart';
+import 'package:auri_sign/features/profile/presentation/screens/badges_page.dart';
 import 'package:auri_sign/features/profile/presentation/widgets/delete_account_dialog.dart';
 import 'package:auri_sign/features/profile/viewmodels/achievements_view_model.dart';
 import 'package:flutter/material.dart';
@@ -324,6 +325,16 @@ class ProfilePage extends StatelessWidget {
                     child: const AchievementsPage(),
                   ),
                 ),
+              );
+            },
+          ),
+
+          ProfileMenuTile(
+            title: "Badges Showcase",
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const BadgesPage()),
               );
             },
           ),
