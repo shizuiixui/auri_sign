@@ -239,7 +239,6 @@ class ProfileMenuTile extends StatelessWidget {
         ),
         trailing: Icon(
           Icons.arrow_forward_ios,
-          size: 14.sp,
           color: Colors.grey,
         ),
         onTap: onTap,
