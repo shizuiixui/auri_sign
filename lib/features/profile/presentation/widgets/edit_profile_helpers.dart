@@ -23,7 +23,7 @@ class EditProfileTextField extends StatelessWidget {
       keyboardType: keyboardType,
       enabled: enabled,
       decoration: InputDecoration(
-        prefixIcon: Icon(icon, color: Colors.black87),
+        prefixIcon: Icon(icon, color: Colors.grey),
         hintText: hint,
         hintStyle: TextStyle(color: Colors.grey.shade500),
         filled: true,
