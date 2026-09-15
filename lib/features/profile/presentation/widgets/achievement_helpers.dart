@@ -344,10 +344,12 @@ class CertificateCard extends StatelessWidget {
                     vertical: 4.h,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.orange.shade50,
+                    color: isCompleted ? Colors.orange.shade50 : Colors.grey.shade100,
                     borderRadius: BorderRadius.circular(20.r),
                     border: Border.all(
-                      color: const Color(0xFFFFB800).withOpacity(0.5),
+                      color: isCompleted
+                          ? const Color(0xFFFFB800).withOpacity(0.5)
+                          : Colors.grey.shade300,
                     ),
                   ),
                   child: Text(
@@ -355,7 +357,7 @@ class CertificateCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12.sp,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFFB8860B),
+                      color: isCompleted ? const Color(0xFFB8860B) : Colors.grey.shade600,
                     ),
                   ),
                 ),
@@ -386,8 +388,8 @@ class CertificateCard extends StatelessWidget {
           // Button
           _ActionButton(
             text: isDownloading ? "Downloading..." : "Download",
-            icon: Icons.download_rounded,
-            color: const Color(0xFFFFB800),
+            icon: isCompleted ? Icons.download_rounded : Icons.lock_outline,
+            color: isCompleted ? const Color(0xFFFFB800) : Colors.grey.shade400,
             textColor: Colors.white,
             onPressed: isDownloading ? null : onDownload,
             isLoading: isDownloading,

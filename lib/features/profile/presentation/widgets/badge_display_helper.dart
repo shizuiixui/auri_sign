@@ -30,16 +30,21 @@ class BadgeDisplayHelper {
     }
     // Generic fallback for any other badge
     else {
-      badgeContent = const Icon(
+      badgeContent = Icon(
         Icons.military_tech,
         size: 50,
-        color: Color(0xFFFFB800),
+        color: isGreyscale ? Colors.grey : const Color(0xFFFFB800),
       );
     }
 
     if (isGreyscale) {
       return ColorFiltered(
-        colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.saturation),
+        colorFilter: const ColorFilter.matrix(<double>[
+          0.2126, 0.7152, 0.0722, 0, 0,
+          0.2126, 0.7152, 0.0722, 0, 0,
+          0.2126, 0.7152, 0.0722, 0, 0,
+          0,      0,      0,      1, 0,
+        ]),
         child: badgeContent,
       );
     }

@@ -343,7 +343,7 @@ class _BadgesPageState extends State<BadgesPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Streak Badges to Earn",
+            "Badges to Earn",
             style: TextStyle(
               fontSize: 16.sp,
               fontWeight: FontWeight.bold,
@@ -392,6 +392,7 @@ class _BadgesPageState extends State<BadgesPage> {
                         child: BadgeDisplayHelper.getBadgeWidget(
                           badge['id'] ?? '',
                           badgeName: badge['name'],
+                          isGreyscale: true,
                         ),
                       ),
                     ],
