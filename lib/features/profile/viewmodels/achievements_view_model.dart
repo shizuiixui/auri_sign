@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:auri_sign/config/api_constants.dart';
 import 'package:auri_sign/features/lessons/data/repositories/lesson_repository.dart';
 import 'package:auri_sign/services/certificate_service.dart';
@@ -6,9 +8,19 @@ import '../models/achievement_category.dart';
 
 class AchievementsViewModel extends ChangeNotifier {
   bool isLoading = false;
-  bool isDownloading = false;
+  String? downloadingCategoryId;
+  String? previewingCategoryId;
   String? errorMessage;
   String? downloadErrorMessage;
+
+  bool get isDownloading =>
+      downloadingCategoryId != null || previewingCategoryId != null;
+
+  bool isDownloadingCategory(String categoryId) =>
+      downloadingCategoryId == categoryId;
+
+  bool isPreviewingCategory(String categoryId) =>
+      previewingCategoryId == categoryId;
 
   final LessonRepository _lessonRepo = LessonRepository(
     baseUrl: ApiConstants.baseUrl,
@@ -32,20 +44,67 @@ class AchievementsViewModel extends ChangeNotifier {
     ),
     AchievementCategory(
       id: 'phrases',
-      title: 'Phrases',
+      title: 'Phrases/Words',
       totalLessons: 9,
       completedLessons: 0,
     ),
   ];
 
+  final Map<String, String> _completionDates = {};
+
+  int get completedTracksCount => categories
+      .where((c) => c.completedLessons >= c.totalLessons && c.totalLessons > 0)
+      .length;
+
+  int get totalTracksCount => categories.length;
+
+  int get totalCompletedLessonsCount =>
+      categories.fold(0, (sum, c) => sum + c.completedLessons);
+
+  int get totalLessonsCount =>
+      categories.fold(0, (sum, c) => sum + c.totalLessons);
+
+  bool get isComprehensiveEligible =>
+      categories.isNotEmpty && completedTracksCount >= totalTracksCount;
+
+  String getCompletionDate(String categoryId) {
+    return _completionDates[categoryId] ??
+        DateFormat('MMMM d, yyyy').format(DateTime.now());
+  }
+
+  Future<void> _loadCompletionDates() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final todayFormatted =
+          DateFormat('MMMM d, yyyy').format(DateTime.now());
+
+      for (var cat in categories) {
+        if (cat.completedLessons >= cat.totalLessons && cat.totalLessons > 0) {
+          final key = 'category_completed_date_${cat.id}';
+          String? date = prefs.getString(key);
+          if (date == null || date.isEmpty) {
+            date = todayFormatted;
+            await prefs.setString(key, date);
+          }
+          _completionDates[cat.id] = date;
+        }
+      }
+    } catch (e) {
+      debugPrint("Error loading completion dates: $e");
+    }
+  }
+
   String _toApiCategoryName(String categoryId) {
-    switch (categoryId) {
+    switch (categoryId.toLowerCase()) {
       case 'alphabets':
         return 'Alphabets';
       case 'numbers':
         return 'Numbers';
       case 'phrases':
+      case 'phrases/words':
         return 'Phrases/Words';
+      case 'comprehensive':
+        return 'Comprehensive';
       default:
         return categoryId;
     }
@@ -99,6 +158,8 @@ class AchievementsViewModel extends ChangeNotifier {
       // assignNewListAndNotify
       categories = updatedCategories;
 
+      await _loadCompletionDates();
+
       if (failedRequests == categories.length) {
         errorMessage = 'Unable to fetch achievements progress right now.';
       }
@@ -111,7 +172,7 @@ class AchievementsViewModel extends ChangeNotifier {
   }
 
   Future<void> downloadCertificate(String categoryId, String userID) async {
-    isDownloading = true;
+    downloadingCategoryId = categoryId;
     downloadErrorMessage = null;
     notifyListeners();
 
@@ -123,10 +184,31 @@ class AchievementsViewModel extends ChangeNotifier {
         userID,
       );
     } catch (e) {
-      downloadErrorMessage = e.toString();
+      downloadErrorMessage = e.toString().replaceAll('Exception: ', '');
       debugPrint('Certificate download error: $e');
     } finally {
-      isDownloading = false;
+      downloadingCategoryId = null;
+      notifyListeners();
+    }
+  }
+
+  Future<void> previewCertificate(String categoryId, String userID) async {
+    previewingCategoryId = categoryId;
+    downloadErrorMessage = null;
+    notifyListeners();
+
+    try {
+      final apiCategoryName = _toApiCategoryName(categoryId);
+
+      await _certificateService.downloadAndOpenCertificate(
+        apiCategoryName,
+        userID,
+      );
+    } catch (e) {
+      downloadErrorMessage = e.toString().replaceAll('Exception: ', '');
+      debugPrint('Certificate preview error: $e');
+    } finally {
+      previewingCategoryId = null;
       notifyListeners();
     }
   }

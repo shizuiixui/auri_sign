@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 // achievementProgressCard
 class AchievementProgressCard extends StatelessWidget {
@@ -293,106 +294,118 @@ class LessonCoin extends StatelessWidget {
   }
 }
 
-// Certificate Card Widget
-class CertificateCard extends StatelessWidget {
-  final String categoryName;
+// Grand Master Credential Top Card Widget
+class GrandMasterCredentialCard extends StatelessWidget {
+  final int completedTracks;
+  final int totalTracks;
   final int completedLessons;
   final int totalLessons;
-  final VoidCallback onDownload;
+  final bool isUnlocked;
   final bool isDownloading;
+  final VoidCallback onDownload;
 
-  const CertificateCard({
+  const GrandMasterCredentialCard({
     super.key,
-    required this.categoryName,
+    required this.completedTracks,
+    required this.totalTracks,
     required this.completedLessons,
     required this.totalLessons,
+    required this.isUnlocked,
+    required this.isDownloading,
     required this.onDownload,
-    this.isDownloading = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    // checkIfCategoryIsFullyCompleted
-    bool isCompleted = completedLessons >= totalLessons && totalLessons > 0;
-
     return Container(
-      margin: EdgeInsets.only(bottom: 12.h),
+      width: double.infinity,
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.grey.shade200),
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 8,
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 10,
             offset: const Offset(0, 2),
           ),
         ],
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // leftSideInfo
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E293B),
+              borderRadius: BorderRadius.circular(20.r),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 10.w,
-                    vertical: 4.h,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isCompleted ? Colors.orange.shade50 : Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(20.r),
-                    border: Border.all(
-                      color: isCompleted
-                          ? const Color(0xFFFFB800).withOpacity(0.5)
-                          : Colors.grey.shade300,
-                    ),
-                  ),
-                  child: Text(
-                    categoryName,
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.bold,
-                      color: isCompleted ? const Color(0xFFB8860B) : Colors.grey.shade600,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10.h),
+                const _CrownIcon(),
+                SizedBox(width: 5.w),
                 Text(
-                  "$completedLessons/$totalLessons lessons completed",
+                  "GRAND MASTER CREDENTIAL",
                   style: TextStyle(
-                    fontSize: 13.sp,
-                    color: Colors.grey[700],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                SizedBox(height: 4.h),
-                Text(
-                  isCompleted ? "Completed" : "Not yet completed",
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    color: isCompleted ? Colors.green : Colors.grey,
-                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFFF59E0B),
+                    fontWeight: FontWeight.w800,
+                    fontSize: 10.sp,
+                    letterSpacing: 0.5,
+                    fontFamily: 'Inter',
                   ),
                 ),
               ],
             ),
           ),
-
-          SizedBox(width: 10.w),
-
-          // Button
-          _ActionButton(
-            text: isDownloading ? "Downloading..." : "Download",
-            icon: isCompleted ? Icons.download_rounded : Icons.lock_outline,
-            color: isCompleted ? const Color(0xFFFFB800) : Colors.grey.shade400,
-            textColor: Colors.white,
-            onPressed: isDownloading ? null : onDownload,
-            isLoading: isDownloading,
+          SizedBox(height: 8.h),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Comprehensive Sign Language Proficiency",
+                      style: TextStyle(
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF1E293B),
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      "$completedTracks/$totalTracks Learning Tracks Completed ($completedLessons/$totalLessons Lessons)",
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: const Color(0xFF64748B),
+                        fontWeight: FontWeight.w500,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                    SizedBox(height: 3.h),
+                    Text(
+                      "Complete Alphabets, Numbers, and Phrases to unlock",
+                      style: TextStyle(
+                        fontSize: 11.5.sp,
+                        color: const Color(0xFF64748B),
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: 8.w),
+              _CertificateActionButton(
+                text: "Download",
+                isUnlocked: isUnlocked,
+                isLoading: isDownloading,
+                onPressed: onDownload,
+              ),
+            ],
           ),
         ],
       ),
@@ -400,41 +413,197 @@ class CertificateCard extends StatelessWidget {
   }
 }
 
-// actionButtonHelperForCertificates
-class _ActionButton extends StatelessWidget {
-  final String text;
-  final IconData icon;
-  final Color color;
-  final Color textColor;
-  final VoidCallback? onPressed;
-  final bool isLoading;
+// Certificate Card Widget
+class CertificateCard extends StatelessWidget {
+  final String categoryName;
+  final int completedLessons;
+  final int totalLessons;
+  final String completedDate;
+  final VoidCallback onDownload;
+  final VoidCallback onPreview;
+  final bool isDownloading;
+  final bool isPreviewing;
 
-  const _ActionButton({
-    required this.text,
-    required this.icon,
-    required this.color,
-    required this.textColor,
-    this.onPressed,
-    this.isLoading = false,
+  const CertificateCard({
+    super.key,
+    required this.categoryName,
+    required this.completedLessons,
+    required this.totalLessons,
+    this.completedDate = '',
+    required this.onDownload,
+    required this.onPreview,
+    this.isDownloading = false,
+    this.isPreviewing = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final bool isCompleted =
+        completedLessons >= totalLessons && totalLessons > 0;
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 14.h),
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Row 1: Category Pill + Completed Badge across the full card width
+          Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8.w,
+            runSpacing: 4.h,
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 10.w,
+                  vertical: 3.h,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFFBEB),
+                  borderRadius: BorderRadius.circular(20.r),
+                  border: Border.all(
+                    color: const Color(0xFFF59E0B),
+                    width: 1.2,
+                  ),
+                ),
+                child: Text(
+                  categoryName,
+                  style: TextStyle(
+                    fontSize: 11.5.sp,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFFD97706),
+                    fontFamily: 'Inter',
+                  ),
+                ),
+              ),
+              if (isCompleted)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.check_rounded,
+                      size: 16.sp,
+                      color: const Color(0xFF00B074),
+                    ),
+                    SizedBox(width: 3.w),
+                    Text(
+                      "Completed",
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF00B074),
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                  ],
+                ),
+            ],
+          ),
+          SizedBox(height: 8.h),
+
+          // Row 2: Subtitle & Status on the left, Buttons on the right
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "$completedLessons/$totalLessons lessons completed",
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: const Color(0xFF64748B),
+                        fontWeight: FontWeight.w500,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                    SizedBox(height: 3.h),
+                    Text(
+                      isCompleted
+                          ? (completedDate.isNotEmpty
+                              ? "Completed on $completedDate"
+                              : "Completed")
+                          : "In progress",
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: const Color(0xFF64748B),
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: 8.w),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (isCompleted) ...[
+                    _PreviewButton(
+                      isLoading: isPreviewing,
+                      onPressed: onPreview,
+                    ),
+                    SizedBox(width: 6.w),
+                  ],
+                  _CertificateActionButton(
+                    text: "Download",
+                    isUnlocked: isCompleted,
+                    isLoading: isDownloading,
+                    onPressed: onDownload,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CertificateActionButton extends StatelessWidget {
+  final String text;
+  final bool isUnlocked;
+  final bool isLoading;
+  final VoidCallback onPressed;
+
+  const _CertificateActionButton({
+    required this.text,
+    required this.isUnlocked,
+    required this.isLoading,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bgColor =
+        isUnlocked ? const Color(0xFFFFB800) : const Color(0xFFFFD866);
+
     return SizedBox(
-      height: 38.h,
+      height: 36.h,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          foregroundColor: textColor,
+          backgroundColor: bgColor,
+          foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.r),
+            borderRadius: BorderRadius.circular(20.r),
           ),
-          padding: EdgeInsets.symmetric(
-            horizontal: 12.w,
-          ),
+          padding: EdgeInsets.symmetric(horizontal: 14.w),
         ),
-        onPressed: onPressed,
+        onPressed: isLoading ? null : onPressed,
         child: isLoading
             ? SizedBox(
                 width: 16.r,
@@ -447,22 +616,107 @@ class _ActionButton extends StatelessWidget {
             : Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    icon,
-                    size: 18.sp,
-                    color: textColor,
-                  ),
-                  SizedBox(width: 6.w),
+                  const _DownloadIcon(color: Colors.white),
+                  SizedBox(width: 5.w),
                   Text(
                     text,
                     style: TextStyle(
-                      fontSize: 12.sp,
+                      fontSize: 12.5.sp,
                       fontWeight: FontWeight.bold,
+                      fontFamily: 'Inter',
                     ),
                   ),
                 ],
               ),
       ),
+    );
+  }
+}
+
+class _PreviewButton extends StatelessWidget {
+  final bool isLoading;
+  final VoidCallback onPressed;
+
+  const _PreviewButton({
+    required this.isLoading,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 36.h,
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: Color(0xFF64748B), width: 1.2),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.r),
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 12.w),
+        ),
+        onPressed: isLoading ? null : onPressed,
+        child: isLoading
+            ? SizedBox(
+                width: 14.r,
+                height: 14.r,
+                child: const CircularProgressIndicator(
+                  strokeWidth: 2.0,
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF475569)),
+                ),
+              )
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.visibility_outlined,
+                    size: 15.sp,
+                    color: const Color(0xFF475569),
+                  ),
+                  SizedBox(width: 4.w),
+                  Text(
+                    "Preview",
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF475569),
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                ],
+              ),
+      ),
+    );
+  }
+}
+
+class _CrownIcon extends StatelessWidget {
+  const _CrownIcon();
+
+  @override
+  Widget build(BuildContext context) {
+    return SvgPicture.string(
+      '''<svg width="13" height="11" viewBox="0 0 24 20" fill="#F59E0B">
+        <path d="M2 17h20v3H2v-3zm0-3.5L5.5 4l6.5 6 6.5-6L22 13.5H2z"/>
+      </svg>''',
+    );
+  }
+}
+
+class _DownloadIcon extends StatelessWidget {
+  final Color color;
+
+  const _DownloadIcon({this.color = Colors.white});
+
+  @override
+  Widget build(BuildContext context) {
+    return SvgPicture.string(
+      '''<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="12" y1="18" x2="12" y2="12"></line>
+        <polyline points="9 15 12 18 15 15"></polyline>
+      </svg>''',
+      colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
     );
   }
 }

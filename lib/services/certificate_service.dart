@@ -29,10 +29,6 @@ class CertificateService {
     return token;
   }
 
-  Options _authOptions(String token) {
-    return Options(headers: {'Authorization': 'Bearer $token'});
-  }
-
   /// Maps category display names to API category names
   String _toApiCategoryName(String categoryDisplayName) {
     switch (categoryDisplayName.toLowerCase()) {
@@ -43,6 +39,8 @@ class CertificateService {
       case 'phrases':
       case 'phrases/words':
         return 'Phrases/Words';
+      case 'comprehensive':
+        return 'Comprehensive';
       default:
         return categoryDisplayName;
     }
@@ -54,25 +52,33 @@ class CertificateService {
   }
 
   /// Generates the certificate on the backend, then downloads and opens the PDF
-  /// Downloads and opens a certificate PDF for the given category
+  /// Downloads and opens a certificate PDF for the given category or Comprehensive
   Future<void> downloadAndOpenCertificate(
     String categoryName,
     String userID,
   ) async {
     try {
       final token = await _getAuthToken();
-      final encodedCategory = _toEncodedCategory(categoryName);
+      final bool isComprehensive =
+          categoryName.trim().toLowerCase() == 'comprehensive';
+
+      final String requestPath = isComprehensive
+          ? '/api/certificates/Comprehensive/'
+          : '/api/certificates/${_toEncodedCategory(categoryName)}/pdf';
+
+      final String fileSuffix = isComprehensive
+          ? 'Comprehensive'
+          : _toEncodedCategory(categoryName).replaceAll('%2F', '_');
 
       debugPrint(
-        '🚨 STEP 1: Sending DOWNLOAD request to /api/certificates/$encodedCategory/pdf',
+        '🚨 STEP 1: Sending DOWNLOAD request to $requestPath',
       );
 
       final tempDir = await getTemporaryDirectory();
-      final filePath =
-          '${tempDir.path}/certificate_${encodedCategory.replaceAll('%2F', '_')}.pdf';
+      final filePath = '${tempDir.path}/certificate_$fileSuffix.pdf';
 
       final response = await _dio.download(
-        '/api/certificates/$encodedCategory/pdf',
+        requestPath,
         filePath,
         options: Options(
           headers: {'Authorization': 'Bearer $token'},
@@ -98,11 +104,16 @@ class CertificateService {
       debugPrint('🚨 ERROR PATH: ${e.requestOptions.path}');
       debugPrint('🚨 ERROR STATUS: ${e.response?.statusCode}');
 
+      final bool isComprehensive =
+          categoryName.trim().toLowerCase() == 'comprehensive';
+
       if (e.response?.statusCode == 400) {
-        throw Exception('Invalid category requested.');
+        throw Exception('Invalid certificate requested.');
       } else if (e.response?.statusCode == 404) {
         throw Exception(
-          'Not found. Please complete all lessons in this category first.',
+          isComprehensive
+              ? 'Please complete all learning tracks (Alphabets, Numbers, Phrases) first.'
+              : 'Not found. Please complete all lessons in this category first.',
         );
       } else if (e.response?.statusCode == 401) {
         throw Exception('Session expired. Please login again.');
