@@ -171,7 +171,7 @@ class UserViewModel extends ChangeNotifier {
   Future<void> updateProfile({
     required String newFirstName,
     required String newLastName,
-    required String newEmail,
+    String? newEmail,
   }) async {
     _isLoading = true;
     _errorMessage = '';
@@ -206,7 +206,10 @@ class UserViewModel extends ChangeNotifier {
       }
 
       // Update Email via HTTP request
-      if (_user != null && newEmail.isNotEmpty && newEmail != _user!.email) {
+      if (_user != null &&
+          newEmail != null &&
+          newEmail.isNotEmpty &&
+          newEmail != _user!.email) {
         final emailResponse = await http.put(
           Uri.parse(ApiConstants.updateEmail),
           headers: {
@@ -226,7 +229,9 @@ class UserViewModel extends ChangeNotifier {
         _user = _user!.copyWith(
           firstName: newFirstName,
           lastName: newLastName,
-          email: newEmail.isNotEmpty ? newEmail : _user!.email,
+          email: (newEmail != null && newEmail.isNotEmpty)
+              ? newEmail
+              : _user!.email,
         );
       }
 
