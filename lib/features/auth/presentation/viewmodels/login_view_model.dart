@@ -27,9 +27,13 @@ class LoginViewModel extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         _token = response.data['token'];
+        final userId = response.data['user']?['_id'] ?? response.data['user']?['id'];
         final prefs = await SharedPreferences.getInstance();
 
         await prefs.setString('auth_token', _token!);
+        if (userId != null) {
+          await prefs.setString('current_user_id', userId.toString());
+        }
 
         print("SUCCESS: Token safely stored on device disk!");
       } else {

@@ -4,7 +4,6 @@ import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:auri_sign/config/api_constants.dart';
-import 'package:auri_sign/models/certificate_models.dart';
 
 class CertificateService {
   late Dio _dio;

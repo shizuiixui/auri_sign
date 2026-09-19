@@ -40,6 +40,10 @@ class UserViewModel extends ChangeNotifier {
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
         _user = UserModel.fromJson(data);
+        if (_user?.id != null && _user!.id.isNotEmpty) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('current_user_id', _user!.id);
+        }
       } else {
         _errorMessage = "Failed to load user";
       }
@@ -97,6 +101,7 @@ class UserViewModel extends ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('auth_token');
+      await prefs.remove('current_user_id');
 
       if (_token != null) {
         await http.post(

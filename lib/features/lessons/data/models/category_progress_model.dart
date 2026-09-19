@@ -29,6 +29,24 @@ class DetailedCategoryProgress {
           [],
     );
   }
+
+  DetailedCategoryProgress copyWith({
+    bool? success,
+    String? category,
+    int? totalLessons,
+    int? completedLessons,
+    bool? isCompleted,
+    List<LessonProgressItem>? lessonProgress,
+  }) {
+    return DetailedCategoryProgress(
+      success: success ?? this.success,
+      category: category ?? this.category,
+      totalLessons: totalLessons ?? this.totalLessons,
+      completedLessons: completedLessons ?? this.completedLessons,
+      isCompleted: isCompleted ?? this.isCompleted,
+      lessonProgress: lessonProgress ?? this.lessonProgress,
+    );
+  }
 }
 
 class LessonProgressItem {
@@ -46,7 +64,6 @@ class LessonProgressItem {
     required this.score,
     required this.isUnlocked,
     required this.description,
-
   });
 
   factory LessonProgressItem.fromJson(Map<String, dynamic> json) {
@@ -62,6 +79,24 @@ class LessonProgressItem {
           ? (progressData['scorePercentage'] as num?)?.toInt() ?? 0
           : 0,
       isUnlocked: json['isUnlocked'] ?? false,
+    );
+  }
+
+  LessonProgressItem copyWith({
+    String? lessonId,
+    String? title,
+    String? description,
+    String? status,
+    int? score,
+    bool? isUnlocked,
+  }) {
+    return LessonProgressItem(
+      lessonId: lessonId ?? this.lessonId,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      status: status ?? this.status,
+      score: score ?? this.score,
+      isUnlocked: isUnlocked ?? this.isUnlocked,
     );
   }
 }
