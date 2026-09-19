@@ -12,65 +12,110 @@ class BadgesViewModel extends ChangeNotifier {
 
   List<Map<String, dynamic>> earnedBadges = [];
   List<Map<String, dynamic>> upcomingBadges = [];
+  List<Map<String, dynamic>> allBadges = [];
 
-  BadgesViewModel() {
-    _updateUpcomingBadges([]);
-  }
-
-  // Fetch user progress from API
-  final List<Map<String, dynamic>> _allBadges = [
+  static final List<Map<String, dynamic>> _badgeDefinitions = [
+    // Streak Milestones
     {
-      "id": "streak_3",
-      "days": 3,
+      "badgeId": "streak_3",
       "name": "3-Day Streak",
-      "desc": "Complete lessons for 3 consecutive days",
+      "category": "Streak Milestone",
+      "categoryType": "streak",
+      "description": "Consistent effort pays off. Earned by learning 3 days in a row.",
+      "criteria": "Complete lessons for 3 consecutive days.",
     },
     {
-      "id": "streak_7",
-      "days": 7,
+      "badgeId": "streak_7",
       "name": "Week Warrior",
-      "desc": "Complete lessons for 7 consecutive days",
+      "category": "Streak Milestone",
+      "categoryType": "streak",
+      "description": "One full week of continuous dedication and signing practice!",
+      "criteria": "Complete lessons for 7 consecutive days.",
     },
     {
-      "id": "streak_14",
-      "days": 14,
+      "badgeId": "streak_14",
       "name": "Two Week Champion",
-      "desc": "Complete lessons for 14 consecutive days",
+      "category": "Streak Milestone",
+      "categoryType": "streak",
+      "description": "Two straight weeks of signing fluency and consistent habit.",
+      "criteria": "Complete lessons for 14 consecutive days.",
     },
     {
-      "id": "streak_30",
-      "days": 30,
+      "badgeId": "streak_30",
       "name": "Month Master",
-      "desc": "Complete lessons for 30 consecutive days",
+      "category": "Streak Milestone",
+      "categoryType": "streak",
+      "description": "A whole month of daily sign language practice. True dedication!",
+      "criteria": "Complete lessons for 30 consecutive days.",
     },
     {
-      "id": "streak_50",
-      "days": 50,
+      "badgeId": "streak_50",
       "name": "50-Day Legend",
-      "desc": "Complete lessons for 50 consecutive days",
+      "category": "Streak Milestone",
+      "categoryType": "streak",
+      "description": "Fifty consecutive days of signing excellence and dedication.",
+      "criteria": "Complete lessons for 50 consecutive days.",
     },
     {
-      "id": "streak_100",
-      "days": 100,
+      "badgeId": "streak_100",
       "name": "Centurion",
-      "desc": "Complete lessons for 100 consecutive days",
+      "category": "Streak Milestone",
+      "categoryType": "streak",
+      "description": "The triple-digit club! 100 consecutive days of mastery.",
+      "criteria": "Complete lessons for 100 consecutive days.",
     },
+    // Course Track Certifications
     {
-      "id": "alphabet",
+      "badgeId": "certified_alphabet",
       "name": "Certified Alphabet Signer",
-      "desc": "Complete all Alphabet lessons",
+      "category": "Course Certification",
+      "categoryType": "track",
+      "description": "Mastered all A-Z finger spelling hand shapes and motions.",
+      "criteria": "Complete all lessons in the Alphabet track.",
     },
     {
-      "id": "number",
+      "badgeId": "certified_numeric",
       "name": "Certified Numeric Signer",
-      "desc": "Complete all Numeric lessons",
+      "category": "Course Certification",
+      "categoryType": "track",
+      "description": "Proficient in numbers and numeric hand sign expressions.",
+      "criteria": "Complete all lessons in the Numbers track.",
     },
     {
-      "id": "phrase",
+      "badgeId": "certified_phrase",
       "name": "Certified Phrase Communicator",
-      "desc": "Complete all Phrase lessons",
+      "category": "Course Certification",
+      "categoryType": "track",
+      "description": "Mastered essential everyday phrases, expressions, and sentences.",
+      "criteria": "Complete all lessons in the Phrases track.",
+    },
+    // Platform Milestones
+    {
+      "badgeId": "first_lesson",
+      "name": "First Steps",
+      "category": "Platform Milestone",
+      "categoryType": "milestone",
+      "description": "Began your sign language journey by completing your first lesson.",
+      "criteria": "Complete your very first lesson in any track.",
+    },
+    {
+      "badgeId": "master",
+      "name": "Sign Language Master",
+      "category": "Platform Milestone",
+      "categoryType": "milestone",
+      "description": "The highest honor awarded to comprehensive sign language masters.",
+      "criteria": "Achieve all track certifications and demonstrate comprehensive proficiency.",
     },
   ];
+
+  BadgesViewModel() {
+    _processBadges([]);
+  }
+
+  int get earnedCount => allBadges.where((b) => b['isEarned'] == true).length;
+  int get lockedCount => allBadges.where((b) => b['isEarned'] != true).length;
+  int get totalCount => allBadges.length;
+  double get unlockedPercent => totalCount == 0 ? 0.0 : (earnedCount / totalCount);
 
   final Dio _dio = Dio(BaseOptions(baseUrl: ApiConstants.baseUrl));
 
@@ -93,30 +138,12 @@ class BadgesViewModel extends ChangeNotifier {
         totalBadges = (data['totalBadges'] as num?)?.toInt() ?? 0;
         totalPoints = (data['totalPoints'] as num?)?.toDouble() ?? 0.0;
 
-        final rawBadgesFromApi = data['badges'] as List? ?? [];
-        List<String> earnedIdentifiers = [];
-        earnedBadges = [];
+        final rawBadgesFromApi = (data['badges'] as List? ?? [])
+            .whereType<Map>()
+            .map((e) => Map<String, dynamic>.from(e))
+            .toList();
 
-        for (var b in rawBadgesFromApi) {
-          if (b is Map) {
-            String badgeId = (b['badgeId'] ?? b['id'] ?? b['_id'] ?? '').toString();
-            String badgeName = (b['badgeName'] ?? b['name'] ?? 'Badge').toString();
-            String desc = (b['description'] ?? b['desc'] ?? '').toString();
-
-            if (badgeId.isNotEmpty) earnedIdentifiers.add(badgeId);
-            if (badgeName.isNotEmpty) earnedIdentifiers.add(badgeName);
-
-            // Store the data
-            earnedBadges.add({
-              "badgeId": badgeId,
-              "name": badgeName,
-              "desc": desc,
-              "unlockedAt": b['unlockedAt'],
-            });
-          }
-        }
-
-        _updateUpcomingBadges(earnedIdentifiers);
+        _processBadges(rawBadgesFromApi);
       }
     } catch (e) {
       errorMessage = "Failed to load badges.";
@@ -131,24 +158,58 @@ class BadgesViewModel extends ChangeNotifier {
     }
   }
 
-  // Private helper to update upcoming badges based on earned identifiers (IDs and Names)
-  void _updateUpcomingBadges(List<String> earnedIdentifiers) {
-    final lowerEarned = earnedIdentifiers
-        .map((e) => e.toLowerCase().trim())
-        .where((e) => e.isNotEmpty)
-        .toSet();
+  void _processBadges(List<Map<String, dynamic>> rawBadgesFromApi) {
+    allBadges = _badgeDefinitions.map((def) {
+      final badgeCopy = Map<String, dynamic>.from(def);
+      final match = _findMatchingApiBadge(def, rawBadgesFromApi);
 
-    upcomingBadges = _allBadges.where((hardcodedBadge) {
-      final id = (hardcodedBadge['id'] as String? ?? '').toLowerCase().trim();
-      final name = (hardcodedBadge['name'] as String? ?? '').toLowerCase().trim();
+      final isEarned = match != null;
+      badgeCopy['isEarned'] = isEarned;
+      badgeCopy['unlockedAt'] = match?['unlockedAt'];
+      badgeCopy['desc'] = def['description']; // For backwards compatibility
 
-      final isEarned = lowerEarned.contains(id) ||
-          lowerEarned.contains(name) ||
-          lowerEarned.any((earned) =>
-              (id.isNotEmpty && (earned.contains(id) || id.contains(earned))) ||
-              (name.isNotEmpty && (earned.contains(name) || name.contains(earned))));
-
-      return !isEarned;
+      return badgeCopy;
     }).toList();
+
+    earnedBadges = allBadges.where((b) => b['isEarned'] == true).toList();
+    upcomingBadges = allBadges.where((b) => b['isEarned'] != true).toList();
+  }
+
+  Map<String, dynamic>? _findMatchingApiBadge(
+    Map<String, dynamic> def,
+    List<Map<String, dynamic>> rawBadgesFromApi,
+  ) {
+    final defId = (def['badgeId'] ?? '').toString().toLowerCase().trim();
+    final defName = (def['name'] ?? '').toString().toLowerCase().trim();
+
+    for (var b in rawBadgesFromApi) {
+      final bId = (b['badgeId'] ?? b['id'] ?? b['_id'] ?? '').toString().toLowerCase().trim();
+      final bName = (b['badgeName'] ?? b['name'] ?? '').toString().toLowerCase().trim();
+
+      if (bId.isNotEmpty && (bId == defId || bId.contains(defId) || defId.contains(bId))) {
+        return b;
+      }
+      if (bName.isNotEmpty && (bName == defName || bName.contains(defName) || defName.contains(bName))) {
+        return b;
+      }
+
+      // Aliases handling
+      if (defId == 'certified_alphabet' && (bId.contains('alphabet') || bName.contains('alphabet'))) {
+        return b;
+      }
+      if (defId == 'certified_numeric' && (bId.contains('number') || bId.contains('numeric') || bName.contains('numeric') || bName.contains('number'))) {
+        return b;
+      }
+      if (defId == 'certified_phrase' && (bId.contains('phrase') || bName.contains('phrase'))) {
+        return b;
+      }
+      if (defId == 'first_lesson' && (bId.contains('first') || bName.contains('first'))) {
+        return b;
+      }
+      if (defId == 'master' && (bId == 'master' || bName.contains('sign language master'))) {
+        return b;
+      }
+    }
+    return null;
   }
 }
