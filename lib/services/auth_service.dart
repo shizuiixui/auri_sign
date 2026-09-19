@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:auri_sign/config/api_constants.dart';
 
 // AuthService API class handle
@@ -13,10 +14,35 @@ class AuthService {
     ),
   );
 
+  Future<Map<String, String>> _getHeaders() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
+    return {
+      'Content-Type': 'application/json',
+      if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+    };
+  }
+
   Future<Response> sendOTP({required String email}) async {
+    final headers = await _getHeaders();
     try {
-      return await _dio.post('/api/otp/sendOTP', data: {'email': email});
-    } catch (e) {
+      return await _dio.post(
+        '/api/otp/sendOTP',
+        data: {'email': email},
+        options: Options(headers: headers),
+      );
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+        try {
+          return await _dio.post(
+            '/api/otp/sendOTP/',
+            data: {'email': email},
+            options: Options(headers: headers),
+          );
+        } catch (_) {
+          rethrow;
+        }
+      }
       rethrow;
     }
   }
@@ -26,12 +52,25 @@ class AuthService {
     required String email,
     required String otp,
   }) async {
+    final headers = await _getHeaders();
     try {
       return await _dio.post(
         '/api/otp/verifyOTP',
         data: {'email': email, 'otp': otp},
+        options: Options(headers: headers),
       );
-    } catch (e) {
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+        try {
+          return await _dio.post(
+            '/api/otp/verifyOTP/',
+            data: {'email': email, 'otp': otp},
+            options: Options(headers: headers),
+          );
+        } catch (_) {
+          rethrow;
+        }
+      }
       rethrow;
     }
   }

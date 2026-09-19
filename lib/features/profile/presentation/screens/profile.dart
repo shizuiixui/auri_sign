@@ -9,6 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 // Ensure plugin is available for the test
 
 // Screens
+import 'package:auri_sign/features/profile/presentation/screens/change_email.dart';
 import 'package:auri_sign/features/profile/presentation/screens/change_password_page.dart';
 import 'package:auri_sign/features/profile/presentation/screens/edit_profile_page.dart';
 import 'package:auri_sign/features/profile/presentation/screens/privacy_policy.dart';
@@ -250,6 +251,19 @@ class ProfilePage extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const EditProfilePage(),
+                ),
+              );
+            },
+          ),
+
+          // Change Email
+          ProfileMenuTile(
+            title: "Change Your Email",
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ChangeEmailPage(),
                 ),
               );
             },

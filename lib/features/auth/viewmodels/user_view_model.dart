@@ -246,6 +246,52 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
+  Future<Map<String, dynamic>> updateEmailOnly(String newEmail, {String? otp}) async {
+    _isLoading = true;
+    _errorMessage = '';
+    notifyListeners();
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token') ?? '';
+
+      final Map<String, dynamic> bodyData = {'email': newEmail};
+      if (otp != null && otp.isNotEmpty) {
+        bodyData['otp'] = otp;
+      }
+
+      final emailResponse = await http.put(
+        Uri.parse(ApiConstants.updateEmail),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(bodyData),
+      );
+
+      final body = jsonDecode(emailResponse.body);
+
+      if (emailResponse.statusCode != 200 && emailResponse.statusCode != 201) {
+        throw Exception(body['message'] ?? 'Failed to update email.');
+      }
+
+      // If OTP was provided and update succeeded, update local user
+      if (otp != null && otp.isNotEmpty && _user != null) {
+        _user = _user!.copyWith(email: newEmail);
+        debugPrint("SUCCESS: Email updated locally and on server.");
+      }
+
+      return body is Map<String, dynamic> ? body : <String, dynamic>{};
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      debugPrint("Update Email Error: $_errorMessage");
+      throw Exception(_errorMessage);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> changePassword({
     required String currentPassword,
     required String newPassword,
