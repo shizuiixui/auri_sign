@@ -31,14 +31,30 @@ class CustomPasswordField extends StatelessWidget {
         color: const Color(0xFF1E293B),
       ),
       decoration: InputDecoration(
-        suffixIcon: IconButton(
-          icon: Icon(
-            isObscured ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+        prefixIcon: Padding(
+          padding: EdgeInsets.only(left: 18.w, right: 12.w),
+          child: Icon(
+            Icons.lock,
             size: iconSize,
-            color: const Color(0xFF64748B),
           ),
-          onPressed: onVisibilityToggle,
         ),
+        prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+
+        suffixIcon: Padding(
+          padding: EdgeInsets.only(right: 12.w),
+          child: IconButton(
+            icon: Icon(
+              isObscured
+                  ? Icons.visibility_off
+                  : Icons.visibility,
+              size: iconSize,
+            ),
+            onPressed: onVisibilityToggle,
+            splashRadius: 20.r,
+          ),
+        ),
+        suffixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+
         hintText: hint,
         hintStyle: TextStyle(
           color: Colors.grey.shade400,
@@ -47,10 +63,7 @@ class CustomPasswordField extends StatelessWidget {
         ),
         filled: true,
         fillColor: Colors.white,
-        contentPadding: EdgeInsets.symmetric(
-          vertical: 14.h,
-          horizontal: 16.w,
-        ),
+        contentPadding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 16.w),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30.r),
           borderSide: BorderSide(color: Colors.grey.shade300),
