@@ -71,14 +71,20 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final scheduleVM = context.read<NotificationScheduleViewModel>();
       final centerVM = context.read<NotificationCenterViewModel>();
+
+      if (scheduleVM.isLoading) {
+        await scheduleVM.ensureScheduleInitialized();
+      }
       final isAlarmEnabled = scheduleVM.schedule != null;
 
-      centerVM.catchUp8AMNotification(isAlarmEnabled);
-      context.read<CategoryViewModel>().fetchAllCategoriesSummary();
-      context.read<StreakViewModel>().fetchStreakInfo();
+      await centerVM.catchUp8AMNotification(isAlarmEnabled);
+      if (mounted) {
+        context.read<CategoryViewModel>().fetchAllCategoriesSummary();
+        context.read<StreakViewModel>().fetchStreakInfo();
+      }
     });
   }
 

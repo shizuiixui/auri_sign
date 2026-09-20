@@ -91,6 +91,21 @@ class LocalNotificationsDataSource {
       scheduledDate = scheduledDate.add(const Duration(days: 1));
     }
 
+    final androidPlugin = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    if (androidPlugin != null) {
+      await androidPlugin.createNotificationChannel(
+        AndroidNotificationChannel(
+          schedule.channelId,
+          schedule.channelName,
+          description: schedule.channelDescription,
+          importance: Importance.max,
+          enableVibration: true,
+          playSound: true,
+        ),
+      );
+    }
+
     final androidScheduleMode = precision == SchedulePrecision.exact
         ? AndroidScheduleMode.exactAllowWhileIdle
         : AndroidScheduleMode.inexactAllowWhileIdle;
@@ -107,8 +122,15 @@ class LocalNotificationsDataSource {
           channelDescription: schedule.channelDescription,
           importance: Importance.max,
           priority: Priority.high,
+          icon: '@mipmap/ic_launcher',
+          enableVibration: true,
+          playSound: true,
         ),
-        iOS: const DarwinNotificationDetails(),
+        iOS: const DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
       ),
       androidScheduleMode: androidScheduleMode,
       matchDateTimeComponents: DateTimeComponents.time,

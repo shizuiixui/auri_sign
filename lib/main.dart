@@ -33,10 +33,14 @@ void main() async {
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings('@mipmap/ic_launcher');
 
+  const DarwinInitializationSettings initializationSettingsDarwin =
+      DarwinInitializationSettings();
+
   const InitializationSettings initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
+    iOS: initializationSettingsDarwin,
   );
-  [];
+
   await flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
     onDidReceiveNotificationResponse: (details) {},
@@ -94,6 +98,10 @@ class _MyAppState extends State<MyApp> {
 
     if (mounted) {
       await context.read<UserViewModel>().initSession();
+    }
+
+    if (mounted) {
+      await context.read<NotificationScheduleViewModel>().ensureScheduleInitialized();
     }
 
     if (mounted) {

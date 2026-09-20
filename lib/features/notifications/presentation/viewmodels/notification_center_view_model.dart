@@ -42,6 +42,7 @@ class NotificationCenterViewModel extends ChangeNotifier {
   List<AppNotification> get notifications => _notifications;
 
   int get unreadCount => _notifications.where((n) => !n.isRead).length;
+  bool _isStorageLoaded = false;
 
   NotificationCenterViewModel() {
     _loadFromStorage();
@@ -56,8 +57,9 @@ class NotificationCenterViewModel extends ChangeNotifier {
       _notifications = decoded
           .map((item) => AppNotification.fromJson(item))
           .toList();
-      notifyListeners();
     }
+    _isStorageLoaded = true;
+    notifyListeners();
   }
 
   Future<void> _saveToStorage() async {
@@ -102,6 +104,10 @@ class NotificationCenterViewModel extends ChangeNotifier {
 
   Future<void> catchUp8AMNotification(bool isScheduleEnabled) async {
     if (!isScheduleEnabled) return;
+
+    if (!_isStorageLoaded) {
+      await _loadFromStorage();
+    }
 
     final now = DateTime.now();
     final today8AM = DateTime(now.year, now.month, now.day, 8, 0);
