@@ -21,7 +21,6 @@ class CustomPasswordField extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
     final iconSize = screenWidth < 600 ? 20.sp : 18.sp;
-    final radius = borderRadius ?? 12.r;
 
     return TextField(
       controller: controller,
