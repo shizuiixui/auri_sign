@@ -6,20 +6,27 @@ enum LessonStatus { locked, current, completed }
 // Header Widget
 class CategoryHeader extends StatelessWidget {
   final String title;
+  final Color? backgroundColor;
 
-  const CategoryHeader({super.key, required this.title});
+  const CategoryHeader({
+    super.key,
+    required this.title,
+    this.backgroundColor,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final Color bgColor = backgroundColor ?? const Color(0xFFE9B63B);
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFE9B63B),
+        color: bgColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFE9B63B).withOpacity(0.3),
+            color: bgColor.withValues(alpha: 0.3),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -59,6 +66,7 @@ class Category extends StatelessWidget {
   final String description;
   final LessonStatus status;
   final VoidCallback onTap;
+  final Color? themeColor;
 
   const Category({
     super.key,
@@ -66,6 +74,7 @@ class Category extends StatelessWidget {
     required this.description,
     required this.status,
     required this.onTap,
+    this.themeColor,
   });
 
   @override
@@ -74,6 +83,7 @@ class Category extends StatelessWidget {
     final bool isLocked = status == LessonStatus.locked;
     final bool isCompleted = status == LessonStatus.completed;
     final bool isCurrent = status == LessonStatus.current;
+    final Color activeColor = themeColor ?? const Color(0xFFE9B63B);
 
     Color borderColor = Colors.transparent;
     Color iconColor = Colors.grey;
@@ -81,8 +91,8 @@ class Category extends StatelessWidget {
     double opacity = 0.6;
 
     if (isCurrent) {
-      borderColor = const Color(0xFFE9B63B);
-      iconColor = const Color(0xFFE9B63B);
+      borderColor = activeColor;
+      iconColor = activeColor;
       statusIcon = Icons.play_arrow_rounded;
       opacity = 1.0;
     } else if (isCompleted) {
@@ -90,6 +100,8 @@ class Category extends StatelessWidget {
       iconColor = Colors.green;
       statusIcon = Icons.check_circle_rounded;
       opacity = 1.0;
+    } else {
+      borderColor = activeColor.withValues(alpha: 0.35);
     }
 
     return GestureDetector(
@@ -104,11 +116,11 @@ class Category extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: borderColor,
-              width: isCurrent || isCompleted ? 2 : 0,
+              width: isCurrent || isCompleted ? 2 : 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -122,7 +134,7 @@ class Category extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isLocked
                       ? Colors.grey[200]
-                      : iconColor.withOpacity(0.1),
+                      : iconColor.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(

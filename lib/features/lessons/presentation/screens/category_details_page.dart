@@ -12,6 +12,7 @@ class CategoryDetailsPage extends StatefulWidget {
   final String apiCategoryName;
   final String webCategorySlug;
   final String description;
+  final Color? themeColor;
 
   const CategoryDetailsPage({
     super.key,
@@ -19,6 +20,7 @@ class CategoryDetailsPage extends StatefulWidget {
     required this.apiCategoryName,
     required this.webCategorySlug,
     required this.description,
+    this.themeColor,
   });
 
   @override
@@ -26,6 +28,25 @@ class CategoryDetailsPage extends StatefulWidget {
 }
 
 class _CategoryDetailsPageState extends State<CategoryDetailsPage> {
+  Color get _themeColor {
+    if (widget.themeColor != null) return widget.themeColor!;
+    final slug = widget.webCategorySlug.toLowerCase();
+    final api = widget.apiCategoryName.toLowerCase();
+    final title = widget.title.toLowerCase();
+
+    if (slug.contains('number') || api.contains('number') || title.contains('number')) {
+      return const Color(0xFF0D6EFD); // Blue for Numbers
+    } else if (slug.contains('phrase') ||
+        api.contains('phrase') ||
+        title.contains('phrase') ||
+        title.contains('common') ||
+        slug.contains('word') ||
+        api.contains('word')) {
+      return const Color(0xFFDC3545);
+    }
+    return const Color(0xFFE9B63B);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -90,8 +111,8 @@ class _CategoryDetailsPageState extends State<CategoryDetailsPage> {
       ),
       body: SafeArea(
         child: vm.isLoading
-            ? const Center(
-                child: CircularProgressIndicator(color: Color(0xFFE9B63B)),
+            ? Center(
+                child: CircularProgressIndicator(color: _themeColor),
               )
             : vm.errorMessage != null
             ? _buildErrorState(vm.errorMessage!)
@@ -130,8 +151,10 @@ class _CategoryDetailsPageState extends State<CategoryDetailsPage> {
         padding: EdgeInsets.all(16.w),
         child: Column(
           children: [
-            // 🔄 DYNAMIC DESCRIPTION
-            CategoryHeader(title: widget.description),
+            CategoryHeader(
+              title: widget.description,
+              backgroundColor: _themeColor,
+            ),
             SizedBox(height: 18.h),
             if (vm.categoryData != null &&
                 vm.categoryData!.lessonProgress.isNotEmpty)
@@ -152,6 +175,7 @@ class _CategoryDetailsPageState extends State<CategoryDetailsPage> {
                     description:
                         "${lesson.description}\n\nScore: ${lesson.score}%",
                     status: uiStatus,
+                    themeColor: _themeColor,
                     onTap: lesson.isUnlocked
                         ? () => _navigateToLesson(lesson.lessonId)
                         : () {},
