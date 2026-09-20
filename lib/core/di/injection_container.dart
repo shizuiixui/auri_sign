@@ -28,6 +28,7 @@ import 'package:auri_sign/features/profile/domain/usecases/get_schedule_enabled_
 
 // View Models
 import 'package:auri_sign/features/profile/viewmodels/notification_schedule_view_model.dart';
+import '../../features/profile/viewmodels/sound_settings_view_model.dart';
 
 final sl = GetIt.instance;
 
@@ -80,5 +81,10 @@ Future<void> init() async {
       getScheduleUseCase: sl(),
       setScheduleUseCase: sl(),
     ),
+  );
+
+  // Sound Settings
+  sl.registerLazySingleton<SoundSettingsViewModel>(
+    () => SoundSettingsViewModel(),
   );
 }

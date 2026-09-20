@@ -209,28 +209,32 @@ class DictionaryListItem extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
         borderRadius: BorderRadius.circular(30),
         border: Border.all(color: Colors.grey.shade300),
       ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 24,
-        ),
-        title: Text(
-          title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-            fontFamily: 'Poppins',
+      child: Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(30),
+        clipBehavior: Clip.antiAlias,
+        child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 24,
           ),
+          title: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              fontFamily: 'Poppins',
+            ),
+          ),
+          trailing: const Icon(
+            Icons.play_arrow_rounded,
+            color: Color(0xFFFFB800),
+            size: 28,
+          ),
+          onTap: onTap,
         ),
-        trailing: const Icon(
-          Icons.play_arrow_rounded,
-          color: Color(0xFFFFB800),
-          size: 28,
-        ),
-        onTap: onTap,
       ),
     );
   }

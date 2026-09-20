@@ -16,10 +16,10 @@ import 'package:auri_sign/features/profile/presentation/screens/privacy_policy.d
 import 'package:auri_sign/features/profile/presentation/screens/terms_conditions.dart';
 import 'package:auri_sign/features/auth/presentation/screens/welcome page/welcome_page.dart';
 
-// ViewModels
 import 'package:auri_sign/features/auth/viewmodels/user_view_model.dart';
 import '/features/auth/presentation/viewmodels/login_view_model.dart';
 import 'package:auri_sign/features/profile/viewmodels/notification_schedule_view_model.dart';
+import 'package:auri_sign/features/profile/viewmodels/sound_settings_view_model.dart';
 
 // Widgets
 import '/core/widgets/user_stats.dart';
@@ -148,6 +148,7 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final userVM = context.watch<UserViewModel>();
     final notificationVM = context.watch<NotificationScheduleViewModel>();
+    final soundVM = context.watch<SoundSettingsViewModel>();
     final user = userVM.user;
 
     return Scaffold(
@@ -155,7 +156,13 @@ class ProfilePage extends StatelessWidget {
       body: SafeArea(
         child: userVM.isLoading
             ? const Center(child: CircularProgressIndicator())
-            : _buildProfileContent(context, user, userVM, notificationVM),
+            : _buildProfileContent(
+                context,
+                user,
+                userVM,
+                notificationVM,
+                soundVM,
+              ),
       ),
     );
   }
@@ -165,6 +172,7 @@ class ProfilePage extends StatelessWidget {
     dynamic user,
     UserViewModel userVM,
     NotificationScheduleViewModel notificationVM,
+    SoundSettingsViewModel soundVM,
   ) {
     // Logic to get user initials
     String initial = "U";
@@ -282,6 +290,9 @@ class ProfilePage extends StatelessWidget {
             },
           ),
 
+          // Preferences Section
+          const ProfileSectionHeader(title: "Preferences"),
+          
           // Practice Reminder Switch
           ProfileSwitchTile(
             title: "Daily Practice Reminder",
@@ -289,6 +300,25 @@ class ProfilePage extends StatelessWidget {
             value: notificationVM.schedule != null,
             onChanged: (value) =>
                 _onScheduleChanged(context, notificationVM, value),
+            titleStyle: TextStyle(
+              fontSize: 14.sp,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w400,
+            ),
+            subtitleStyle: TextStyle(
+              fontSize: 13.sp,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w400,
+              color: Colors.grey[600],
+            ),
+          ),
+
+          // App Sound Effects Switch
+          ProfileSwitchTile(
+            title: "App Sound Effects",
+            subtitle: "Interactive audio for quizzes & gestures",
+            value: soundVM.isSoundEffectsEnabled,
+            onChanged: (value) => soundVM.setSoundEffectsEnabled(value),
             titleStyle: TextStyle(
               fontSize: 14.sp,
               fontFamily: 'Poppins',

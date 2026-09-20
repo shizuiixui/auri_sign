@@ -227,21 +227,25 @@ class ProfileMenuTile extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
-        color: Colors.white,
         border: Border.all(color: Colors.grey.shade200),
         borderRadius: BorderRadius.circular(30.r),
       ),
-      child: ListTile(
-        contentPadding: EdgeInsets.symmetric(horizontal: 20.w),
-        title: Text(
-          title,
-          style: TextStyle(fontSize: 14.sp, fontFamily: 'Inter'),
+      child: Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(30.r),
+        clipBehavior: Clip.antiAlias,
+        child: ListTile(
+          contentPadding: EdgeInsets.symmetric(horizontal: 20.w),
+          title: Text(
+            title,
+            style: TextStyle(fontSize: 14.sp, fontFamily: 'Inter'),
+          ),
+          trailing: const Icon(
+            Icons.arrow_forward_ios,
+            color: Colors.grey,
+          ),
+          onTap: onTap,
         ),
-        trailing: Icon(
-          Icons.arrow_forward_ios,
-          color: Colors.grey,
-        ),
-        onTap: onTap,
       ),
     );
   }
@@ -291,46 +295,53 @@ class ProfileSwitchTile extends StatelessWidget {
     final responsiveSubtitleSize = isTablet ? 13.sp : 12.sp;
     final responsiveHorizontalPadding = isTablet ? 24.w : 20.w;
     final responsiveVerticalPadding = isTablet ? 8.h : 0.h;
+    final resolvedBorderRadius = borderRadius ?? BorderRadius.circular(30.r);
 
     return Container(
       margin: margin ?? EdgeInsets.only(bottom: isTablet ? 14.h : 12.h),
       decoration: BoxDecoration(
-        color: backgroundColor ?? Colors.white,
         border: Border.all(color: borderColor ?? Colors.grey.shade200),
-        borderRadius: borderRadius ?? BorderRadius.circular(30.r),
+        borderRadius: resolvedBorderRadius,
       ),
-      child: ListTile(
-        contentPadding:
-            contentPadding ??
-            EdgeInsets.symmetric(
-              horizontal: responsiveHorizontalPadding,
-              vertical: responsiveVerticalPadding,
-            ),
-        title: Text(
-          title,
-          style:
-              titleStyle ??
-              TextStyle(fontSize: responsiveTitleSize, fontFamily: 'Inter'),
-        ),
-        subtitle: subtitle == null
-            ? null
-            : Text(
-                subtitle!,
-                style:
-                    subtitleStyle ??
-                    TextStyle(
-                      fontSize: responsiveSubtitleSize,
-                      color: Colors.grey[600],
-                      fontFamily: 'Inter',
-                    ),
+      child: Material(
+        color: backgroundColor ?? Colors.white,
+        borderRadius: resolvedBorderRadius is BorderRadius
+            ? resolvedBorderRadius
+            : BorderRadius.circular(30.r),
+        clipBehavior: Clip.antiAlias,
+        child: ListTile(
+          contentPadding:
+              contentPadding ??
+              EdgeInsets.symmetric(
+                horizontal: responsiveHorizontalPadding,
+                vertical: responsiveVerticalPadding,
               ),
-        trailing: Switch(
-          value: value,
-          onChanged: onChanged,
-          activeColor: switchActiveColor ?? const Color(0xFFFFB800),
-          activeTrackColor: switchActiveTrackColor,
-          inactiveThumbColor: switchInactiveThumbColor,
-          inactiveTrackColor: switchInactiveTrackColor,
+          title: Text(
+            title,
+            style:
+                titleStyle ??
+                TextStyle(fontSize: responsiveTitleSize, fontFamily: 'Inter'),
+          ),
+          subtitle: subtitle == null
+              ? null
+              : Text(
+                  subtitle!,
+                  style:
+                      subtitleStyle ??
+                      TextStyle(
+                        fontSize: responsiveSubtitleSize,
+                        color: Colors.grey[600],
+                        fontFamily: 'Inter',
+                      ),
+                ),
+          trailing: Switch(
+            value: value,
+            onChanged: onChanged,
+            activeThumbColor: switchActiveColor ?? const Color(0xFFFFB800),
+            activeTrackColor: switchActiveTrackColor,
+            inactiveThumbColor: switchInactiveThumbColor,
+            inactiveTrackColor: switchInactiveTrackColor,
+          ),
         ),
       ),
     );

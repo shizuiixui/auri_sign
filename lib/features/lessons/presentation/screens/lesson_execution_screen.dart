@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import 'package:auri_sign/config/api_constants.dart';
 import 'package:auri_sign/features/lessons/presentation/viewmodels/category_view_model.dart';
 import 'package:auri_sign/features/profile/viewmodels/streak_view_model.dart';
+import 'package:auri_sign/features/profile/viewmodels/sound_settings_view_model.dart';
+import 'package:auri_sign/core/utils/webview_audio_helper.dart';
 
 class LessonExecutionScreen extends StatefulWidget {
   final String category;
@@ -110,6 +112,7 @@ class _LessonExecutionScreenState extends State<LessonExecutionScreen> {
                 }
               })();
             """);
+            _applyAudioSetting(webViewController);
           },
           onPageFinished: (url) {
             if (url == 'about:blank') return;
@@ -119,6 +122,7 @@ class _LessonExecutionScreenState extends State<LessonExecutionScreen> {
                 window.location.replace('$targetPath');
               }
             """);
+            _applyAudioSetting(webViewController);
 
             if (mounted) setState(() => _isLoading = false);
           },
@@ -127,6 +131,17 @@ class _LessonExecutionScreenState extends State<LessonExecutionScreen> {
       ..loadRequest(Uri.parse(targetUrl));
 
     if (mounted) setState(() => controller = webViewController);
+  }
+
+  void _applyAudioSetting(WebViewController ctrl) {
+    if (!mounted) return;
+    try {
+      final isSoundEnabled =
+          context.read<SoundSettingsViewModel>().isSoundEffectsEnabled;
+      WebViewAudioHelper.applyAudioSetting(ctrl, isSoundEnabled);
+    } catch (e) {
+      debugPrint("Error applying webview audio setting: $e");
+    }
   }
 
   @override

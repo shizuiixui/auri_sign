@@ -3,6 +3,9 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:auri_sign/config/api_constants.dart';
+import 'package:auri_sign/core/di/injection_container.dart' as di;
+import 'package:auri_sign/core/utils/webview_audio_helper.dart';
+import 'package:auri_sign/features/profile/viewmodels/sound_settings_view_model.dart';
 
 class GestureWebviewScreen extends StatefulWidget {
   final String userToken;
@@ -116,9 +119,11 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
         NavigationDelegate(
           onPageStarted: (String url) {
             _injectCSS(webViewController);
+            _applyAudioSetting(webViewController);
           },
           onPageFinished: (String url) {
             _injectCSS(webViewController);
+            _applyAudioSetting(webViewController);
 
             // Token and Routing Injection
             webViewController.runJavaScript("""
@@ -145,6 +150,17 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
       setState(() {
         controller = webViewController;
       });
+    }
+  }
+
+  void _applyAudioSetting(WebViewController ctrl) {
+    if (!mounted) return;
+    try {
+      final isSoundEnabled =
+          di.sl<SoundSettingsViewModel>().isSoundEffectsEnabled;
+      WebViewAudioHelper.applyAudioSetting(ctrl, isSoundEnabled);
+    } catch (e) {
+      debugPrint("Error applying webview audio setting: $e");
     }
   }
 

@@ -18,6 +18,7 @@ import 'package:auri_sign/features/notifications/presentation/viewmodels/notific
 import '../../features/lessons/presentation/viewmodels/category_view_model.dart';
 import 'package:auri_sign/features/profile/viewmodels/streak_view_model.dart';
 import 'package:auri_sign/features/profile/viewmodels/badges_view_model.dart';
+import 'package:auri_sign/features/profile/viewmodels/sound_settings_view_model.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -57,6 +58,9 @@ void main() async {
         ChangeNotifierProvider(create: (_) => StreakViewModel()),
         ChangeNotifierProvider(create: (_) => BadgesViewModel()),
         ChangeNotifierProvider(create: (_) => ForgotPasswordViewModel()),
+        ChangeNotifierProvider(
+          create: (_) => di.sl<SoundSettingsViewModel>(),
+        ),
       ],
       child: const MyApp(),
     ),
