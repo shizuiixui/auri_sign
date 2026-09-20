@@ -159,9 +159,15 @@ class _CategoryDetailsPageState extends State<CategoryDetailsPage> {
             if (vm.categoryData != null &&
                 vm.categoryData!.lessonProgress.isNotEmpty)
               ...vm.categoryData!.lessonProgress.map((lesson) {
+                final bool isPassed = lesson.score >= 80;
+                final bool isAttempted = lesson.score > 0 || lesson.status == 'completed';
+                final bool needsRetake = isAttempted && !isPassed;
+
                 LessonStatus uiStatus;
-                if (lesson.status == 'completed') {
+                if (isPassed) {
                   uiStatus = LessonStatus.completed;
+                } else if (needsRetake) {
+                  uiStatus = LessonStatus.retake;
                 } else if (lesson.isUnlocked) {
                   uiStatus = LessonStatus.current;
                 } else {
@@ -172,11 +178,11 @@ class _CategoryDetailsPageState extends State<CategoryDetailsPage> {
                   padding: EdgeInsets.only(bottom: 16.h),
                   child: Category(
                     title: lesson.title,
-                    description:
-                        "${lesson.description}\n\nScore: ${lesson.score}%",
+                    description: lesson.description,
                     status: uiStatus,
+                    score: isAttempted ? lesson.score : null,
                     themeColor: _themeColor,
-                    onTap: lesson.isUnlocked
+                    onTap: (lesson.isUnlocked || needsRetake || isPassed)
                         ? () => _navigateToLesson(lesson.lessonId)
                         : () {},
                   ),

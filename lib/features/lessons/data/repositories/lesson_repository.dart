@@ -51,27 +51,26 @@ class LessonRepository {
         final scoreKey = 'lesson_best_score_$userPrefix${lesson.lessonId}';
         final statusKey = 'lesson_is_completed_$userPrefix${lesson.lessonId}';
 
-        final cachedBestScore = prefs.getInt(scoreKey) ?? 0;
+        final cachedBestScore = prefs.getDouble(scoreKey) ??
+            (prefs.getInt(scoreKey)?.toDouble() ?? 0.0);
         final cachedIsCompleted = prefs.getBool(statusKey) ?? false;
 
-        // A lesson is considered completed if the API reports it completed OR if it was previously completed
-        final isCompleted = lesson.status == 'completed' || cachedIsCompleted;
+        // Keep highest score achieved
+        double bestScore = math.max(lesson.score, cachedBestScore);
+        if (lesson.score > cachedBestScore) {
+          await prefs.setDouble(scoreKey, lesson.score);
+        }
 
-        // If currently completed, mark it permanently
-        if (lesson.status == 'completed') {
+        // A lesson is only considered completed if score is >= 80%
+        final isCompleted = bestScore >= 80 || (cachedIsCompleted && bestScore >= 80);
+
+        // If completed with >= 80%, mark it permanently
+        if (isCompleted) {
           await prefs.setBool(statusKey, true);
         }
 
-        // Keep highest score achieved
-        int bestScore = math.max(lesson.score, cachedBestScore);
-        if (lesson.score > cachedBestScore) {
-          await prefs.setInt(scoreKey, lesson.score);
-        }
-
-        // If the lesson was previously completed, never let an abandoned retake
-        // overwrite it with 0% score and uncompleted status!
         final finalStatus = isCompleted ? 'completed' : lesson.status;
-        final finalScore = isCompleted ? bestScore : lesson.score;
+        final finalScore = bestScore;
 
         mergedLessons.add(
           lesson.copyWith(

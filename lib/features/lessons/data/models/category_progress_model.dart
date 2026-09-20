@@ -54,7 +54,7 @@ class LessonProgressItem {
   final String title;
   final String description;
   final String status;
-  final int score;
+  final double score;
   final bool isUnlocked;
 
   LessonProgressItem({
@@ -76,8 +76,8 @@ class LessonProgressItem {
       description: lessonData['description'] ?? 'No description available.',
       status: progressData != null ? progressData['status'] : 'locked',
       score: progressData != null
-          ? (progressData['scorePercentage'] as num?)?.toInt() ?? 0
-          : 0,
+          ? (progressData['scorePercentage'] as num?)?.toDouble() ?? 0.0
+          : 0.0,
       isUnlocked: json['isUnlocked'] ?? false,
     );
   }
@@ -87,7 +87,7 @@ class LessonProgressItem {
     String? title,
     String? description,
     String? status,
-    int? score,
+    double? score,
     bool? isUnlocked,
   }) {
     return LessonProgressItem(
