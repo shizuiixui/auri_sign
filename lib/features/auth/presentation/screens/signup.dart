@@ -304,7 +304,7 @@ class _SignupFormState extends State<SignupForm> {
                         keyboardType: TextInputType.emailAddress,
                         decoration: textInputField(
                           "name@example.com",
-                          prefixIcon: Icons.email_outlined,
+                          prefixIcon: Icons.email,
                         ),
                       ),
                       SizedBox(height: 14.h),
@@ -319,7 +319,7 @@ class _SignupFormState extends State<SignupForm> {
                         decoration:
                             textInputField(
                               "Create a password",
-                              prefixIcon: Icons.lock_outlined,
+                              prefixIcon: Icons.lock,
                             ).copyWith(
                               errorMaxLines: 3,
                               suffixIcon: _buildPasswordVisibilityIcon(
@@ -345,7 +345,7 @@ class _SignupFormState extends State<SignupForm> {
                         decoration:
                             textInputField(
                               "Re-type your password",
-                              prefixIcon: Icons.lock_outlined,
+                              prefixIcon: Icons.lock,
                             ).copyWith(
                               suffixIcon: _buildPasswordVisibilityIcon(
                                 isVisible: confirmInputPassword,

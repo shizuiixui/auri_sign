@@ -87,7 +87,7 @@ class _LoginFormState extends State<LoginForm> {
                   keyboardType: TextInputType.emailAddress,
                   decoration: textInputField(
                     "name@example.com",
-                    prefixIcon: Icons.email_outlined,
+                    prefixIcon: Icons.email,
                   ),
                 ),
                 SizedBox(height: 14.h),
@@ -99,7 +99,7 @@ class _LoginFormState extends State<LoginForm> {
                   decoration:
                       textInputField(
                         "Create a password",
-                        prefixIcon: Icons.lock_outlined,
+                        prefixIcon: Icons.lock,
                       ).copyWith(
                         errorMaxLines: 3,
                         suffixIcon: _buildPasswordVisibilityIcon(

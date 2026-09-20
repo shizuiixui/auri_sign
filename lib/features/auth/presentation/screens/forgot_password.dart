@@ -104,7 +104,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         keyboardType: TextInputType.emailAddress,
                         decoration: textInputField(
                           "Enter your email",
-                          prefixIcon: Icons.email_outlined,
+                          prefixIcon: Icons.email,
                         ),
                       ),
                       SizedBox(height: 60.h),
