@@ -48,40 +48,72 @@ class LessonRepository {
       List<LessonProgressItem> mergedLessons = [];
 
       for (var lesson in progress.lessonProgress) {
-        final scoreKey = 'lesson_best_score_$userPrefix${lesson.lessonId}';
-        final statusKey = 'lesson_is_completed_$userPrefix${lesson.lessonId}';
+        final id = lesson.lessonId.isNotEmpty ? lesson.lessonId : lesson.title;
+        final scoreKey = 'lesson_best_score_$userPrefix$id';
+        final statusKey = 'lesson_is_completed_$userPrefix$id';
+        final legacyScoreKey = 'lesson_best_score_$id';
+        final legacyStatusKey = 'lesson_is_completed_$id';
 
-        final cachedBestScore = prefs.getDouble(scoreKey) ??
-            (prefs.getInt(scoreKey)?.toDouble() ?? 0.0);
-        final cachedIsCompleted = prefs.getBool(statusKey) ?? false;
-
-        // Keep highest score achieved
-        double bestScore = math.max(lesson.score, cachedBestScore);
-        if (lesson.score > cachedBestScore) {
-          await prefs.setDouble(scoreKey, lesson.score);
+        // 1. Safely read cached score (handles both int and double safely)
+        final rawCachedScore = prefs.get(scoreKey) ??
+            (userPrefix.isNotEmpty ? prefs.get(legacyScoreKey) : null);
+        double cachedBestScore = 0.0;
+        if (rawCachedScore is num) {
+          cachedBestScore = rawCachedScore.toDouble();
         }
 
-        // A lesson is only considered completed if score is >= 80%
-        final isCompleted = bestScore >= 80 || (cachedIsCompleted && bestScore >= 80);
+        final cachedIsCompleted = (prefs.getBool(statusKey) ??
+                (userPrefix.isNotEmpty
+                    ? prefs.getBool(legacyStatusKey)
+                    : null)) ??
+            false;
 
-        // If completed with >= 80%, mark it permanently
-        if (isCompleted) {
+        // Take the highest score between server API response and local cache
+        final double bestScore = math.max(lesson.score, cachedBestScore);
+
+        double finalScore = bestScore;
+        String finalStatus = lesson.status;
+
+        if (bestScore >= 80) {
+          finalStatus = 'completed';
+          await prefs.setDouble(scoreKey, bestScore);
           await prefs.setBool(statusKey, true);
+        } else if (bestScore > 0) {
+          finalStatus = (lesson.status == 'completed') ? 'completed' : 'in_progress';
+          await prefs.setDouble(scoreKey, bestScore);
+          await prefs.setBool(statusKey, false);
+        } else if (cachedIsCompleted || lesson.status == 'completed') {
+          finalStatus = 'completed';
         }
-
-        final finalStatus = isCompleted ? 'completed' : lesson.status;
-        final finalScore = bestScore;
 
         mergedLessons.add(
           lesson.copyWith(
             status: finalStatus,
             score: finalScore,
+            isUnlocked: lesson.isUnlocked || bestScore >= 80 || finalStatus == 'completed',
           ),
         );
       }
 
-      final completedCount = mergedLessons.where((l) => l.status == 'completed').length;
-      final isAllCompleted = mergedLessons.isNotEmpty && completedCount >= mergedLessons.length;
+      // Sequential unlock cascade parity with web app:
+      // First lesson is always unlocked; subsequent lessons are unlocked if previous lesson is passed (>= 80%)
+      for (int i = 0; i < mergedLessons.length; i++) {
+        if (i == 0) {
+          mergedLessons[0] = mergedLessons[0].copyWith(isUnlocked: true);
+        } else {
+          final prevLesson = mergedLessons[i - 1];
+          final bool prevPassed = prevLesson.score >= 80 || prevLesson.status == 'completed';
+          if (prevPassed) {
+            mergedLessons[i] = mergedLessons[i].copyWith(isUnlocked: true);
+          }
+        }
+      }
+
+      final completedCount = mergedLessons
+          .where((l) => l.status == 'completed' && l.score >= 80)
+          .length;
+      final isAllCompleted =
+          mergedLessons.isNotEmpty && completedCount >= mergedLessons.length;
 
       return progress.copyWith(
         completedLessons: math.max(progress.completedLessons, completedCount),
