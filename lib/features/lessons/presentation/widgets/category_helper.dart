@@ -89,25 +89,44 @@ class Category extends StatelessWidget {
 
     final bool hasScore = score != null && score! > 0;
 
+    // Web-parity soft red colors for failed/retake (< 80%) lessons
+    const Color failedContainerBg = Color(0xFFFFF6F5);
+    const Color failedContainerBorder = Color(0xFFF3B4AE);
+    const Color failedBadgeBg = Color(0xFFD45D55);
+    const Color failedText = Color(0xFFB23B35);
+    const Color failedIconBg = Color(0xFFFCE8E6);
+    const Color failedIconText = Color(0xFFC85A54);
+
     // Border color and width
     Color borderColor;
     double borderWidth;
-    if (isLocked) {
-      borderColor = activeColor.withValues(alpha: 0.25);
-      borderWidth = 1.0;
-    } else {
+    if (isRetake) {
+      borderColor = failedContainerBorder;
+      borderWidth = 1.2;
+    } else if (isCompleted || isCurrent) {
       borderColor = activeColor.withValues(alpha: 0.7);
       borderWidth = 1.2;
+    } else {
+      borderColor = activeColor.withValues(alpha: 0.25);
+      borderWidth = 1.0;
     }
 
     // Card background color
     Color cardBgColor;
-    if (isLocked) {
-      cardBgColor = Colors.white;
-    } else if (isCompleted || isRetake) {
-      cardBgColor = activeColor.withValues(alpha: 0.04);
+    if (isRetake) {
+      cardBgColor = failedContainerBg;
+    } else if (isCompleted) {
+      cardBgColor = activeColor.withValues(alpha: 0.08);
     } else {
       cardBgColor = Colors.white;
+    }
+
+    // Score badge color
+    Color badgeColor;
+    if (isRetake) {
+      badgeColor = failedBadgeBg;
+    } else {
+      badgeColor = activeColor;
     }
 
     // Action button styling
@@ -130,13 +149,13 @@ class Category extends StatelessWidget {
       actionButton = Container(
         width: 44,
         height: 44,
-        decoration: BoxDecoration(
-          color: activeColor.withValues(alpha: 0.12),
+        decoration: const BoxDecoration(
+          color: failedIconBg,
           shape: BoxShape.circle,
         ),
-        child: Icon(
+        child: const Icon(
           Icons.refresh_rounded,
-          color: activeColor,
+          color: failedIconText,
           size: 22,
         ),
       );
@@ -221,7 +240,7 @@ class Category extends StatelessWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: activeColor,
+                              color: badgeColor,
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Text(
@@ -274,10 +293,10 @@ class Category extends StatelessWidget {
                       const SizedBox(height: 8),
                       Text(
                         "Retake to reach 80% and unlock the next lesson",
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: activeColor,
+                          color: failedText,
                           fontFamily: 'Poppins',
                         ),
                       ),
