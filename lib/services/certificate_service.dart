@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -63,16 +62,12 @@ class CertificateService {
           categoryName.trim().toLowerCase() == 'comprehensive';
 
       final String requestPath = isComprehensive
-          ? '/api/certificates/Comprehensive/'
+          ? '/api/certificates/Comprehensive/pdf'
           : '/api/certificates/${_toEncodedCategory(categoryName)}/pdf';
 
       final String fileSuffix = isComprehensive
           ? 'Comprehensive'
           : _toEncodedCategory(categoryName).replaceAll('%2F', '_');
-
-      debugPrint(
-        '🚨 STEP 1: Sending DOWNLOAD request to $requestPath',
-      );
 
       final tempDir = await getTemporaryDirectory();
       final filePath = '${tempDir.path}/certificate_$fileSuffix.pdf';
@@ -86,8 +81,6 @@ class CertificateService {
         ),
       );
 
-      debugPrint('🚨 STEP 2 SUCCESS. File downloaded to: $filePath');
-
       if (response.statusCode == 200) {
         final result = await OpenFilex.open(filePath);
 
@@ -100,10 +93,6 @@ class CertificateService {
         throw Exception('Failed to download certificate. Please try again.');
       }
     } on DioException catch (e) {
-      debugPrint('🚨 DIO ERROR TRIGGERED!');
-      debugPrint('🚨 ERROR PATH: ${e.requestOptions.path}');
-      debugPrint('🚨 ERROR STATUS: ${e.response?.statusCode}');
-
       final bool isComprehensive =
           categoryName.trim().toLowerCase() == 'comprehensive';
 
@@ -123,8 +112,10 @@ class CertificateService {
         throw Exception('Failed to download certificate: ${e.message}');
       }
     } catch (e) {
-      debugPrint('🚨 GENERAL ERROR: $e');
-      throw Exception('Unexpected error while downloading certificate.');
+      if (e is Exception) {
+        rethrow;
+      }
+      throw Exception('Unexpected error while downloading certificate: $e');
     }
   }
 }

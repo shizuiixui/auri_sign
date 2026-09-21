@@ -178,14 +178,12 @@ class AchievementsViewModel extends ChangeNotifier {
 
     try {
       final apiCategoryName = _toApiCategoryName(categoryId);
-
       await _certificateService.downloadAndOpenCertificate(
         apiCategoryName,
         userID,
       );
     } catch (e) {
       downloadErrorMessage = e.toString().replaceAll('Exception: ', '');
-      debugPrint('Certificate download error: $e');
     } finally {
       downloadingCategoryId = null;
       notifyListeners();
@@ -199,14 +197,12 @@ class AchievementsViewModel extends ChangeNotifier {
 
     try {
       final apiCategoryName = _toApiCategoryName(categoryId);
-
       await _certificateService.downloadAndOpenCertificate(
         apiCategoryName,
         userID,
       );
     } catch (e) {
       downloadErrorMessage = e.toString().replaceAll('Exception: ', '');
-      debugPrint('Certificate preview error: $e');
     } finally {
       previewingCategoryId = null;
       notifyListeners();
