@@ -302,7 +302,9 @@ class GrandMasterCredentialCard extends StatelessWidget {
   final int totalLessons;
   final bool isUnlocked;
   final bool isDownloading;
+  final bool isPreviewing;
   final VoidCallback onDownload;
+  final VoidCallback onPreview;
 
   const GrandMasterCredentialCard({
     super.key,
@@ -312,7 +314,9 @@ class GrandMasterCredentialCard extends StatelessWidget {
     required this.totalLessons,
     required this.isUnlocked,
     required this.isDownloading,
+    this.isPreviewing = false,
     required this.onDownload,
+    required this.onPreview,
   });
 
   @override
@@ -360,23 +364,23 @@ class GrandMasterCredentialCard extends StatelessWidget {
             ),
           ),
           SizedBox(height: 8.h),
+          Text(
+            "Comprehensive Sign Language Proficiency",
+            style: TextStyle(
+              fontSize: 15.sp,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF1E293B),
+              fontFamily: 'Inter',
+            ),
+          ),
+          SizedBox(height: 6.h),
           Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      "Comprehensive Sign Language Proficiency",
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF1E293B),
-                        fontFamily: 'Inter',
-                      ),
-                    ),
-                    SizedBox(height: 4.h),
                     Text(
                       "$completedTracks/$totalTracks Learning Tracks Completed ($completedLessons/$totalLessons Lessons)",
                       style: TextStyle(
@@ -388,7 +392,9 @@ class GrandMasterCredentialCard extends StatelessWidget {
                     ),
                     SizedBox(height: 3.h),
                     Text(
-                      "Complete Alphabets, Numbers, and Phrases to unlock",
+                      isUnlocked
+                          ? "All tracks completed"
+                          : "Complete Alphabets, Numbers, and Phrases to unlock",
                       style: TextStyle(
                         fontSize: 11.5.sp,
                         color: const Color(0xFF64748B),
@@ -399,11 +405,23 @@ class GrandMasterCredentialCard extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 8.w),
-              _CertificateActionButton(
-                text: "Download",
-                isUnlocked: isUnlocked,
-                isLoading: isDownloading,
-                onPressed: onDownload,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (isUnlocked) ...[
+                    _PreviewButton(
+                      isLoading: isPreviewing,
+                      onPressed: onPreview,
+                    ),
+                    SizedBox(width: 6.w),
+                  ],
+                  _CertificateActionButton(
+                    text: "Download",
+                    isUnlocked: isUnlocked,
+                    isLoading: isDownloading,
+                    onPressed: onDownload,
+                  ),
+                ],
               ),
             ],
           ),

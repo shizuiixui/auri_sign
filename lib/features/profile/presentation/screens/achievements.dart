@@ -192,6 +192,41 @@ class _AchievementsPageState extends State<AchievementsPage> {
     }
   }
 
+  Future<void> _handleComprehensivePreview(
+    BuildContext context,
+    AchievementsViewModel viewModel,
+  ) async {
+    if (!viewModel.isComprehensiveEligible) {
+      _showComprehensiveLockDialog(context);
+      return;
+    }
+
+    final userVM = context.read<UserViewModel>();
+    final userId = userVM.user?.id;
+
+    if (userId == null || userId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("User ID not available. Please login again."),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    await viewModel.previewCertificate('comprehensive', userId);
+    if (!context.mounted) return;
+
+    if (viewModel.downloadErrorMessage != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(viewModel.downloadErrorMessage!),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   Future<void> _handleCategoryPreview(
     BuildContext context,
     AchievementsViewModel viewModel,
@@ -311,6 +346,10 @@ class _AchievementsPageState extends State<AchievementsPage> {
                     isUnlocked: viewModel.isComprehensiveEligible,
                     isDownloading:
                         viewModel.isDownloadingCategory('comprehensive'),
+                    isPreviewing:
+                        viewModel.isPreviewingCategory('comprehensive'),
+                    onPreview: () =>
+                        _handleComprehensivePreview(context, viewModel),
                     onDownload: () =>
                         _handleComprehensiveDownload(context, viewModel),
                   ),
