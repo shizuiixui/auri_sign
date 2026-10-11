@@ -88,7 +88,8 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
   Future<void> _initWebView() async {
     await [Permission.camera, Permission.microphone].request();
 
-    const String targetUrl = ApiConstants.gestureWebviewUrl;
+    final String baseTargetUrl = ApiConstants.gestureWebviewUrl;
+    final String targetUrl = "$baseTargetUrl#auth=${widget.userToken}";
 
     late final PlatformWebViewControllerCreationParams params;
     if (WebViewPlatform.instance is AndroidWebViewPlatform) {
@@ -118,19 +119,35 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (String url) {
+            webViewController.runJavaScript("""
+              (function() {
+                const token = '${widget.userToken}';
+                if (token) {
+                  localStorage.setItem('token', token);
+                  localStorage.setItem('auth_token', token);
+                  localStorage.setItem('sessionActivity', JSON.stringify({ token: token, at: Date.now() }));
+                }
+              })();
+            """);
             _injectCSS(webViewController);
             _applyAudioSetting(webViewController);
           },
           onPageFinished: (String url) {
+            if (url == 'about:blank') return;
             _injectCSS(webViewController);
             _applyAudioSetting(webViewController);
 
             // Token and Routing Injection
             webViewController.runJavaScript("""
-              localStorage.setItem('token', '${widget.userToken}');
-              if (window.location.pathname === '/login' || window.location.pathname === '/') {
-                 window.location.href = '/ai_gesture';
-              }
+              (function() {
+                const token = '${widget.userToken}';
+                localStorage.setItem('token', token);
+                localStorage.setItem('auth_token', token);
+                localStorage.setItem('sessionActivity', JSON.stringify({ token: token, at: Date.now() }));
+                if (window.location.pathname.includes('/login') || window.location.pathname === '/') {
+                   window.location.replace('/ai_gesture/mobile');
+                }
+              })();
             """);
 
             if (mounted) {
