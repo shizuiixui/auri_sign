@@ -550,7 +550,7 @@ class _BadgesPageState extends State<BadgesPage> {
         Expanded(
           child: _buildStatCard(
             "Total Points",
-            vm.totalPoints.toInt().toString(),
+            vm.totalPoints.round().toString(),
             Icons.star,
             const Color(0xFF1E74FD),
           ),
