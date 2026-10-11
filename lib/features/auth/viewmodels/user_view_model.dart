@@ -46,6 +46,11 @@ class UserViewModel extends ChangeNotifier {
         }
       } else {
         _errorMessage = "Failed to load user";
+        _user = null;
+        _token = null;
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove('auth_token');
+        await prefs.remove('current_user_id');
       }
     } catch (e) {
       debugPrint("API Error: $e");
