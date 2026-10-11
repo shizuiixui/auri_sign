@@ -144,19 +144,42 @@ class _LessonExecutionScreenState extends State<LessonExecutionScreen> {
     }
   }
 
+  void _handleBackPress() {
+    controller?.runJavaScript("""
+      (function() {
+        const exitBtn = document.querySelector('button[aria-label="Exit or go back from lesson"]')
+          || Array.from(document.querySelectorAll('button')).find(b =>
+              b.innerText && (b.innerText.toLowerCase().includes('exit') || b.innerText.toLowerCase().includes('quit'))
+          );
+        if (exitBtn) {
+          exitBtn.click();
+        } else if (window.history.length > 1) {
+          window.history.back();
+        }
+      })();
+    """);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            if (controller != null) WebViewWidget(controller: controller!),
-            if (_isLoading)
-              const Center(
-                child: CircularProgressIndicator(color: Color(0xFFE9B63B)),
-              ),
-          ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        _handleBackPress();
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: Stack(
+            children: [
+              if (controller != null) WebViewWidget(controller: controller!),
+              if (_isLoading)
+                const Center(
+                  child: CircularProgressIndicator(color: Color(0xFFE9B63B)),
+                ),
+            ],
+          ),
         ),
       ),
     );
