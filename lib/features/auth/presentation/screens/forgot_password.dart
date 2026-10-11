@@ -29,15 +29,25 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   Future<void> _sendResetLink() async {
     if (!_formKey.currentState!.validate()) return;
+    setState(() {
+      _isLoading = true;
+    });
+
     final viewModel = context.read<ForgotPasswordViewModel>();
     final success = await viewModel.requestReset(emailController.text.trim());
 
-    if (success && mounted) {
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (success) {
       _controller.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
-    } else if (!success && mounted) {
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(viewModel.errorMessage ?? "Failed to send reset link."),
@@ -150,16 +160,41 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       ),
                     ),
                     SizedBox(height: 14.h),
+                    Text.rich(
+                      TextSpan(
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontFamily: 'KantumruyPro-Regular',
+                          fontWeight: FontWeight.w400,
+                        ),
+                        children: [
+                          const TextSpan(text: "If an account exists with "),
+                          TextSpan(
+                            text: emailController.text.trim(),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const TextSpan(
+                            text:
+                                ", we've sent a password reset link to that email address.",
+                          ),
+                        ],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 20.h),
                     Text(
-                      "We have sent a password reset link to your email. Please click the link in the email to change your password.",
+                      "The link will expire in 1 hour. Don't forget to check your spam folder.",
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 16.sp,
+                        fontSize: 14.sp,
                         fontFamily: 'KantumruyPro-Regular',
                         fontWeight: FontWeight.w400,
+                        color: Colors.grey[600],
                       ),
                     ),
-                    SizedBox(height: 40.h),
+                    SizedBox(height: 32.h),
                     SizedBox(
                       width: double.infinity,
                       height: 50.h,
