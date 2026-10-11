@@ -186,14 +186,15 @@ class BadgesViewModel extends ChangeNotifier {
       final bId = (b['badgeId'] ?? b['id'] ?? b['_id'] ?? '').toString().toLowerCase().trim();
       final bName = (b['badgeName'] ?? b['name'] ?? '').toString().toLowerCase().trim();
 
-      if (bId.isNotEmpty && (bId == defId || bId.contains(defId) || defId.contains(bId))) {
+      // Exact match on ID or Name
+      if (bId.isNotEmpty && bId == defId) {
         return b;
       }
-      if (bName.isNotEmpty && (bName == defName || bName.contains(defName) || defName.contains(bName))) {
+      if (bName.isNotEmpty && bName == defName) {
         return b;
       }
 
-      // Aliases handling
+      // Track Aliases handling (not streak badges!)
       if (defId == 'certified_alphabet' && (bId.contains('alphabet') || bName.contains('alphabet'))) {
         return b;
       }
@@ -206,7 +207,7 @@ class BadgesViewModel extends ChangeNotifier {
       if (defId == 'first_lesson' && (bId.contains('first') || bName.contains('first'))) {
         return b;
       }
-      if (defId == 'master' && (bId == 'master' || bName.contains('sign language master'))) {
+      if (defId == 'master' && (bId == 'master' || bName == 'sign language master')) {
         return b;
       }
     }
