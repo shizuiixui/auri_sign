@@ -17,135 +17,126 @@ class _AchievementsPageState extends State<AchievementsPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AchievementsViewModel>().fetchAchievements();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final vm = context.read<AchievementsViewModel>();
+      await vm.fetchAchievements();
+      if (mounted && vm.completedTracksCount == 0) {
+        _showNoCertificateDialog(context);
+      }
     });
   }
 
-  void _showComprehensiveLockDialog(BuildContext context) {
+  void _showNoCertificateDialog(BuildContext context, {String? categoryTitle}) {
     showDialog(
       context: context,
-      builder: (dialogCtx) => AlertDialog(
+      builder: (dialogCtx) => Dialog(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.r),
+          borderRadius: BorderRadius.circular(20.r),
         ),
-        contentPadding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
-        title: Center(
-          child: Text(
-            "Grand Master Credential Locked",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18.sp,
-              fontFamily: 'Inter',
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        content: Text(
-          "Complete Alphabets, Numbers, and Phrases to unlock your Comprehensive Sign Language Proficiency certificate.",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: Colors.grey.shade600,
-            fontSize: 13.sp,
-            fontFamily: 'Inter',
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(bottom: 10.h, left: 10.w, right: 10.w),
-            child: SizedBox(
-              width: double.infinity,
-              height: 45.h,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFFB800),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.r),
+        backgroundColor: Colors.white,
+        insetPadding: EdgeInsets.symmetric(horizontal: 24.w),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header with Title and Close 'X' Button
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const SizedBox(width: 24), // Spacer for centering
+                  Expanded(
+                    child: Text(
+                      "No Certificate Available Yet",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 17.sp,
+                        fontFamily: 'Inter',
+                        color: const Color(0xFF1E293B),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                  elevation: 0,
-                ),
-                onPressed: () {
-                  AppRouter.navTabIndex.value = 0;
-                  Navigator.of(dialogCtx).pop();
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  "Go To Lessons",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14.sp,
-                    fontFamily: 'Inter',
+                  GestureDetector(
+                    onTap: () => Navigator.of(dialogCtx).pop(),
+                    child: Icon(
+                      Icons.close,
+                      size: 22.sp,
+                      color: const Color(0xFF94A3B8),
+                    ),
                   ),
-                ),
+                ],
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+              SizedBox(height: 20.h),
 
-  void _showCategoryLockDialog(BuildContext context, String categoryTitle) {
-    showDialog(
-      context: context,
-      builder: (dialogCtx) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.r),
-        ),
-        contentPadding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
-        title: Center(
-          child: Text(
-            "No Certificate Available Yet",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18.sp,
-              fontFamily: 'Inter',
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        content: Text(
-          "You need to finish all lessons in $categoryTitle before downloading a certificate.",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: Colors.grey.shade600,
-            fontSize: 13.sp,
-            fontFamily: 'Inter',
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(bottom: 10.h, left: 10.w, right: 10.w),
-            child: SizedBox(
-              width: double.infinity,
-              height: 45.h,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFFB800),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-                  elevation: 0,
+              // Center Gold Seal Icon
+              Container(
+                width: 64.r,
+                height: 64.r,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF9E6),
+                  shape: BoxShape.circle,
                 ),
-                onPressed: () {
-                  AppRouter.navTabIndex.value = 0;
-                  Navigator.of(dialogCtx).pop();
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  "Go To Lessons",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14.sp,
-                    fontFamily: 'Inter',
+                child: Center(
+                  child: Icon(
+                    Icons.workspace_premium,
+                    size: 38.sp,
+                    color: const Color(0xFFFFB800),
                   ),
                 ),
               ),
-            ),
+              SizedBox(height: 16.h),
+
+              // Message Body
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10.w),
+                child: Text(
+                  categoryTitle != null
+                      ? "You need to finish all lessons in $categoryTitle to unlock this certificate!"
+                      : "You need to complete all lessons in at least one category to unlock your first accredited certificate!",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: const Color(0xFF64748B),
+                    fontSize: 13.5.sp,
+                    fontFamily: 'Inter',
+                    height: 1.4,
+                  ),
+                ),
+              ),
+              SizedBox(height: 24.h),
+
+              // Start Learning Now Button
+              SizedBox(
+                width: double.infinity,
+                height: 48.h,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFFB800),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.r),
+                    ),
+                  ),
+                  onPressed: () {
+                    AppRouter.navTabIndex.value = 0;
+                    Navigator.of(dialogCtx).pop();
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    "Start Learning Now",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15.sp,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -155,7 +146,10 @@ class _AchievementsPageState extends State<AchievementsPage> {
     AchievementsViewModel viewModel,
   ) async {
     if (!viewModel.isComprehensiveEligible) {
-      _showComprehensiveLockDialog(context);
+      _showNoCertificateDialog(
+        context,
+        categoryTitle: "Alphabets, Numbers, and Phrases",
+      );
       return;
     }
 
@@ -197,7 +191,10 @@ class _AchievementsPageState extends State<AchievementsPage> {
     AchievementsViewModel viewModel,
   ) async {
     if (!viewModel.isComprehensiveEligible) {
-      _showComprehensiveLockDialog(context);
+      _showNoCertificateDialog(
+        context,
+        categoryTitle: "Alphabets, Numbers, and Phrases",
+      );
       return;
     }
 
@@ -267,7 +264,7 @@ class _AchievementsPageState extends State<AchievementsPage> {
     bool isCompleted,
   ) async {
     if (!isCompleted) {
-      _showCategoryLockDialog(context, categoryTitle);
+      _showNoCertificateDialog(context, categoryTitle: categoryTitle);
       return;
     }
 
