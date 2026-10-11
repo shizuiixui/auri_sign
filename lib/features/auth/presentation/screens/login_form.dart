@@ -94,11 +94,11 @@ class _LoginFormState extends State<LoginForm> {
                 TextFormField(
                   style: TextStyle(fontSize: 14.sp, fontFamily: 'Inter'),
                   controller: passwordController,
-                  validator: (value) => Validators.validatePassword(value),
+                  validator: (value) => Validators.validateLoginPassword(value),
                   obscureText: obscurePassword,
                   decoration:
                       textInputField(
-                        "Create a password",
+                        "Enter your password",
                         prefixIcon: Icons.lock,
                       ).copyWith(
                         errorMaxLines: 3,
