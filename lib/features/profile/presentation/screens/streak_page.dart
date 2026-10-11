@@ -31,7 +31,7 @@ class _StreakPageState extends State<StreakPage> {
         backgroundColor: const Color(0XFFF8F8F8),
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black, size: 24.sp),
+          icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
