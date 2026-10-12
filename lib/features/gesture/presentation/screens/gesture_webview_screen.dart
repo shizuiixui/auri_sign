@@ -181,6 +181,24 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
     }
   }
 
+  Widget _buildWebViewWidget() {
+    if (controller == null) return const SizedBox.shrink();
+
+    final PlatformWebViewWidgetCreationParams widgetParams;
+    if (WebViewPlatform.instance is AndroidWebViewPlatform) {
+      widgetParams = AndroidWebViewWidgetCreationParams(
+        controller: controller!.platform,
+        displayWithHybridComposition: true,
+      );
+    } else {
+      widgetParams = PlatformWebViewWidgetCreationParams(
+        controller: controller!.platform,
+      );
+    }
+
+    return WebViewWidget.fromPlatformCreationParams(params: widgetParams);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -204,7 +222,7 @@ class _GestureWebviewScreenState extends State<GestureWebviewScreen> {
       ),
       body: Stack(
         children: [
-          if (controller != null) WebViewWidget(controller: controller!),
+          if (controller != null) _buildWebViewWidget(),
 
           // Loading Overlay
           if (controller == null || _isLoading)
