@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -22,12 +23,87 @@ class _VerifyEmailState extends State<VerifyEmail> {
   bool _isLoading = false;
   final SignupViewModel _signupVM = SignupViewModel();
 
+  Timer? _resendTimer;
+  int _counter = 60;
+  bool _isResending = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _startResendTimer();
+  }
+
   @override
   void dispose() {
+    _resendTimer?.cancel();
     for (var controller in _controllers) {
       controller.dispose();
     }
     super.dispose();
+  }
+
+  void _startResendTimer([int seconds = 60]) {
+    _resendTimer?.cancel();
+    setState(() {
+      _counter = seconds;
+    });
+
+    _resendTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      if (_counter > 1) {
+        setState(() {
+          _counter--;
+        });
+      } else {
+        setState(() {
+          _counter = 0;
+        });
+        timer.cancel();
+      }
+    });
+  }
+
+  Future<void> _handleResend() async {
+    if (_counter > 0 || _isResending) return;
+
+    setState(() => _isResending = true);
+
+    try {
+      await _signupVM.resendOTP(email: widget.email);
+      if (!mounted) return;
+
+      final bool isSuccess = _signupVM.errorMessage == null;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            _signupVM.errorMessage ??
+                _signupVM.successMessage ??
+                "OTP resent",
+          ),
+          backgroundColor: isSuccess ? Colors.green : Colors.red,
+        ),
+      );
+
+      if (isSuccess) {
+        _startResendTimer(60);
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isResending = false);
+      }
+    }
   }
 
   void _handleVerify() async {
@@ -168,23 +244,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
               ),
               SizedBox(height: 16.h),
               GestureDetector(
-                onTap: () async {
-                  await _signupVM.resendOTP(email: widget.email);
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          _signupVM.errorMessage ??
-                              _signupVM.successMessage ??
-                              "OTP resent",
-                        ),
-                        backgroundColor: _signupVM.errorMessage != null
-                            ? Colors.red
-                            : Colors.green,
-                      ),
-                    );
-                  }
-                },
+                onTap: (_counter == 0 && !_isResending) ? _handleResend : null,
                 child: Padding(
                   padding: EdgeInsets.all(8.w),
                   child: Text.rich(
@@ -198,15 +258,36 @@ class _VerifyEmailState extends State<VerifyEmail> {
                             fontWeight: FontWeight.w400,
                           ),
                         ),
-                        TextSpan(
-                          text: "Resend",
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFFE9B63B),
+                        if (_isResending)
+                          TextSpan(
+                            text: "Sending...",
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w700,
+                              color: Colors.grey,
+                            ),
+                          )
+                        else if (_counter > 0)
+                          TextSpan(
+                            text: "Resend in ($_counter)",
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w700,
+                              color: Colors.grey,
+                            ),
+                          )
+                        else
+                          TextSpan(
+                            text: "Resend",
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFFE9B63B),
+                            ),
                           ),
-                        ),
                       ],
                     ),
                   ),
