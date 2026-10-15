@@ -29,6 +29,11 @@
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">
 
+        <!-- Disables Impeller on Android to prevent WebView flickering and video blackouts in Release builds -->
+        <meta-data
+            android:name="io.flutter.embedding.android.EnableImpeller"
+            android:value="false" />
+
         <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
         
         <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">

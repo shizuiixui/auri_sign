@@ -104,7 +104,7 @@ class _LessonExecutionScreenState extends State<LessonExecutionScreen> {
 
     webViewController
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(Colors.white)
+      ..setBackgroundColor(const Color(0x00000000))
       ..setUserAgent(
         "Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Mobile Safari/537.36 AuriSignMobile",
       )
