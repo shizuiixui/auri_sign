@@ -106,6 +106,10 @@ class CertificateService {
         );
       } else if (e.response?.statusCode == 401) {
         throw Exception('Session expired. Please login again.');
+      } else if (e.response?.statusCode == 429) {
+        throw Exception(
+          'Too many certificate download requests. Please try again after 15 minutes.',
+        );
       } else if (e.response?.statusCode == 500) {
         throw Exception('Server error while generating certificate PDF.');
       } else {
